@@ -8,7 +8,7 @@ def create_app():
     app = Flask(__name__)
     CORS(app)
 
-    # Configuración de la base de datos (SQLite por defecto)
+    # Configuración de la base de datos
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 

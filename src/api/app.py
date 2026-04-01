@@ -1,33 +1,28 @@
 from flask import Flask
+from flask_migrate import Migrate
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager
-from .models import db
-from .routes_health import health
-from .routes_auth import auth
+from api.models import db
+from api.routes_auth import auth
+from api.routes_health import health
+from api.routes_places import places
+from api.routes_premium import premium
+from api.routes_pois import pois
 
-def create_app():
-    app = Flask(__name__)
-    CORS(app)
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    # Configuración DB
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
+Migrate(app, db)
+CORS(app)
 
-    # Clave JWT
-    app.config['JWT_SECRET_KEY'] = "super-secret-key"
+# Registrar blueprints
+app.register_blueprint(auth, url_prefix="/api")
+app.register_blueprint(health, url_prefix="/api")
+app.register_blueprint(places, url_prefix="/api")
+app.register_blueprint(premium, url_prefix="/api")
+app.register_blueprint(pois, url_prefix="/api")
 
-    # Inicializar extensiones
-    db.init_app(app)
-    JWTManager(app)
-
-    # Registrar blueprints
-    app.register_blueprint(health)
-    app.register_blueprint(auth)
-
-    return app
-
-app = create_app()
-
-# Crear tablas si no existen
-with app.app_context():
-    db.create_all()
+@app.route('/')
+def home():
+    return "Backend funcionando"

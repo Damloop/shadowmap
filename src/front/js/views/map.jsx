@@ -1,10 +1,10 @@
 import React from "react";
+import MapView from "../component/MapView";
 
-const Map = () => {
+export const Map = () => {
     return (
-        <div>
-            <h1>Mapa</h1>
-            <p>Aquí irá el mapa de ShadowMap.</p>
+        <div style={{ height: "100vh", width: "100%" }}>
+            <MapView />
         </div>
     );
 };

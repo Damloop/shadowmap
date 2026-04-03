@@ -39,7 +39,7 @@ const Login = () => {
 
             <div className="login-box">
                 <h2 className="auth-title">Authorization Required</h2>
-                <p className="clearance">LEVEL 4 CLEARANCE NECESSARY</p>
+                {/* <p className="clearance">LEVEL 4 CLEARANCE NECESSARY</p> */}
 
                 <form onSubmit={handleSubmit}>
                     <label>CREDENTIAL EMAIL</label>

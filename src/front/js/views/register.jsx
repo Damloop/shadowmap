@@ -1,119 +1,126 @@
-// src/front/views/register.jsx
-import React, { useState, useContext } from "react";
-import { Context } from "../store/appContext.jsx";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { register } from "../../services/authService";
+import AvatarSelector from "../../components/AvatarSelector";
 import "../../styles/register.css";
 
 const Register = () => {
-    const { actions } = useContext(Context);
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const [form, setForm] = useState({
-        name: "",
-        email: "",
-        password: "",
-        verify: ""
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    avatar: null
+  });
+
+  const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
     });
+  };
 
-    const handleChange = e => {
-        setForm({
-            ...form,
-            [e.target.name]: e.target.value
-        });
-    };
+  const handleAvatarSelect = (id) => {
+    setFormData({
+      ...formData,
+      avatar: id
+    });
+  };
 
-    const handleSubmit = async e => {
-        e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
 
-        if (form.password !== form.verify) {
-            alert("Las claves no coinciden");
-            return;
-        }
+    try {
+      const response = await register({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        avatar: formData.avatar
+      });
 
-        const ok = await actions.register(form.name, form.email, form.password);
+      navigate("/login");
+    } catch (err) {
+      setError(err.message || "Registration failed");
+    }
+  };
 
-        if (ok) navigate("/login");
-        else alert("Error creando usuario");
-    };
-
-    return (
-        <div className="register-container">
-
-            {/* PANEL IZQUIERDO */}
-            <div className="left-panel">
-                <h1 className="shadow-title">ShadowMap</h1>
-
-                <h2 className="section-title">NEW ENTITY ACQUISITION</h2>
-                <p className="description">
-                    Enter the Shadow Archive.<br />
-                    Your presence here is an anomaly.
-                    We require formal indexing to synchronize your spectral coordinates
-                    with the central map.
-                </p>
-
-                <div className="system-info">
-                    <p>SIGNAL STRENGTH: OPTIMAL</p>
-                    <p>ENCRYPTION: END-TO-END SPECTRAL</p>
-                    <p>© 2024 SHADOWMAP GLOBAL SURVEILLANCE.</p>
-                </div>
-            </div>
-
-            {/* PANEL DERECHO */}
-            <div className="right-panel">
-                <form className="register-box" onSubmit={handleSubmit}>
-                    <label>NAME / ALIAS</label>
-                    <input
-                        type="text"
-                        name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        required
-                    />
-
-                    <label>SECURE EMAIL</label>
-                    <input
-                        type="email"
-                        name="email"
-                        value={form.email}
-                        onChange={handleChange}
-                        required
-                    />
-
-                    <label>CIPHER KEY</label>
-                    <input
-                        type="password"
-                        name="password"
-                        value={form.password}
-                        onChange={handleChange}
-                        required
-                    />
-
-                    <label>VERIFY KEY</label>
-                    <input
-                        type="password"
-                        name="verify"
-                        value={form.verify}
-                        onChange={handleChange}
-                        required
-                    />
-
-                    <button type="submit" className="register-btn">
-                        INITIATE ENTRY →
-                    </button>
-
-                    <p className="login-link">
-                        ALREADY INDEXED?{" "}
-                        <span onClick={() => navigate("/login")}>LOG IN</span>
-                    </p>
-
-                    <p className="terms">
-                        BY INITIATING, YOU AGREE TO THE VEL PROTOCOLS AND ARCHIVAL TERMS.
-                    </p>
-                </form>
-            </div>
-
+  return (
+    <div className="register-container">
+      <div className="left-panel">
+        <div className="shadow-title-wrapper">
+          <h1 className="shadow-title">SHADOWMAP</h1>
         </div>
-    );
+
+        <h2 className="section-title">New Entity Acquisition</h2>
+
+        <p className="description">
+          Enter the Shadow Archive. Your presence here is an anomaly.
+          We require formal indexing to synchronize your spectral
+          coordinates with the central map.
+        </p>
+      </div>
+
+      <div className="right-panel">
+        <div className="register-box">
+          <form onSubmit={handleSubmit}>
+            <label>Name / Alias</label>
+            <input
+              type="text"
+              name="name"
+              placeholder="Shadow Operative"
+              value={formData.name}
+              onChange={handleChange}
+            />
+
+            <label>Secure Email</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="user@example.com"
+              value={formData.email}
+              onChange={handleChange}
+            />
+
+            <label>Cipher Key</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={handleChange}
+            />
+
+            <label>Choose Your Avatar</label>
+            <AvatarSelector
+              selected={formData.avatar}
+              onSelect={handleAvatarSelect}
+              disabled={false}
+            />
+
+            {error && <p className="login-error">{error}</p>}
+
+            <button type="submit" className="register-btn">
+              Initiate Entry →
+            </button>
+          </form>
+
+          <div className="login-link">
+            <span onClick={() => navigate("/login")}>
+              Already Indexed? Log In
+            </span>
+          </div>
+
+          <p className="terms">
+            By initiating, you agree to the VEL protocols and archival terms.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Register;

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// ICONOS
+// ICONOS PERSONALIZADOS
 const icons = {
     social: L.icon({ iconUrl: "/img/markers/pink-marker.png", iconSize: [38, 38], iconAnchor: [19, 38] }),
     tech: L.icon({ iconUrl: "/img/markers/blue-marker.png", iconSize: [38, 38], iconAnchor: [19, 38] }),
@@ -18,12 +18,15 @@ const getIconByType = type => icons[type] || icons.main;
 export const MapView = () => {
     const { store, actions } = useContext(Context);
     const mapRef = useRef(null);
+    const markersRef = useRef([]);
     const navigate = useNavigate();
 
+    // Cargar POIs al entrar
     useEffect(() => {
         actions.loadPois();
     }, []);
 
+    // Inicializar mapa solo una vez
     useEffect(() => {
         if (mapRef.current) return;
 
@@ -38,31 +41,43 @@ export const MapView = () => {
         return () => map.remove();
     }, []);
 
+    // Renderizar POIs
     useEffect(() => {
         if (!mapRef.current || !store.pois?.length) return;
 
         const map = mapRef.current;
 
-        // BORRAR SOLO MARKERS
-        map.eachLayer(layer => {
-            if (layer instanceof L.Marker) map.removeLayer(layer);
-        });
+        // LIMPIAR MARKERS ANTERIORES
+        markersRef.current.forEach(m => map.removeLayer(m));
+        markersRef.current = [];
 
-        // AÑADIR MARKERS
+        // AÑADIR NUEVOS MARKERS
         store.pois.forEach(poi => {
             const marker = L.marker([poi.lat, poi.lng], {
                 icon: getIconByType(poi.type)
             }).addTo(map);
 
             marker.bindPopup(`
-                <b>${poi.name}</b><br>
-                <button id="btn-${poi.id}" style="margin-top:5px;">Ver detalles</button>
+                <div style="text-align:center;">
+                    <b>${poi.name}</b><br>
+                    <button class="popup-btn" data-id="${poi.id}" style="
+                        margin-top:6px;
+                        padding:4px 10px;
+                        border:none;
+                        background:#6c2bd9;
+                        color:white;
+                        border-radius:4px;
+                        cursor:pointer;
+                    ">Ver detalles</button>
+                </div>
             `);
 
             marker.on("popupopen", () => {
-                const btn = document.getElementById(`btn-${poi.id}`);
-                if (btn) btn.addEventListener("click", () => navigate(`/place/${poi.id}`));
+                const btn = document.querySelector(`.popup-btn[data-id="${poi.id}"]`);
+                if (btn) btn.onclick = () => navigate(`/place/${poi.id}`);
             });
+
+            markersRef.current.push(marker);
         });
 
     }, [store.pois]);

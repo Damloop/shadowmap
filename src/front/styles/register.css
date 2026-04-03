@@ -1,0 +1,131 @@
+/* src/front/styles/register.css */
+
+.register-container {
+    display: flex;
+    min-height: 100vh;
+    background: #050509;
+    color: #e5e5e5;
+    font-family: 'Orbitron', system-ui, sans-serif;
+}
+
+/* PANEL IZQUIERDO */
+.left-panel {
+    flex: 1;
+    padding: 80px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.shadow-title {
+    font-size: 42px;
+    color: #a855f7;
+    letter-spacing: 4px;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+}
+
+.section-title {
+    font-size: 20px;
+    color: #a855f7;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.description {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #bbb;
+    max-width: 420px;
+}
+
+.system-info {
+    margin-top: 60px;
+    font-size: 12px;
+    color: #777;
+    line-height: 1.6;
+}
+
+/* PANEL DERECHO */
+.right-panel {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.register-box {
+    width: 380px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 40px;
+    border-radius: 8px;
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    backdrop-filter: blur(4px);
+}
+
+.register-box label {
+    font-size: 11px;
+    margin-top: 15px;
+    display: block;
+    color: #a855f7;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.register-box input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    background: #0b0b10;
+    border: 1px solid #333;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.register-box input:focus {
+    outline: none;
+    border-color: #a855f7;
+    box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.4);
+}
+
+.register-btn {
+    width: 100%;
+    margin-top: 25px;
+    padding: 12px;
+    background: #a855f7;
+    border: none;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.register-btn:hover {
+    background: #9333ea;
+}
+
+.login-link {
+    margin-top: 20px;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.login-link span {
+    color: #a855f7;
+    cursor: pointer;
+}
+
+.login-link span:hover {
+    text-decoration: underline;
+}
+
+.terms {
+    margin-top: 20px;
+    font-size: 10px;
+    color: #777;
+    text-transform: uppercase;
+    line-height: 1.4;
+}

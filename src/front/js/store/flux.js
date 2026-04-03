@@ -3,6 +3,8 @@ import places from "./places.js";
 const getState = ({ getStore, getActions, setStore }) => {
   const placesState = places({ getStore, getActions, setStore });
 
+  const API_URL = import.meta.env.VITE_BACKEND_URL; // 🔥 CORRECTO PARA VITE
+
   return {
     store: {
       ...placesState.store,
@@ -18,7 +20,7 @@ const getState = ({ getStore, getActions, setStore }) => {
       // ============================
       register: async ({ name, email, password }) => {
         try {
-          const resp = await fetch(process.env.BACKEND_URL + "/api/register", {
+          const resp = await fetch(`${API_URL}/api/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name, email, password }),
@@ -41,7 +43,7 @@ const getState = ({ getStore, getActions, setStore }) => {
       // ============================
       login: async (email, password) => {
         try {
-          const resp = await fetch(process.env.BACKEND_URL + "/api/login", {
+          const resp = await fetch(`${API_URL}/api/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
@@ -75,7 +77,7 @@ const getState = ({ getStore, getActions, setStore }) => {
         if (!store.token) return;
 
         try {
-          const resp = await fetch(process.env.BACKEND_URL + "/api/auth/me", {
+          const resp = await fetch(`${API_URL}/api/auth/me`, {
             headers: { Authorization: "Bearer " + store.token },
           });
 

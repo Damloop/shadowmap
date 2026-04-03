@@ -1,0 +1,131 @@
+/* src/front/styles/login.css */
+
+.login-container {
+    min-height: 100vh;
+    background: #050509;
+    color: #e5e5e5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 60px;
+    font-family: 'Orbitron', system-ui, sans-serif;
+}
+
+.title {
+    font-size: 48px;
+    color: #a855f7;
+    letter-spacing: 4px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 40px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.login-box {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 40px;
+    width: 380px;
+    border-radius: 8px;
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.8);
+}
+
+.auth-title {
+    font-size: 20px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.clearance {
+    font-size: 12px;
+    color: #a855f7;
+    margin-bottom: 25px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.login-box label {
+    font-size: 11px;
+    margin-top: 15px;
+    display: block;
+    color: #a855f7;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.login-box input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    background: #0b0b10;
+    border: 1px solid #333;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.login-box input:focus {
+    outline: none;
+    border-color: #a855f7;
+    box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.4);
+}
+
+.login-btn {
+    width: 100%;
+    margin-top: 25px;
+    padding: 12px;
+    background: #a855f7;
+    border: none;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.login-btn:hover {
+    background: #9333ea;
+}
+
+.google-btn {
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    background: #18181b;
+    border: 1px solid #444;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.google-btn:hover {
+    background: #27272f;
+}
+
+.links {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.links span {
+    cursor: pointer;
+    color: #a855f7;
+}
+
+.links span:hover {
+    text-decoration: underline;
+}

@@ -1,131 +1,354 @@
-/* src/front/styles/login.css */
+/* ============================================
+   SHADOWMAP — LEVEL 4 AUTH TERMINAL
+   Paranormal Login Interface (FINAL VERSION)
+============================================ */
+
+/* Tipografías futuristas */
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Montserrat+Alternates:wght@600;700&family=Inter+Tight:wght@300;400&display=swap");
+
+/* ============================================
+   CONTENEDOR PRINCIPAL
+============================================ */
 
 .login-container {
-    min-height: 100vh;
-    background: #050509;
-    color: #e5e5e5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 60px;
-    font-family: 'Orbitron', system-ui, sans-serif;
+  min-height: 100vh;
+  background: radial-gradient(
+    circle at 50% 10%,
+    #2a0f4a 0%,
+    #0a0710 40%,
+    #030308 90%
+  );
+  color: #e5e5e5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 70px;
+  position: relative;
+  overflow: hidden;
 }
+
+/* Ruido digital */
+.login-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("/img/noise.svg");
+  opacity: 0.08;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* Glow violeta ambiental */
+.login-container::after {
+  content: "";
+  position: absolute;
+  width: 900px;
+  height: 900px;
+  background: radial-gradient(
+    circle,
+    rgba(168, 85, 247, 0.35),
+    transparent 70%
+  );
+  top: -200px;
+  filter: blur(140px);
+  z-index: 0;
+}
+
+/* Scanlines CRT */
+.login-container::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.03),
+    rgba(255, 255, 255, 0.03) 1px,
+    transparent 2px,
+    transparent 3px
+  );
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  animation: flicker 4s infinite;
+}
+
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 0.05;
+  }
+  50% {
+    opacity: 0.1;
+  }
+}
+
+/* ============================================
+   TÍTULO PRINCIPAL (GLITCH RGB)
+============================================ */
 
 .title {
-    font-size: 48px;
-    color: #a855f7;
-    letter-spacing: 4px;
-    margin-bottom: 5px;
-    text-transform: uppercase;
+  font-family: "Montserrat Alternates", sans-serif;
+  font-size: 58px;
+  color: #c084fc;
+  letter-spacing: 8px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  position: relative;
+  text-shadow:
+    0 0 12px rgba(168, 85, 247, 0.9),
+    0 0 25px rgba(168, 85, 247, 0.6);
+  animation: glitch 2.8s infinite;
 }
+
+/* Doble fantasma RGB */
+.title::before,
+.title::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.title::before {
+  color: #ff00ff;
+  transform: translate(2px, 0);
+  animation: glitch 2.8s infinite;
+}
+
+.title::after {
+  color: #00ffff;
+  transform: translate(-2px, 0);
+  animation: glitch 3.2s infinite;
+}
+
+/* Animación glitch */
+@keyframes glitch {
+  0% {
+    transform: none;
+    opacity: 1;
+  }
+  7% {
+    transform: skew(-0.5deg, -0.9deg);
+    opacity: 0.75;
+  }
+  10% {
+    transform: none;
+    opacity: 1;
+  }
+  13% {
+    transform: skew(0.8deg, -0.1deg);
+    opacity: 0.85;
+  }
+  16% {
+    transform: none;
+    opacity: 1;
+  }
+  18% {
+    transform: skew(-1deg, 0.2deg);
+    opacity: 0.7;
+  }
+  20% {
+    transform: none;
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   SUBTÍTULO
+============================================ */
 
 .subtitle {
-    font-size: 14px;
-    color: #888;
-    margin-bottom: 40px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
+  font-family: "Inter Tight", sans-serif;
+  font-size: 14px;
+  color: #8b5cf6;
+  margin-bottom: 45px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  opacity: 0.85;
+  animation: glitch-soft 3.5s infinite;
 }
+
+@keyframes glitch-soft {
+  0% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 0.65;
+    transform: translateX(1px);
+  }
+  100% {
+    opacity: 0.85;
+  }
+}
+
+/* ============================================
+   LOGIN BOX
+============================================ */
 
 .login-box {
-    background: rgba(255, 255, 255, 0.03);
-    padding: 40px;
-    width: 380px;
-    border-radius: 8px;
-    border: 1px solid rgba(168, 85, 247, 0.4);
-    backdrop-filter: blur(4px);
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.8);
+  background: rgba(10, 10, 15, 0.55);
+  padding: 50px;
+  width: 420px;
+  border-radius: 10px;
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 0 45px rgba(0, 0, 0, 1),
+    0 0 30px rgba(168, 85, 247, 0.3);
+  position: relative;
+  z-index: 2;
 }
 
+/* Línea militar */
+.login-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 15%;
+  width: 70%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #a855f7, transparent);
+}
+
+/* ============================================
+   TEXTOS INTERNOS
+============================================ */
+
 .auth-title {
-    font-size: 20px;
-    margin-bottom: 5px;
-    text-transform: uppercase;
+  font-size: 22px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
 }
 
 .clearance {
-    font-size: 12px;
-    color: #a855f7;
-    margin-bottom: 25px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+  font-size: 12px;
+  color: #a855f7;
+  margin-bottom: 25px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.9;
 }
 
 .login-box label {
-    font-size: 11px;
-    margin-top: 15px;
-    display: block;
-    color: #a855f7;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+  font-size: 11px;
+  margin-top: 18px;
+  display: block;
+  color: #a855f7;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
+/* ============================================
+   INPUTS
+============================================ */
+
 .login-box input {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    background: #0b0b10;
-    border: 1px solid #333;
-    color: #fff;
-    border-radius: 4px;
-    font-size: 13px;
+  width: 100%;
+  padding: 12px;
+  margin-top: 6px;
+  background: #0b0b10;
+  border: 1px solid #2a2a2f;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: 0.2s;
 }
 
 .login-box input:focus {
-    outline: none;
-    border-color: #a855f7;
-    box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.4);
+  outline: none;
+  border-color: #a855f7;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.7);
 }
 
+/* ============================================
+   BOTÓN PRINCIPAL
+============================================ */
+
 .login-btn {
-    width: 100%;
-    margin-top: 25px;
-    padding: 12px;
-    background: #a855f7;
-    border: none;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 4px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  width: 100%;
+  margin-top: 30px;
+  padding: 14px;
+  background: linear-gradient(90deg, #7e22ce, #a855f7);
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  box-shadow: 0 0 18px rgba(168, 85, 247, 0.7);
+  transition: 0.2s;
 }
 
 .login-btn:hover {
-    background: #9333ea;
+  background: linear-gradient(90deg, #6b21a8, #9333ea);
+  box-shadow: 0 0 28px rgba(168, 85, 247, 1);
+  transform: translateY(-1px);
 }
 
+/* ============================================
+   GOOGLE BUTTON
+============================================ */
+
 .google-btn {
-    width: 100%;
-    margin-top: 15px;
-    padding: 12px;
-    background: #18181b;
-    border: 1px solid #444;
-    color: white;
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  width: 100%;
+  margin-top: 18px;
+  padding: 12px;
+  background: #18181b;
+  border: 1px solid #444;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: 0.2s;
 }
 
 .google-btn:hover {
-    background: #27272f;
+  background: #27272f;
 }
 
+/* ============================================
+   LINKS
+============================================ */
+
 .links {
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    text-transform: uppercase;
+  margin-top: 25px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 .links span {
-    cursor: pointer;
-    color: #a855f7;
+  cursor: pointer;
+  color: #a855f7;
+  transition: 0.2s;
 }
 
 .links span:hover {
-    text-decoration: underline;
+  text-decoration: underline;
+  text-shadow: 0 0 6px rgba(168, 85, 247, 0.8);
+}
+
+/* ============================================
+   FOOTER DE SEGURIDAD
+============================================ */
+
+.security-footer {
+  margin-top: 40px;
+  font-size: 10px;
+  color: #6b21a8;
+  letter-spacing: 2px;
+  opacity: 0.6;
+  text-transform: uppercase;
+  text-align: center;
 }

@@ -27,7 +27,7 @@ const PlaceDetails = () => {
         const success = await actions.deletePlace(id);
 
         if (success) {
-            navigate("/");
+            navigate("/map");
         } else {
             alert("Error eliminando el lugar");
         }
@@ -64,7 +64,7 @@ const PlaceDetails = () => {
 
                 <button
                     className="btn btn-secondary ms-3"
-                    onClick={() => navigate("/")}
+                    onClick={() => navigate("/map")}
                 >
                     Volver al mapa
                 </button>
@@ -74,3 +74,4 @@ const PlaceDetails = () => {
 };
 
 export default PlaceDetails;
+    

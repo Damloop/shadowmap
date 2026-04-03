@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// ICONOS PERSONALIZADOS
+// ICONOS PERSONALIZADOS (adaptados a tu estructura real)
 const icons = {
     social: L.icon({ iconUrl: "/img/markers/pink-marker.png", iconSize: [38, 38], iconAnchor: [19, 38] }),
     tech: L.icon({ iconUrl: "/img/markers/blue-marker.png", iconSize: [38, 38], iconAnchor: [19, 38] }),
@@ -21,9 +21,9 @@ export const MapView = () => {
     const markersRef = useRef([]);
     const navigate = useNavigate();
 
-    // Cargar POIs al entrar
+    // Cargar POIs desde el backend
     useEffect(() => {
-        actions.loadPois();
+        actions.loadPois(); // ← aquí conectamos al backend real
     }, []);
 
     // Inicializar mapa solo una vez
@@ -41,7 +41,7 @@ export const MapView = () => {
         return () => map.remove();
     }, []);
 
-    // Renderizar POIs
+    // Renderizar POIs dinámicos
     useEffect(() => {
         if (!mapRef.current || !store.pois?.length) return;
 

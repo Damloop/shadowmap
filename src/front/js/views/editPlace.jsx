@@ -1,11 +1,10 @@
-// src/front/js/views/addPlace.jsx
-
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Context } from "../store/appContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-const AddPlace = () => {
-    const { actions } = useContext(Context);
+const EditPlace = () => {
+    const { store, actions } = useContext(Context);
+    const { id } = useParams();
     const navigate = useNavigate();
 
     const [form, setForm] = useState({
@@ -16,6 +15,29 @@ const AddPlace = () => {
         description: ""
     });
 
+    // ============================
+    // CARGAR DATOS DEL POI
+    // ============================
+    useEffect(() => {
+        actions.loadPlaceById(id);
+    }, [id]);
+
+    // Cuando currentPlace llega del store, rellenamos el formulario
+    useEffect(() => {
+        if (store.currentPlace) {
+            setForm({
+                name: store.currentPlace.name,
+                lat: store.currentPlace.lat,
+                lng: store.currentPlace.lng,
+                type: store.currentPlace.type,
+                description: store.currentPlace.description || ""
+            });
+        }
+    }, [store.currentPlace]);
+
+    // ============================
+    // MANEJO DE FORMULARIO
+    // ============================
     const handleChange = e => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
@@ -23,7 +45,7 @@ const AddPlace = () => {
     const handleSubmit = async e => {
         e.preventDefault();
 
-        const success = await actions.createPlace({
+        const success = await actions.updatePlace(id, {
             name: form.name,
             lat: parseFloat(form.lat),
             lng: parseFloat(form.lng),
@@ -32,15 +54,19 @@ const AddPlace = () => {
         });
 
         if (success) {
-            navigate("/");
+            navigate(`/place/${id}`);
         } else {
-            alert("Error creando el lugar");
+            alert("Error actualizando el lugar");
         }
     };
 
+    if (!store.currentPlace) {
+        return <div className="container mt-4"><h3>Cargando...</h3></div>;
+    }
+
     return (
         <div className="container mt-4">
-            <h2>Agregar Lugar Embrujado</h2>
+            <h2>Editar Lugar</h2>
 
             <form onSubmit={handleSubmit} className="mt-3">
 
@@ -112,11 +138,19 @@ const AddPlace = () => {
                 </div>
 
                 <button type="submit" className="btn btn-primary">
-                    Guardar Lugar
+                    Guardar Cambios
+                </button>
+
+                <button
+                    type="button"
+                    className="btn btn-secondary ms-3"
+                    onClick={() => navigate(`/place/${id}`)}
+                >
+                    Cancelar
                 </button>
             </form>
         </div>
     );
 };
 
-export default AddPlace;
+export default EditPlace;

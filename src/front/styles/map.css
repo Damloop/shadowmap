@@ -1,0 +1,42 @@
+/* ===========================
+   MAPA PRINCIPAL
+=========================== */
+
+.map-view {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+}
+
+/* Oculta el control de zoom por defecto */
+.leaflet-control-zoom {
+    display: none;
+}
+
+/* Popup estilizado */
+.leaflet-popup-content-wrapper {
+    background: #1e1e1e;
+    color: #fff;
+    border-radius: 10px;
+    padding: 10px;
+    border: 1px solid #444;
+}
+
+.leaflet-popup-tip {
+    background: #1e1e1e;
+}
+
+/* Botón dentro del popup */
+.leaflet-popup-content button {
+    background: #6c5ce7;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.leaflet-popup-content button:hover {
+    background: #a29bfe;
+}

@@ -1,101 +1,112 @@
+import places from "./places.js";
+
 const getState = ({ getStore, getActions, setStore }) => {
-  const API_URL = process.env.BACKEND_URL || "http://localhost:3001";
+  const placesState = places({ getStore, getActions, setStore });
 
   return {
     store: {
-      token: sessionStorage.getItem("token") || null,
+      ...placesState.store,
+      token: null,
       user: null,
     },
 
     actions: {
-      // LOGIN REAL
+      ...placesState.actions,
+
+      // ============================
+      // REGISTRO
+      // ============================
+      register: async ({ name, email, password }) => {
+        try {
+          const resp = await fetch(process.env.BACKEND_URL + "/api/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, password }),
+          });
+
+          if (!resp.ok) {
+            console.error("Error en registro:", resp.status);
+            return false;
+          }
+
+          return true;
+        } catch (error) {
+          console.error("Error en register:", error);
+          return false;
+        }
+      },
+
+      // ============================
+      // LOGIN
+      // ============================
       login: async (email, password) => {
         try {
-          const resp = await fetch(`${API_URL}/api/auth/login`, {
+          const resp = await fetch(process.env.BACKEND_URL + "/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),
           });
 
-          if (!resp.ok) throw new Error("Credenciales incorrectas");
+          if (!resp.ok) {
+            console.error("Error en login:", resp.status);
+            return false;
+          }
 
-          const data = await resp.json(); // { token, user }
+          const data = await resp.json();
 
           sessionStorage.setItem("token", data.token);
+          setStore({ token: data.token });
 
-          setStore({
-            token: data.token,
-            user: data.user || null,
-          });
+          const actions = getActions();
+          await actions.getCurrentUser();
 
           return true;
-        } catch (err) {
-          console.error("Error en login:", err);
+        } catch (error) {
+          console.error("Error en login:", error);
           return false;
         }
       },
 
-      // REGISTER REAL
-      register: async (form) => {
-        try {
-          const resp = await fetch(`${API_URL}/api/auth/register`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(form),
-          });
-
-          if (!resp.ok) throw new Error("Error en registro");
-
-          return true;
-        } catch (err) {
-          console.error("Error en register:", err);
-          return false;
-        }
-      },
-
-      // CARGAR TOKEN DESDE SESSION STORAGE
-      syncTokenFromSessionStore: async () => {
-        const token = sessionStorage.getItem("token");
-
-        if (token) {
-          setStore({ token: token });
-          await getActions().getUserData();
-        }
-      },
-
-      // OBTENER DATOS DEL USUARIO LOGUEADO
-      getUserData: async () => {
+      // ============================
+      // CARGAR USUARIO AUTENTICADO
+      // ============================
+      getCurrentUser: async () => {
         const store = getStore();
-
         if (!store.token) return;
 
         try {
-          const resp = await fetch(`${API_URL}/api/auth/me`, {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${store.token}`,
-            },
+          const resp = await fetch(process.env.BACKEND_URL + "/api/auth/me", {
+            headers: { Authorization: "Bearer " + store.token },
           });
 
-          if (!resp.ok) throw new Error("Token inválido");
-
-          const data = await resp.json(); // user info
-
-          setStore({ user: data });
+          if (resp.ok) {
+            const data = await resp.json();
+            setStore({ user: data });
+          }
         } catch (err) {
           console.error("Error cargando usuario:", err);
-          sessionStorage.removeItem("token");
-          setStore({ token: null, user: null });
         }
       },
 
-      // LOGOUT REAL
+      // ============================
+      // SINCRONIZAR TOKEN
+      // ============================
+      syncTokenFromSessionStore: async () => {
+        const token = sessionStorage.getItem("token");
+        if (!token) return;
+
+        setStore({ token });
+
+        const actions = getActions();
+        await actions.getCurrentUser();
+      },
+
+      // ============================
+      // LOGOUT
+      // ============================
       logout: () => {
         sessionStorage.removeItem("token");
-        setStore({
-          token: null,
-          user: null,
-        });
+        setStore({ token: null, user: null });
       },
     },
   };

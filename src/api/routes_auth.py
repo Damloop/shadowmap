@@ -1,101 +1,67 @@
-from flask import Blueprint, request, jsonify
+from flask import request, jsonify
 from api.models import db, User
-import jwt
-import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from api.routes import api   # si tu proyecto usa Blueprint api
 
-auth = Blueprint('auth', __name__)
-SECRET_KEY = "super-secret-key"   # cámbiala si quieres
-
-# -------------------------
+# ============================
 # REGISTRO
-# -------------------------
-@auth.route('/auth/register', methods=['POST'])
+# ============================
+@api.route("/register", methods=["POST"])
 def register():
-    data = request.get_json()
+    data = request.json
 
-    email = data.get("email")
-    password = data.get("password")
+    required = ["name", "email", "password"]
+    for field in required:
+        if field not in data:
+            return jsonify({"error": f"Missing field: {field}"}), 400
 
-    if not email or not password:
-        return jsonify({"error": "Email y password requeridos"}), 400
+    # Comprobar si ya existe
+    user = User.query.filter_by(email=data["email"]).first()
+    if user:
+        return jsonify({"error": "User already exists"}), 400
 
-    user_exists = User.query.filter_by(email=email).first()
-    if user_exists:
-        return jsonify({"error": "El usuario ya existe"}), 400
-
-    hashed = generate_password_hash(password)
-    new_user = User(email=email, password=hashed)
+    new_user = User(
+        name=data["name"],
+        email=data["email"],
+        password=generate_password_hash(data["password"])
+    )
 
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({"message": "Usuario registrado correctamente"}), 201
+    return jsonify({"message": "User created"}), 201
 
 
-# -------------------------
+# ============================
 # LOGIN
-# -------------------------
-@auth.route('/auth/login', methods=['POST'])
+# ============================
+@api.route("/login", methods=["POST"])
 def login():
-    data = request.get_json()
+    data = request.json
 
-    email = data.get("email")
-    password = data.get("password")
+    user = User.query.filter_by(email=data.get("email")).first()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
 
-    user = User.query.filter_by(email=email).first()
+    if not check_password_hash(user.password, data.get("password")):
+        return jsonify({"error": "Invalid password"}), 401
 
-    if not user or not check_password_hash(user.password, password):
-        return jsonify({"error": "Credenciales inválidas"}), 401
+    token = create_access_token(identity=user.id)
 
-    token = jwt.encode({
-        "user_id": user.id,
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=24)
-    }, SECRET_KEY, algorithm="HS256")
-
-    return jsonify({"token": token}), 200
+    return jsonify({ "token": token }), 200
 
 
-# -------------------------
-# VALIDAR TOKEN
-# -------------------------
-def token_required(f):
-    def wrapper(*args, **kwargs):
-        token = None
+# ============================
+# USUARIO AUTENTICADO
+# ============================
+@api.route("/auth/me", methods=["GET"])
+@jwt_required()
+def get_me():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
 
-        if "Authorization" in request.headers:
-            token = request.headers["Authorization"].replace("Bearer ", "")
+    if not user:
+        return jsonify({"error": "User not found"}), 404
 
-        if not token:
-            return jsonify({"error": "Token requerido"}), 401
-
-        try:
-            data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            user = User.query.get(data["user_id"])
-        except:
-            return jsonify({"error": "Token inválido o expirado"}), 401
-
-        return f(user, *args, **kwargs)
-
-    wrapper.__name__ = f.__name__
-    return wrapper
-
-
-# -------------------------
-# RUTA PROTEGIDA
-# -------------------------
-@auth.route('/auth/me', methods=['GET'])
-@token_required
-def me(user):
-    return jsonify({
-        "id": user.id,
-        "email": user.email
-    }), 200
-
-
-# -------------------------
-# ROOT DEL AUTH
-# -------------------------
-@auth.route('/auth', methods=['GET'])
-def auth_root():
-    return jsonify({"message": "Auth funcionando"}), 200
+    return jsonify(user.serialize()), 200

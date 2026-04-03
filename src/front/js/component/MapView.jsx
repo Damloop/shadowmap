@@ -1,97 +1,73 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext, useRef } from "react";
+import { Context } from "../store/appContext";
+import { useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// ICONOS PERSONALIZADOS
-const iconRosa = L.icon({
-  iconUrl: "/img/markers/pink-marker.png",
-  iconSize: [38, 38],
-  iconAnchor: [19, 38],
-  popupAnchor: [0, -38]
-});
-
-const iconAzul = L.icon({
-  iconUrl: "/img/markers/blue-marker.png",
-  iconSize: [38, 38],
-  iconAnchor: [19, 38],
-  popupAnchor: [0, -38]
-});
-
-const iconAmarillo = L.icon({
-  iconUrl: "/img/markers/yellow-marker.png",
-  iconSize: [38, 38],
-  iconAnchor: [19, 38],
-  popupAnchor: [0, -38]
-});
-
-const iconMorado = L.icon({
-  iconUrl: "/img/markers/purple-marker.png",
-  iconSize: [38, 38],
-  iconAnchor: [19, 38],
-  popupAnchor: [0, -38]
-});
-
-const iconBlanco = L.icon({
-  iconUrl: "/img/markers/white-marker.png",
-  iconSize: [38, 38],
-  iconAnchor: [19, 38],
-  popupAnchor: [0, -38]
-});
-
-// FUNCIÓN PARA ASIGNAR ICONO SEGÚN TIPO
-const getIconByType = (type) => {
-  switch (type) {
-    case "social": return iconRosa;
-    case "tech": return iconAzul;
-    case "exploration": return iconAmarillo;
-    case "main": return iconMorado;
-    case "neutral": return iconBlanco;
-    default: return iconMorado;
-  }
+// ICONOS
+const icons = {
+    social: L.icon({ iconUrl: "/img/markers/pink-marker.png", iconSize: [38, 38], iconAnchor: [19, 38] }),
+    tech: L.icon({ iconUrl: "/img/markers/blue-marker.png", iconSize: [38, 38], iconAnchor: [19, 38] }),
+    exploration: L.icon({ iconUrl: "/img/markers/yellow-marker.png", iconSize: [38, 38], iconAnchor: [19, 38] }),
+    main: L.icon({ iconUrl: "/img/markers/purple-marker.png", iconSize: [38, 38], iconAnchor: [19, 38] }),
+    neutral: L.icon({ iconUrl: "/img/markers/white-marker.png", iconSize: [38, 38], iconAnchor: [19, 38] })
 };
 
+const getIconByType = type => icons[type] || icons.main;
+
 export const MapView = () => {
+    const { store, actions } = useContext(Context);
+    const mapRef = useRef(null);
+    const navigate = useNavigate();
 
-  useEffect(() => {
-    // Inicializar mapa
-    const map = L.map("map", {
-      zoomControl: false
-    }).setView([40.4168, -3.7038], 13);
+    useEffect(() => {
+        actions.loadPois();
+    }, []);
 
-    // Capa base
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19
-    }).addTo(map);
+    useEffect(() => {
+        if (mapRef.current) return;
 
-    // EJEMPLO DE POIs
-    const pois = [
-      { name: "Zona Social", lat: 40.4178, lng: -3.7030, type: "social" },
-      { name: "Terminal Tech", lat: 40.4185, lng: -3.7045, type: "tech" },
-      { name: "Punto de Exploración", lat: 40.4192, lng: -3.7055, type: "exploration" },
-      { name: "Base Principal", lat: 40.4200, lng: -3.7060, type: "main" },
-      { name: "Zona Neutral", lat: 40.4210, lng: -3.7070, type: "neutral" }
-    ];
+        const map = L.map("map", { zoomControl: false }).setView([40.4168, -3.7038], 13);
 
-    // Renderizar POIs
-    pois.forEach(poi => {
-      L.marker([poi.lat, poi.lng], {
-        icon: getIconByType(poi.type)
-      })
-      .addTo(map)
-      .bindPopup(`<b>${poi.name}</b>`);
-    });
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19
+        }).addTo(map);
 
-  }, []);
+        mapRef.current = map;
 
-  return (
-    <div
-      id="map"
-      style={{
-        width: "100%",
-        height: "100vh"
-      }}
-    ></div>
-  );
+        return () => map.remove();
+    }, []);
+
+    useEffect(() => {
+        if (!mapRef.current || !store.pois?.length) return;
+
+        const map = mapRef.current;
+
+        // BORRAR SOLO MARKERS
+        map.eachLayer(layer => {
+            if (layer instanceof L.Marker) map.removeLayer(layer);
+        });
+
+        // AÑADIR MARKERS
+        store.pois.forEach(poi => {
+            const marker = L.marker([poi.lat, poi.lng], {
+                icon: getIconByType(poi.type)
+            }).addTo(map);
+
+            marker.bindPopup(`
+                <b>${poi.name}</b><br>
+                <button id="btn-${poi.id}" style="margin-top:5px;">Ver detalles</button>
+            `);
+
+            marker.on("popupopen", () => {
+                const btn = document.getElementById(`btn-${poi.id}`);
+                if (btn) btn.addEventListener("click", () => navigate(`/place/${poi.id}`));
+            });
+        });
+
+    }, [store.pois]);
+
+    return <div id="map" className="map-view"></div>;
 };
 
 export default MapView;

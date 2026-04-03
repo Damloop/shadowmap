@@ -1,0 +1,111 @@
+/* ===========================
+   LAYOUT GENERAL
+=========================== */
+
+.shadowmap-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    background: #0f0f0f;
+    color: #fff;
+    font-family: "Inter", sans-serif;
+}
+
+/* ===========================
+   PANEL LATERAL
+=========================== */
+
+.sidebar {
+    width: 350px;
+    background: #151515;
+    border-right: 1px solid #222;
+    padding: 20px;
+    overflow-y: auto;
+    transition: 0.3s ease;
+}
+
+.sidebar h2 {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    color: #a29bfe;
+}
+
+/* Scrollbar */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 4px;
+}
+
+/* ===========================
+   TARJETAS DE LUGARES
+=========================== */
+
+.place-card {
+    background: #1c1c1c;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: 0.2s ease;
+    cursor: pointer;
+}
+
+.place-card:hover {
+    transform: translateY(-3px);
+    border-color: #6c5ce7;
+}
+
+.place-card h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #fff;
+}
+
+.place-card p {
+    margin: 5px 0 0;
+    color: #bbb;
+}
+
+/* Etiquetas de tipo */
+.tag {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    margin-top: 8px;
+    color: #fff;
+}
+
+.tag-main { background: #6c5ce7; }
+.tag-social { background: #e84393; }
+.tag-tech { background: #0984e3; }
+.tag-exploration { background: #fdcb6e; color: #000; }
+.tag-neutral { background: #dfe6e9; color: #000; }
+
+/* ===========================
+   BOTÓN FLOTANTE "AÑADIR"
+=========================== */
+
+.add-button {
+    position: absolute;
+    bottom: 25px;
+    right: 25px;
+    background: #6c5ce7;
+    color: white;
+    border: none;
+    padding: 14px 18px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    transition: 0.2s ease;
+}
+
+.add-button:hover {
+    background: #a29bfe;
+    transform: scale(1.1);
+}

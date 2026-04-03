@@ -1,0 +1,28 @@
+@import "leaflet/dist/leaflet.css";
+
+/* ===========================
+   RESET GLOBAL
+=========================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0f0f0f;
+  color: #fff;
+  font-family: "Inter", sans-serif;
+  overflow: hidden;
+}
+
+/* Links */
+a {
+  color: #a29bfe;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}

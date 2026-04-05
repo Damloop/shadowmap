@@ -1,34 +1,38 @@
 import React, { useState, useEffect } from "react";
 import getState from "./flux.js";
 
-const Context = React.createContext(null);
+export const Context = React.createContext(null);
 
-const injectContext = PassedComponent => {
-    const StoreWrapper = props => {
-        const [state, setState] = useState(
-            getState({
-                getStore: () => state.store,
-                getActions: () => state.actions,
-                setStore: updatedStore =>
-                    setState({
-                        store: Object.assign(state.store, updatedStore),
-                        actions: { ...state.actions }
-                    })
-            })
-        );
+const StoreWrapper = ({ children }) => {
+    // Inicialización correcta SIN usar state antes de existir
+    const [state, setState] = useState(() => {
+        let initialState = {};
 
-        useEffect(() => {
+        initialState = getState({
+            getStore: () => initialState.store,
+            getActions: () => initialState.actions,
+            setStore: updatedStore =>
+                setState(prevState => ({
+                    store: { ...prevState.store, ...updatedStore },
+                    actions: { ...prevState.actions }
+                }))
+        });
+
+        return initialState;
+    });
+
+    // Cargar token si existe
+    useEffect(() => {
+        if (state.actions && state.actions.syncTokenFromSessionStore) {
             state.actions.syncTokenFromSessionStore();
-        }, []);
+        }
+    }, [state.actions]);
 
-        return (
-            <Context.Provider value={state}>
-                <PassedComponent {...props} />
-            </Context.Provider>
-        );
-    };
-    return StoreWrapper;
+    return (
+        <Context.Provider value={state}>
+            {children}
+        </Context.Provider>
+    );
 };
 
-export { Context };
-export default injectContext;
+export default StoreWrapper;

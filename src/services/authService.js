@@ -1,4 +1,5 @@
-// src/front/services/authService.js
+// src/services/authService.js
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
 export async function register(data) {
@@ -32,7 +33,7 @@ export async function login(data) {
     throw new Error(error.msg || "Credenciales inválidas");
   }
 
-  return res.json(); // aquí esperas { token, user } o similar
+  return res.json();
 }
 
 export async function me(token) {

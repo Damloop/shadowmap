@@ -1,42 +1,46 @@
-/* ===========================
-   MAPA PRINCIPAL
-=========================== */
-
-.map-view {
-    width: 100%;
-    height: 100vh;
-    position: relative;
+.map-page {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
 }
 
-/* Oculta el control de zoom por defecto */
-.leaflet-control-zoom {
-    display: none;
+/* PANEL IZQUIERDO */
+.left-panel {
+  width: 300px;
+  background: rgba(10, 5, 20, 0.95);
+  border-right: 1px solid rgba(180, 120, 255, 0.3);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-/* Popup estilizado */
-.leaflet-popup-content-wrapper {
-    background: #1e1e1e;
-    color: #fff;
-    border-radius: 10px;
-    padding: 10px;
-    border: 1px solid #444;
+.left-title {
+  font-family: "Orbitron", sans-serif;
+  color: #caaaff;
+  text-align: center;
+  margin-bottom: 10px;
 }
 
-.leaflet-popup-tip {
-    background: #1e1e1e;
+.left-subtitle {
+  color: #e8e0ff;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
 }
 
-/* Botón dentro del popup */
-.leaflet-popup-content button {
-    background: #6c5ce7;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.2s;
+.left-text {
+  color: #7a6a9f;
+  font-size: 0.8rem;
 }
 
-.leaflet-popup-content button:hover {
-    background: #a29bfe;
+/* MAPA */
+.map-container {
+  flex: 1;
+  position: relative;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
 }

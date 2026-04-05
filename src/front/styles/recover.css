@@ -1,0 +1,67 @@
+/* SHADOWMAP — RECOVER (ULTRA MINIMAL) */
+
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@300;400;600&display=swap");
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", sans-serif;
+  background: radial-gradient(circle at 20% 30%, #1a1028, #05050a 70%);
+  color: #e8e0ff;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.recover-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+}
+
+.recover-title {
+  font-family: "Orbitron", sans-serif;
+  font-size: 2rem;
+  color: #caaaff;
+}
+
+.recover-input {
+  width: 320px;
+  padding: 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  color: white;
+  margin-bottom: 12px;
+}
+
+.recover-btn {
+  width: 320px;
+  padding: 12px;
+  background: #7f5af0;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  animation: heartbeat 1.8s infinite ease-in-out;
+}
+
+@keyframes heartbeat {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.06); }
+  60% { transform: scale(0.98); }
+  100% { transform: scale(1); }
+}
+
+.recover-return a {
+  color: #b28cff;
+  text-decoration: none;
+}
+
+.recover-return a:hover {
+  text-decoration: underline;
+}

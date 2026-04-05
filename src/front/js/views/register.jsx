@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { register } from "../../services/authService";
+import { register } from "../../../services/authService";
 import AvatarSelector from "../../components/AvatarSelector";
 import "../../styles/register.css";
 
@@ -35,7 +35,7 @@ const Register = () => {
     setError("");
 
     try {
-      const response = await register({
+      await register({
         name: formData.name,
         email: formData.email,
         password: formData.password,
@@ -94,29 +94,19 @@ const Register = () => {
               onChange={handleChange}
             />
 
-            <label>Choose Your Avatar</label>
-            <AvatarSelector
-              selected={formData.avatar}
-              onSelect={handleAvatarSelect}
-              disabled={false}
-            />
+            <label>Avatar</label>
+            <AvatarSelector onSelect={handleAvatarSelect} />
 
-            {error && <p className="login-error">{error}</p>}
+            {error && <p className="error-message">{error}</p>}
 
             <button type="submit" className="register-btn">
-              Initiate Entry →
+              Initiate Entry
             </button>
+
+            <p className="login-link">
+              Already indexed? <span onClick={() => navigate("/login")}>Log in</span>
+            </p>
           </form>
-
-          <div className="login-link">
-            <span onClick={() => navigate("/login")}>
-              Already Indexed? Log In
-            </span>
-          </div>
-
-          <p className="terms">
-            By initiating, you agree to the VEL protocols and archival terms.
-          </p>
         </div>
       </div>
     </div>

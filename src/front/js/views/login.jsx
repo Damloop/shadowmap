@@ -1,4 +1,4 @@
-// src/front/views/login.jsx
+// src/front/js/views/login.jsx
 import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext.jsx";
 import { useNavigate } from "react-router-dom";
@@ -38,8 +38,7 @@ const Login = () => {
             <p className="subtitle">VERIFIED PARANORMAL INTERFACE</p>
 
             <div className="login-box">
-                <h2 className="auth-title">Authorization Required</h2>
-                {/* <p className="clearance">LEVEL 4 CLEARANCE NECESSARY</p> */}
+                <h2 className="auth-title">AUTHORIZATION REQUIRED</h2>
 
                 <form onSubmit={handleSubmit}>
                     <label>CREDENTIAL EMAIL</label>
@@ -48,7 +47,8 @@ const Login = () => {
                         name="email"
                         value={form.email}
                         onChange={handleChange}
-                        placeholder="operator@veiled-archive.org"
+                        placeholder="operator@shadowmap"
+                        className="login-input"
                         required
                     />
 
@@ -58,7 +58,8 @@ const Login = () => {
                         name="password"
                         value={form.password}
                         onChange={handleChange}
-                        placeholder="••••••••••"
+                        placeholder="••••••••"
+                        className="login-input"
                         required
                     />
 
@@ -71,10 +72,14 @@ const Login = () => {
                     CONTINUE WITH GOOGLE
                 </button>
 
-                <div className="links">
-                    <span onClick={() => navigate("/register")}>CREATE ACCOUNT</span>
-                    <span>RECOVER PASSWORD</span>
-                </div>
+                <a href="/register" className="login-link">
+                    CREATE ACCOUNT
+                </a>
+
+                {/* ✔ AHORA FUNCIONA PERFECTAMENTE */}
+                <a href="/recover" className="login-link">
+                    RECOVER PASSWORD
+                </a>
             </div>
         </div>
     );

@@ -1,0 +1,83 @@
+/* SHADOWMAP — SIDEBAR MISTERIOSO */
+
+.sidebar {
+    width: 300px;
+    height: 100vh;
+    background: rgba(10, 5, 20, 0.75);
+    border-right: 1px solid rgba(180, 120, 255, 0.2);
+    backdrop-filter: blur(12px);
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sidebar-title {
+    font-family: "Orbitron", sans-serif;
+    font-size: 1.3rem;
+    color: #caaaff;
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+/* BUSCADOR */
+.sidebar-search input {
+    width: 100%;
+    padding: 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    color: #e8e0ff;
+    font-size: 0.9rem;
+    transition: 0.2s ease;
+}
+
+.sidebar-search input::placeholder {
+    color: rgba(200,180,255,0.4);
+    font-style: italic;
+}
+
+.sidebar-search input:focus {
+    border-color: #7f5af0;
+    outline: none;
+}
+
+/* SELECT */
+.sidebar-filter {
+    width: 100%;
+    padding: 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    color: #e8e0ff;
+    cursor: pointer;
+}
+
+/* LISTA */
+.sidebar-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.sidebar-item {
+    padding: 10px;
+    margin-bottom: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.sidebar-item:hover {
+    background: rgba(127,90,240,0.2);
+    border-color: #7f5af0;
+}
+
+.sidebar-empty {
+    text-align: center;
+    opacity: 0.5;
+    font-size: 0.85rem;
+    margin-top: 20px;
+}

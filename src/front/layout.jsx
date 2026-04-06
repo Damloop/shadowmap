@@ -1,23 +1,26 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Outlet } from "react-router-dom";
 
+// IMPORTS CORRECTOS SEGÚN TU ESTRUCTURA
 import Login from "./js/views/login.jsx";
 import Register from "./js/views/register.jsx";
-import Recover from "./js/views/recover.jsx";
-import Map from "./js/views/map.jsx";
 import Profile from "./js/views/profile.jsx";
 
 const Layout = () => {
-  return (
-    <Routes>
-      <Route element={<Login />} path="/" />
-      <Route element={<Login />} path="/login" />
-      <Route element={<Register />} path="/register" />
-      <Route element={<Recover />} path="/recover" />
-      <Route element={<Map />} path="/map" />
-      <Route element={<Profile />} path="/profile" />
-    </Routes>
-  );
+    return <Outlet />;
 };
 
-export default Layout;
+const App = () => {
+    return (
+        <Routes>
+            <Route element={<Layout />}>
+                <Route path="/" element={<Login />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/profile" element={<Profile />} />
+            </Route>
+        </Routes>
+    );
+};
+
+export default App;

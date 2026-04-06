@@ -3,10 +3,7 @@ from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 
-# IMPORTA TODOS LOS MODELOS AQUÍ
 from src.api.models import db, User, POI, Place
-
-# IMPORTA EL BLUEPRINT PRINCIPAL
 from src.api.routes import api
 
 def create_app():
@@ -25,3 +22,6 @@ def create_app():
     return app
 
 app = create_app()
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=3001, debug=True)

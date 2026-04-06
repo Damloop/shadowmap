@@ -1,192 +1,162 @@
-/* SHADOWMAP REGISTER — MINIMAL PARANORMAL */
+/* ===========================
+   SHADOWMAP — REGISTER CIBERPUNK TENEBROSO
+   Layout izquierda/derecha
+   =========================== */
 
-@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@300;400;600&display=swap");
-
-/* CONTENEDOR GENERAL */
-.register-container {
+.register-wrapper {
   display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px;
+  padding: 40px;
   min-height: 100vh;
-  background: #050509;
-  color: #dcdcdc;
-  font-family: "Inter", sans-serif;
+  background: #03000a;
   position: relative;
   overflow: hidden;
 }
 
-/* Noise */
-.register-container::before {
+/* Vignette oscura */
+.register-wrapper::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: url("/img/noise.svg");
-  opacity: 0.04;
   pointer-events: none;
+  background: radial-gradient(circle, transparent 25%, rgba(0, 0, 0, 0.95) 100%);
 }
 
-/* Glow general */
-.register-container::after {
-  content: "";
-  position: absolute;
-  width: 700px;
-  height: 700px;
-  background: radial-gradient(circle, rgba(140,50,200,0.25), transparent 70%);
-  top: -150px;
-  left: 50%;
-  transform: translateX(-50%);
-  filter: blur(120px);
-  pointer-events: none;
-}
-
-/* PANEL IZQUIERDO */
-.left-panel {
-  flex: 1;
-  padding: 80px 60px;
+/* LEFT SIDE */
+.register-left {
+  width: 40%;
+  max-width: 420px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  z-index: 2;
+  gap: 18px;
 }
 
-/* Glow detrás del título */
-.shadow-title-wrapper {
-  position: relative;
-  display: inline-block;
-}
+/* Fuente gótica */
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap');
 
-.shadow-title-wrapper::before {
-  content: "";
-  position: absolute;
-  width: 260px;
-  height: 260px;
-  background: radial-gradient(circle, rgba(168,85,247,0.35), transparent 70%);
-  top: -40px;
-  left: 50%;
-  transform: translateX(-50%);
-  filter: blur(70px);
-  z-index: -1;
-}
-
-/* TÍTULO PRINCIPAL */
+/* Título grande */
 .shadow-title {
-  font-family: "Orbitron", sans-serif;
-  font-size: 42px;
-  color: #b277ff;
-  letter-spacing: 5px;
+  font-family: "UnifrakturMaguntia", serif;
+  font-size: 3.4rem;
+  color: #c9a8ff;
   text-transform: uppercase;
-  margin-bottom: 35px;
+  letter-spacing: 3px;
+  text-shadow:
+    0 0 35px rgba(150, 80, 255, 0.7),
+    0 0 12px rgba(150, 80, 255, 0.5),
+    0 0 4px rgba(150, 80, 255, 0.3);
 }
 
-/* SUBTÍTULOS */
-.section-title {
-  font-family: "Orbitron", sans-serif;
-  font-size: 18px;
-  color: #a855f7;
-  margin-bottom: 15px;
-  text-transform: uppercase;
+/* Subtítulo */
+.shadow-subtitle {
+  font-size: 1.3rem;
+  color: #9a7ed6;
+  margin-top: -10px;
 }
 
-.description {
-  font-size: 13px;
-  line-height: 1.6;
-  color: #b9b9b9;
+/* Descripción */
+.shadow-description {
+  font-size: 0.95rem;
+  color: #b9a6e8;
+  line-height: 1.5;
+  max-width: 380px;
+}
+
+/* RIGHT SIDE */
+.register-right {
+  width: 40%;
   max-width: 420px;
 }
 
-.system-info {
-  display: none; /* ELIMINADO */
-}
-
-/* PANEL DERECHO */
-.right-panel {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2;
-}
-
-/* REGISTER BOX */
+/* Caja del formulario */
 .register-box {
-  width: 360px;
-  background: rgba(10,10,15,0.45);
-  padding: 40px;
-  border-radius: 6px;
-  border: 1px solid rgba(168,85,247,0.25);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 0 25px #000;
+  background: rgba(12, 5, 25, 0.88);
+  border: 1px solid rgba(150, 80, 255, 0.25);
+  border-radius: 12px;
+  padding: 32px 26px;
+  box-shadow: 0 0 60px rgba(150, 80, 255, 0.25);
+  backdrop-filter: blur(14px);
 }
 
-/* LABELS */
-.register-box label {
-  font-size: 10px;
-  margin-top: 15px;
-  display: block;
-  color: #a855f7;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+/* Formulario */
+.sm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-/* INPUTS */
-.register-box input {
+.sm-label {
+  font-size: 0.85rem;
+  color: #d8caff;
+}
+
+.sm-input {
   width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  background: #0b0b10;
-  border: 1px solid #2a2a2f;
-  color: #fff;
-  border-radius: 4px;
-  font-size: 13px;
+  padding: 12px 14px;
+  background: rgba(22, 15, 40, 0.85);
+  border: 1px solid rgba(150, 80, 255, 0.35);
+  border-radius: 8px;
+  color: #eaeaea;
+  font-size: 0.95rem;
+  transition: 0.25s ease;
 }
 
-.register-box input:focus {
+.sm-input:focus {
   outline: none;
-  border-color: #a855f7;
-  box-shadow: 0 0 8px rgba(168,85,247,0.45);
+  border-color: #c7a2ff;
+  box-shadow: 0 0 14px rgba(150, 80, 255, 0.45);
 }
 
-/* BOTÓN PRINCIPAL */
-.register-btn {
+/* Botón */
+.sm-btn {
   width: 100%;
-  margin-top: 25px;
   padding: 12px;
-  background: #a855f7;
+  margin-top: 6px;
+  background: linear-gradient(135deg, #5a2de0, #3a1a9b);
   border: none;
+  border-radius: 8px;
   color: white;
-  font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
-  border-radius: 4px;
+  transition: 0.25s ease;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  transition: 0.2s;
+  letter-spacing: 1px;
 }
 
-.register-btn:hover {
-  background: #9333ea;
+.sm-btn:hover {
+  background: linear-gradient(135deg, #7a4dff, #4a2ad6);
+  box-shadow: 0 0 22px rgba(150, 80, 255, 0.55);
 }
 
-/* LOGIN LINK */
-.login-link {
-  margin-top: 18px;
-  font-size: 11px;
-  text-transform: uppercase;
+/* Divider */
+.sm-faint-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(150, 80, 255, 0.15);
+  margin: 22px 0;
+}
+
+/* Error */
+.sm-error {
+  background: rgba(255, 60, 60, 0.12);
+  border: 1px solid rgba(255, 60, 60, 0.35);
+  padding: 10px;
+  border-radius: 8px;
+  color: #ff8a8a;
+  font-size: 0.85rem;
   text-align: center;
 }
 
-.login-link span {
-  color: #a855f7;
-  cursor: pointer;
+/* Link */
+.sm-link-muted {
+  color: #bfa2ff;
+  font-size: 0.9rem;
+  text-decoration: none;
 }
 
-.login-link span:hover {
-  text-decoration: underline;
-}
-
-/* TERMS */
-.terms {
-  margin-top: 18px;
-  font-size: 10px;
-  color: #777;
-  text-transform: uppercase;
-  line-height: 1.4;
-  text-align: center;
+.sm-link-muted:hover {
+  color: #e8d9ff;
+  text-shadow: 0 0 8px rgba(150, 80, 255, 0.6);
 }

@@ -1,88 +1,64 @@
-// src/front/js/views/login.jsx
 import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext.jsx";
-import { useNavigate } from "react-router-dom";
 import "../../styles/login.css";
 
 const Login = () => {
-    const { actions } = useContext(Context);
-    const navigate = useNavigate();
+  const { actions } = useContext(Context);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
 
-    const [form, setForm] = useState({
-        email: "",
-        password: ""
-    });
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const ok = await actions.login(email, password);
+    if (!ok) setError("Credenciales incorrectas");
+  };
 
-    const handleChange = e => {
-        setForm({
-            ...form,
-            [e.target.name]: e.target.value
-        });
-    };
+  return (
+    <div className="sm-page">
+      <div className="sm-card">
 
-    const handleSubmit = async e => {
-        e.preventDefault();
+        <h1 className="sm-title">ShadowMap</h1>
+        <p className="sm-card-subtitle">Acceso restringido</p>
 
-        const success = await actions.login(form.email, form.password);
+        {error && <div className="sm-error">{error}</div>}
 
-        if (success) {
-            navigate("/profile");
-        } else {
-            alert("Credenciales incorrectas");
-        }
-    };
+        <form className="sm-form" onSubmit={handleLogin}>
+          <div>
+            <label className="sm-label">Email</label>
+            <input
+              type="email"
+              className="sm-input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-    return (
-        <div className="login-container">
-            <h1 className="title">SHADOWMAP</h1>
-            <p className="subtitle">VERIFIED PARANORMAL INTERFACE</p>
+          <div>
+            <label className="sm-label">Contraseña</label>
+            <input
+              type="password"
+              className="sm-input"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
 
-            <div className="login-box">
-                <h2 className="auth-title">AUTHORIZATION REQUIRED</h2>
+          <button className="sm-btn" type="submit">
+            Entrar
+          </button>
+        </form>
 
-                <form onSubmit={handleSubmit}>
-                    <label>CREDENTIAL EMAIL</label>
-                    <input
-                        type="email"
-                        name="email"
-                        value={form.email}
-                        onChange={handleChange}
-                        placeholder="operator@shadowmap"
-                        className="login-input"
-                        required
-                    />
+        <div className="sm-faint-divider"></div>
 
-                    <label>SECRET PHRASE</label>
-                    <input
-                        type="password"
-                        name="password"
-                        value={form.password}
-                        onChange={handleChange}
-                        placeholder="••••••••"
-                        className="login-input"
-                        required
-                    />
-
-                    <button type="submit" className="login-btn">
-                        EXECUTE LOGIN →
-                    </button>
-                </form>
-
-                <button className="google-btn">
-                    CONTINUE WITH GOOGLE
-                </button>
-
-                <a href="/register" className="login-link">
-                    CREATE ACCOUNT
-                </a>
-
-                {/* ✔ AHORA FUNCIONA PERFECTAMENTE */}
-                <a href="/recover" className="login-link">
-                    RECOVER PASSWORD
-                </a>
-            </div>
-        </div>
-    );
+        <a href="/register" className="sm-link-muted">
+          Crear cuenta
+        </a>
+      </div>
+    </div>
+  );
 };
 
 export default Login;

@@ -1,7 +1,7 @@
 @import "leaflet/dist/leaflet.css";
 
 /* ===========================
-   RESET GLOBAL
+   SHADOWMAP — GLOBAL RESET
 =========================== */
 
 * {
@@ -10,19 +10,257 @@
   box-sizing: border-box;
 }
 
+html,
+body,
+#root,
+#app {
+  height: 100%;
+  width: 100%;
+}
+
+/* ===========================
+   PALETA PARANORMAL
+=========================== */
+
+:root {
+  --sm-bg-main: #0a0a0f;
+  --sm-bg-alt: #11111a;
+  --sm-bg-panel: #1a1a24;
+
+  --sm-primary: #6a4dff;
+  --sm-primary-soft: #8f7bff;
+  --sm-primary-light: #c3b8ff;
+
+  --sm-text-main: #ededed;
+  --sm-text-muted: #9a9ab3;
+
+  --sm-danger: #ff3e6c;
+
+  --sm-border-subtle: rgba(255, 255, 255, 0.06);
+
+  --sm-radius-sm: 6px;
+  --sm-radius-md: 10px;
+  --sm-radius-lg: 18px;
+
+  --sm-transition-fast: 0.18s ease-out;
+  --sm-transition-med: 0.25s ease;
+
+  --sm-shadow-glow: 0 0 18px rgba(106, 77, 255, 0.45);
+}
+
+/* ===========================
+   BODY GLOBAL
+=========================== */
+
 body {
-  background: #0f0f0f;
-  color: #fff;
+  background: radial-gradient(circle at 20% 20%, #1a1a24, #0a0a0f 70%);
+  color: var(--sm-text-main);
   font-family: "Inter", sans-serif;
+  -webkit-font-smoothing: antialiased;
   overflow: hidden;
 }
 
-/* Links */
+/* ===========================
+   TEXTURA PARANORMAL (NOISE)
+=========================== */
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("/noise.svg");
+  background-size: cover;
+  background-repeat: repeat;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ===========================
+   LINKS
+=========================== */
+
 a {
-  color: #a29bfe;
+  color: var(--sm-primary-light);
   text-decoration: none;
+  transition: color var(--sm-transition-fast);
 }
 
 a:hover {
-  text-decoration: underline;
+  color: var(--sm-primary);
+}
+
+/* ===========================
+   GLOBAL PAGE WRAPPER
+=========================== */
+
+.sm-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+/* ===========================
+   GLOBAL CARD
+=========================== */
+
+.sm-card {
+  background: radial-gradient(circle at 0 0, #1a1a24 0, #0a0a0f 60%);
+  border-radius: var(--sm-radius-lg);
+  border: 1px solid var(--sm-border-subtle);
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.7);
+  padding: 32px 28px;
+  max-width: 420px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.sm-card::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(
+    circle at 10% 0,
+    rgba(106, 77, 255, 0.12),
+    transparent 55%
+  );
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* ===========================
+   TITULOS
+=========================== */
+
+.sm-card-title {
+  font-family: "Cinzel", serif;
+  font-size: 1.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--sm-primary-light);
+  text-shadow: 0 0 10px rgba(106, 77, 255, 0.6);
+}
+
+.sm-card-subtitle {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  text-align: center;
+  color: var(--sm-text-muted);
+}
+
+/* ===========================
+   FORMULARIOS
+=========================== */
+
+.sm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.sm-label {
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sm-text-muted);
+}
+
+.sm-input {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--sm-radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 12px;
+  color: var(--sm-text-main);
+  font-size: 0.95rem;
+  outline: none;
+  transition: var(--sm-transition-fast);
+  backdrop-filter: blur(4px);
+}
+
+.sm-input::placeholder {
+  color: rgba(237, 237, 237, 0.35);
+}
+
+.sm-input:focus {
+  border-color: rgba(106, 77, 255, 0.7);
+  box-shadow: 0 0 0 1px rgba(106, 77, 255, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+
+/* ===========================
+   BOTONES
+=========================== */
+
+.sm-btn {
+  border: none;
+  border-radius: var(--sm-radius-sm);
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--sm-transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.sm-btn-primary {
+  background: linear-gradient(135deg, #6a4dff, #8f7bff);
+  color: var(--sm-text-main);
+  box-shadow: 0 0 18px rgba(106, 77, 255, 0.5);
+}
+
+.sm-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 24px rgba(106, 77, 255, 0.7);
+}
+
+.sm-btn-full {
+  width: 100%;
+}
+
+/* ===========================
+   DIVISORES
+=========================== */
+
+.sm-faint-divider {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.12),
+    transparent
+  );
+  margin: 12px 0;
+}
+
+/* ===========================
+   TEXTO CON GLOW
+=========================== */
+
+.sm-glow-text {
+  text-shadow: 0 0 8px rgba(106, 77, 255, 0.5);
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media (max-width: 600px) {
+  .sm-card {
+    padding: 24px 18px;
+    border-radius: 14px;
+  }
+
+  .sm-card-title {
+    font-size: 1.3rem;
+  }
 }

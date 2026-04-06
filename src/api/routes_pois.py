@@ -1,88 +1,90 @@
 # src/api/routes_pois.py
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required
 from src.api.models import db, POI
 
-pois = Blueprint("pois", __name__)
+pois_api = Blueprint("pois_api", __name__)
 
-# ============================
-# GET /api/pois → Lista de POIs
-# ============================
-@pois.route("/pois", methods=["GET"])
-def get_pois():
-    all_pois = POI.query.all()
-    return jsonify([p.serialize() for p in all_pois]), 200
-
-
-# =====================================
-# GET /api/pois/<id> → Detalle de un POI
-# =====================================
-@pois.route("/pois/<int:poi_id>", methods=["GET"])
-def get_poi(poi_id):
-    poi = POI.query.get(poi_id)
-    if not poi:
-        return jsonify({"error": "POI not found"}), 404
-    return jsonify(poi.serialize()), 200
-
-
-# ================================
-# POST /api/pois → Crear un nuevo POI
-# ================================
-@pois.route("/pois", methods=["POST"])
+@pois_api.route("/pois", methods=["POST"])
+@jwt_required()
 def create_poi():
-    data = request.json
+    data = request.get_json()
 
-    required = ["name", "lat", "lng", "type"]
-    for field in required:
-        if field not in data:
-            return jsonify({"error": f"Missing field: {field}"}), 400
+    name = data.get("name")
+    description = data.get("description")
+    lat = data.get("lat")
+    lng = data.get("lng")
+
+    if not name:
+        return jsonify({"message": "El nombre es obligatorio"}), 400
+    if lat is None or lng is None:
+        return jsonify({"message": "Lat y lng son obligatorios"}), 400
 
     new_poi = POI(
-        name=data["name"],
-        lat=data["lat"],
-        lng=data["lng"],
-        type=data["type"],
-        description=data.get("description", "")
+        name=name,
+        description=description,
+        lat=lat,
+        lng=lng
     )
 
     db.session.add(new_poi)
     db.session.commit()
 
-    return jsonify(new_poi.serialize()), 201
+    return jsonify({
+        "message": "POI creado correctamente",
+        "poi": new_poi.serialize()
+    }), 201
 
 
-# ==========================================
-# PUT /api/pois/<id> → Actualizar un POI
-# ==========================================
-@pois.route("/pois/<int:poi_id>", methods=["PUT"])
-def update_poi(poi_id):
+@pois_api.route("/pois", methods=["GET"])
+def get_all_pois():
+    pois = POI.query.all()
+    return jsonify([p.serialize() for p in pois]), 200
+
+
+@pois_api.route("/pois/<int:poi_id>", methods=["GET"])
+def get_one_poi(poi_id):
     poi = POI.query.get(poi_id)
+
     if not poi:
-        return jsonify({"error": "POI not found"}), 404
-
-    data = request.json
-
-    poi.name = data.get("name", poi.name)
-    poi.lat = data.get("lat", poi.lat)
-    poi.lng = data.get("lng", poi.lng)
-    poi.type = data.get("type", poi.type)
-    poi.description = data.get("description", poi.description)
-
-    db.session.commit()
+        return jsonify({"message": "POI no encontrado"}), 404
 
     return jsonify(poi.serialize()), 200
 
 
-# ==========================================
-# DELETE /api/pois/<id> → Eliminar un POI
-# ==========================================
-@pois.route("/pois/<int:poi_id>", methods=["DELETE"])
+@pois_api.route("/pois/<int:poi_id>", methods=["PUT"])
+@jwt_required()
+def update_poi(poi_id):
+    poi = POI.query.get(poi_id)
+
+    if not poi:
+        return jsonify({"message": "POI no encontrado"}), 404
+
+    data = request.get_json()
+
+    poi.name = data.get("name", poi.name)
+    poi.description = data.get("description", poi.description)
+    poi.lat = data.get("lat", poi.lat)
+    poi.lng = data.get("lng", poi.lng)
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "POI actualizado correctamente",
+        "poi": poi.serialize()
+    }), 200
+
+
+@pois_api.route("/pois/<int:poi_id>", methods=["DELETE"])
+@jwt_required()
 def delete_poi(poi_id):
     poi = POI.query.get(poi_id)
+
     if not poi:
-        return jsonify({"error": "POI not found"}), 404
+        return jsonify({"message": "POI no encontrado"}), 404
 
     db.session.delete(poi)
     db.session.commit()
 
-    return jsonify({"message": "POI deleted"}), 200
+    return jsonify({"message": "POI eliminado correctamente"}), 200

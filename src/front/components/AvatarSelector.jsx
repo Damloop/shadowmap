@@ -44,7 +44,15 @@ const AvatarSelector = ({ onSelect }) => {
       <audio ref={audioRef} src="/sounds/glitch.mp3" preload="auto"></audio>
 
       <div className="avatar-carrusel">
-        <button className="flecha flecha-izq" onClick={anterior}>◀</button>
+
+        {/* BOTONES CORREGIDOS */}
+        <button
+          type="button"
+          className="flecha flecha-izq"
+          onClick={anterior}
+        >
+          ◀
+        </button>
 
         <div className={`avatar-mostrado ${glitch ? "glitch" : ""}`}>
           <img
@@ -55,7 +63,13 @@ const AvatarSelector = ({ onSelect }) => {
           />
         </div>
 
-        <button className="flecha flecha-der" onClick={siguiente}>▶</button>
+        <button
+          type="button"
+          className="flecha flecha-der"
+          onClick={siguiente}
+        >
+          ▶
+        </button>
       </div>
 
       <div className="avatar-info">

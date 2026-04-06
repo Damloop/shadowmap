@@ -1,59 +1,70 @@
+# src/api/routes_auth.py
+
 from flask import request, jsonify
-from src.api.models import db, User
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from .routes import api
+from src.api.models import db, User
+from src.api.routes import api
 
-# ============================
-# REGISTRO
-# ============================
+
 @api.route("/register", methods=["POST"])
-def register():
-    data = request.json
+def register_user():
+    data = request.get_json()
 
-    required = ["name", "email", "password"]
-    for field in required:
-        if field not in data:
-            return jsonify({"error": f"Missing field: {field}"}), 400
+    name = data.get("name")
+    email = data.get("email")
+    password = data.get("password")
+    avatar = data.get("avatar")
 
-    user = User.query.filter_by(email=data["email"]).first()
+    if not email or not password:
+        return jsonify({"message": "Email y contraseña son obligatorios"}), 400
+
+    user = User.query.filter_by(email=email).first()
     if user:
-        return jsonify({"error": "User already exists"}), 400
+        return jsonify({"message": "El usuario ya existe"}), 400
+
+    hashed = generate_password_hash(password)
 
     new_user = User(
-        name=data["name"],
-        email=data["email"],
-        password=generate_password_hash(data["password"])
+        name=name,
+        email=email,
+        password=hashed,
+        avatar=avatar
     )
 
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({"message": "User created"}), 201
+    return jsonify({"message": "Usuario registrado correctamente"}), 201
 
 
-# ============================
-# LOGIN
-# ============================
 @api.route("/login", methods=["POST"])
-def login():
-    data = request.json
+def login_user():
+    data = request.get_json()
 
-    user = User.query.filter_by(email=data.get("email")).first()
+    email = data.get("email")
+    password = data.get("password")
+
+    if not email or not password:
+        return jsonify({"message": "Email y contraseña son obligatorios"}), 400
+
+    user = User.query.filter_by(email=email).first()
+
     if not user:
-        return jsonify({"error": "User not found"}), 404
+        return jsonify({"message": "Usuario no encontrado"}), 404
 
-    if not check_password_hash(user.password, data.get("password")):
-        return jsonify({"error": "Invalid password"}), 401
+    if not check_password_hash(user.password, password):
+        return jsonify({"message": "Contraseña incorrecta"}), 401
 
     token = create_access_token(identity=user.id)
 
-    return jsonify({ "token": token }), 200
+    return jsonify({
+        "message": "Login correcto",
+        "token": token,
+        "user": user.serialize()
+    }), 200
 
 
-# ============================
-# USUARIO AUTENTICADO
-# ============================
 @api.route("/auth/me", methods=["GET"])
 @jwt_required()
 def get_me():

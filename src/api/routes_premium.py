@@ -12,21 +12,19 @@ premium_api = Blueprint("premium_api", __name__)
 @premium_api.route("/premium-routes", methods=["POST"])
 @jwt_required()
 def create_premium_route():
+    user_id = get_jwt_identity()
     data = request.get_json()
 
-    name = data.get("name")
+    title = data.get("title")
     description = data.get("description")
-    difficulty = data.get("difficulty")
-    price = data.get("price")
 
-    if not name:
-        return jsonify({"message": "El nombre es obligatorio"}), 400
+    if not title:
+        return jsonify({"message": "El título es obligatorio"}), 400
 
     new_route = PremiumRoute(
-        name=name,
-        description=description,
-        difficulty=difficulty,
-        price=price
+        user_id=user_id,
+        title=title,
+        description=description
     )
 
     db.session.add(new_route)
@@ -73,10 +71,8 @@ def update_premium_route(route_id):
 
     data = request.get_json()
 
-    route.name = data.get("name", route.name)
+    route.title = data.get("title", route.title)
     route.description = data.get("description", route.description)
-    route.difficulty = data.get("difficulty", route.difficulty)
-    route.price = data.get("price", route.price)
 
     db.session.commit()
 

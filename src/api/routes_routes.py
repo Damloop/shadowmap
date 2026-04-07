@@ -7,6 +7,9 @@ from src.api.models import db, Route, RoutePoint
 
 routes_api = Blueprint("routes_api", __name__)
 
+# ============================
+# CREATE ROUTE
+# ============================
 @routes_api.route("/routes", methods=["POST"])
 @jwt_required()
 def create_route():
@@ -34,7 +37,7 @@ def create_route():
         is_shared=False
     )
     db.session.add(route)
-    db.session.flush()
+    db.session.flush()  # Necesario para obtener route.id antes del commit
 
     for idx, p in enumerate(points):
         rp = RoutePoint(
@@ -53,6 +56,9 @@ def create_route():
     }), 201
 
 
+# ============================
+# GET ALL ROUTES (PRIVATE)
+# ============================
 @routes_api.route("/routes", methods=["GET"])
 @jwt_required()
 def get_routes():
@@ -60,12 +66,18 @@ def get_routes():
     return jsonify([r.serialize() for r in routes]), 200
 
 
+# ============================
+# GET SHARED ROUTES (PUBLIC)
+# ============================
 @routes_api.route("/routes/shared", methods=["GET"])
 def get_shared_routes():
     routes = Route.query.filter_by(is_shared=True).order_by(Route.created_at.desc()).all()
     return jsonify([r.serialize() for r in routes]), 200
 
 
+# ============================
+# SHARE ROUTE
+# ============================
 @routes_api.route("/routes/<int:route_id>/share", methods=["POST"])
 @jwt_required()
 def share_route(route_id):

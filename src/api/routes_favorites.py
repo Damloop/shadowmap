@@ -9,8 +9,6 @@ favorites_api = Blueprint("favorites_api", __name__)
 # -----------------------------------
 # ADD FAVORITE
 # -----------------------------------
-
-
 @favorites_api.route("/favorites", methods=["POST"])
 @jwt_required()
 def add_favorite():
@@ -27,7 +25,9 @@ def add_favorite():
         return jsonify({"message": "Lugar no encontrado"}), 404
 
     existing = Favorite.query.filter_by(
-        user_id=user_id, place_id=place_id).first()
+        user_id=user_id, place_id=place_id
+    ).first()
+
     if existing:
         return jsonify({"message": "Ya está en favoritos"}), 409
 
@@ -68,4 +68,4 @@ def delete_favorite(fav_id):
     db.session.delete(fav)
     db.session.commit()
 
-    return jsonify({"message": "Favorito eliminado"}), 200
+    return jsonify({"message": "Eliminado de favoritos"}), 200

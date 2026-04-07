@@ -1,7 +1,12 @@
+# src/api/routes_health.py
+
 from flask import Blueprint, jsonify
 
-health = Blueprint("health", __name__)
+health_api = Blueprint("health_api", __name__)
 
-@health.route("/health", methods=["GET"])
+# ============================
+# HEALTH CHECK
+# ============================
+@health_api.route("/health", methods=["GET"])
 def health_check():
     return jsonify({"status": "ok"}), 200

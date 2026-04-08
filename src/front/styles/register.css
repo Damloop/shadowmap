@@ -1,162 +1,156 @@
-/* ===========================
-   SHADOWMAP — REGISTER CIBERPUNK TENEBROSO
-   Layout izquierda/derecha
-   =========================== */
-
 .register-wrapper {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 60px;
-  padding: 40px;
   min-height: 100vh;
-  background: #03000a;
-  position: relative;
-  overflow: hidden;
+  background: linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 40%, #0d0d0d 100%);
+  color: #f5f5f5;
+  font-family: "Inter", sans-serif;
 }
 
-/* Vignette oscura */
-.register-wrapper::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(circle, transparent 25%, rgba(0, 0, 0, 0.95) 100%);
-}
-
-/* LEFT SIDE */
+/* LADO IZQUIERDO */
 .register-left {
-  width: 40%;
-  max-width: 420px;
+  flex: 1;
+  padding: 4rem 3rem;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  justify-content: center;
+  background: linear-gradient(
+      160deg,
+      rgba(40, 40, 40, 0.4),
+      rgba(0, 0, 0, 0.9)
+    );
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.9);
 }
 
-/* Fuente gótica */
-@import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap');
-
-/* Título grande */
 .shadow-title {
-  font-family: "UnifrakturMaguntia", serif;
-  font-size: 3.4rem;
-  color: #c9a8ff;
+  font-size: 2.8rem;
+  letter-spacing: 0.35em;
+  text-indent: 0.35em;
+  margin-bottom: 1.5rem;
+  color: #eaeaea;
   text-transform: uppercase;
-  letter-spacing: 3px;
-  text-shadow:
-    0 0 35px rgba(150, 80, 255, 0.7),
-    0 0 12px rgba(150, 80, 255, 0.5),
-    0 0 4px rgba(150, 80, 255, 0.3);
 }
 
-/* Subtítulo */
 .shadow-subtitle {
-  font-size: 1.3rem;
-  color: #9a7ed6;
-  margin-top: -10px;
+  font-size: 1.4rem;
+  color: #b8b8b8;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
 }
 
-/* Descripción */
 .shadow-description {
+  max-width: 480px;
+  line-height: 1.6;
   font-size: 0.95rem;
-  color: #b9a6e8;
-  line-height: 1.5;
-  max-width: 380px;
+  color: #cfcfcf;
 }
 
-/* RIGHT SIDE */
+/* LADO DERECHO */
 .register-right {
-  width: 40%;
-  max-width: 420px;
+  flex: 1;
+  padding: 4rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Caja del formulario */
 .register-box {
-  background: rgba(12, 5, 25, 0.88);
-  border: 1px solid rgba(150, 80, 255, 0.25);
-  border-radius: 12px;
-  padding: 32px 26px;
-  box-shadow: 0 0 60px rgba(150, 80, 255, 0.25);
+  width: 100%;
+  max-width: 420px;
+  background: rgba(15, 15, 15, 0.95);
+  border-radius: 18px;
+  padding: 2.5rem 2.25rem;
+  box-shadow:
+    0 0 0 1px rgba(120, 120, 120, 0.25),
+    0 24px 60px rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(14px);
 }
 
-/* Formulario */
+/* FORMULARIO */
 .sm-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0.9rem;
 }
 
 .sm-label {
-  font-size: 0.85rem;
-  color: #d8caff;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #a7a7a7;
 }
 
 .sm-input {
-  width: 100%;
-  padding: 12px 14px;
-  background: rgba(22, 15, 40, 0.85);
-  border: 1px solid rgba(150, 80, 255, 0.35);
-  border-radius: 8px;
-  color: #eaeaea;
-  font-size: 0.95rem;
-  transition: 0.25s ease;
+  margin-top: 0.25rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid rgba(120, 120, 120, 0.6);
+  background: rgba(20, 20, 20, 0.95);
+  color: #f5f5ff;
+  font-size: 0.9rem;
+  outline: none;
 }
 
 .sm-input:focus {
-  outline: none;
-  border-color: #c7a2ff;
-  box-shadow: 0 0 14px rgba(150, 80, 255, 0.45);
+  border-color: #888;
+  box-shadow: 0 0 0 1px rgba(180, 180, 180, 0.4);
 }
 
-/* Botón */
+/* BOTÓN */
 .sm-btn {
+  margin-top: 1.2rem;
   width: 100%;
-  padding: 12px;
-  margin-top: 6px;
-  background: linear-gradient(135deg, #5a2de0, #3a1a9b);
+  padding: 0.85rem 1rem;
+  border-radius: 999px;
   border: none;
-  border-radius: 8px;
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: 0.25s ease;
+  background: linear-gradient(135deg, #444 0%, #222 50%, #111 100%);
+  color: #fdfbff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow:
+    0 0 18px rgba(60, 60, 60, 0.7),
+    0 10px 30px rgba(0, 0, 0, 0.9);
 }
 
 .sm-btn:hover {
-  background: linear-gradient(135deg, #7a4dff, #4a2ad6);
-  box-shadow: 0 0 22px rgba(150, 80, 255, 0.55);
+  filter: brightness(1.1);
 }
 
-/* Divider */
-.sm-faint-divider {
-  width: 100%;
-  height: 1px;
-  background: rgba(150, 80, 255, 0.15);
-  margin: 22px 0;
+/* MENSAJES */
+.sm-error,
+.sm-success {
+  margin-bottom: 0.9rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
 }
 
-/* Error */
 .sm-error {
-  background: rgba(255, 60, 60, 0.12);
-  border: 1px solid rgba(255, 60, 60, 0.35);
-  padding: 10px;
-  border-radius: 8px;
-  color: #ff8a8a;
+  background: rgba(120, 20, 40, 0.9);
+  border: 1px solid rgba(255, 90, 120, 0.7);
+  color: #ffd6e0;
+}
+
+.sm-success {
+  background: rgba(20, 90, 60, 0.9);
+  border: 1px solid rgba(120, 230, 170, 0.7);
+  color: #d6ffef;
+}
+
+/* LINK */
+.sm-link {
+  margin-top: 1.4rem;
   font-size: 0.85rem;
+  color: #b7b7b7;
   text-align: center;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 4px;
 }
 
-/* Link */
-.sm-link-muted {
-  color: #bfa2ff;
-  font-size: 0.9rem;
-  text-decoration: none;
-}
-
-.sm-link-muted:hover {
-  color: #e8d9ff;
-  text-shadow: 0 0 8px rgba(150, 80, 255, 0.6);
+.sm-link:hover {
+  color: #e0e0e0;
 }

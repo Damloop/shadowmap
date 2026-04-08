@@ -1,26 +1,54 @@
-# src/api/utils.py
-
 import secrets
-from flask_mail import Message
-from src.api.extensions import mail
+
+# ============================================================
+#  GENERADOR DE TOKEN DE RECUPERACIÓN
+# ============================================================
 
 def generate_recovery_token(user_id):
+    """
+    Genera un token único basado en user_id + random hex.
+    """
     return f"{user_id}-{secrets.token_hex(16)}"
 
+
+# ============================================================
+#  EMAIL DE RECUPERACIÓN (SIMULADO)
+# ============================================================
+
 def send_recovery_email(email, token):
-    link = f"https://solid-goldfish-xj5599r4x942vrp4-3000.app.github.dev/reset-password/{token}"
+    """
+    Placeholder seguro.
+    Cuando actives Flask-Mail, este método enviará emails reales.
+    """
+    link = f"https://shadowmap.app/reset-password/{token}"
 
-    msg = Message(
-        subject="ShadowMap — Restore Access",
-        recipients=[email],
-        body=f"""
-Your access to ShadowMap requires re-stabilization.
+    print("====================================")
+    print(" EMAIL DE RECUPERACIÓN (SIMULADO) ")
+    print("====================================")
+    print(f"Para: {email}")
+    print(f"Token: {token}")
+    print(f"Enlace: {link}")
+    print("====================================")
+    print("Habilita Flask-Mail para envío real.")
+    print("====================================")
 
-Follow this link to restore your identity:
-{link}
+    return True
 
-If you did not request this, ignore this message.
-"""
-    )
 
-    mail.send(msg)
+# ============================================================
+#  EMAIL GENÉRICO (SIMULADO) — NECESARIO PARA routes_recover
+# ============================================================
+
+def send_email(to, subject, body):
+    """
+    Envío de email simulado (dummy).
+    Compatible con routes_recover.py.
+    """
+    print("====================================")
+    print(" EMAIL SIMULADO ")
+    print("====================================")
+    print(f"Para: {to}")
+    print(f"Asunto: {subject}")
+    print(f"Cuerpo:\n{body}")
+    print("====================================")
+    return True

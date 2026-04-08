@@ -1,6 +1,7 @@
 import React, { useEffect, useContext } from "react";
 import { Context } from "../store/appContext";
 import { useParams, useNavigate } from "react-router-dom";
+import "../../styles/placeDetails.css";
 
 const PlaceDetails = () => {
     const { store, actions } = useContext(Context);
@@ -15,8 +16,10 @@ const PlaceDetails = () => {
 
     if (!place) {
         return (
-            <div className="container mt-4">
-                <h3>Cargando...</h3>
+            <div className="place-details-wrapper">
+                <div className="place-details-card">
+                    <h3>Cargando...</h3>
+                </div>
             </div>
         );
     }
@@ -34,44 +37,47 @@ const PlaceDetails = () => {
     };
 
     return (
-        <div className="container mt-4 text-light">
-            <h2>{place.name}</h2>
+        <div className="place-details-wrapper">
+            <div className="place-details-card">
 
-            <span className={`tag tag-${place.type}`}>{place.type}</span>
+                <h2>{place.name}</h2>
 
-            <p className="mt-3">{place.description}</p>
+                <span className={`tag tag-${place.type}`}>{place.type}</span>
 
-            <div className="mt-3">
-                <strong>Lat:</strong> {place.lat}  
-                <br />
-                <strong>Lng:</strong> {place.lng}
-            </div>
+                <p className="mt-3">{place.description}</p>
 
-            <div className="mt-4">
-                <button
-                    className="btn btn-warning me-3"
-                    onClick={() => navigate(`/edit-place/${id}`)}
-                >
-                    Editar
-                </button>
+                <div className="place-coords">
+                    <strong>Lat:</strong> {place.lat}  
+                    <br />
+                    <strong>Lng:</strong> {place.lng}
+                </div>
 
-                <button
-                    className="btn btn-danger"
-                    onClick={handleDelete}
-                >
-                    Eliminar
-                </button>
+                <div className="place-details-buttons">
+                    <button
+                        className="btn btn-warning"
+                        onClick={() => navigate(`/edit-place/${id}`)}
+                    >
+                        Editar
+                    </button>
 
-                <button
-                    className="btn btn-secondary ms-3"
-                    onClick={() => navigate("/map")}
-                >
-                    Volver al mapa
-                </button>
+                    <button
+                        className="btn btn-danger"
+                        onClick={handleDelete}
+                    >
+                        Eliminar
+                    </button>
+
+                    <button
+                        className="btn btn-secondary"
+                        onClick={() => navigate("/map")}
+                    >
+                        Volver al mapa
+                    </button>
+                </div>
+
             </div>
         </div>
     );
 };
 
 export default PlaceDetails;
-    

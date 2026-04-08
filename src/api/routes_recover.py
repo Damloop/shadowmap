@@ -2,11 +2,12 @@
 
 from flask import Blueprint, request, jsonify
 from src.api.models import db, User
-from src.utils import send_email
+from src.api.utils import send_email
 import secrets
 import os
 
 recover_bp = Blueprint("recover_bp", __name__)
+
 
 @recover_bp.route("/recover", methods=["POST"])
 def recover():
@@ -26,7 +27,7 @@ def recover():
     # Token seguro
     token = secrets.token_urlsafe(32)
 
-    # Guardar token
+    # Guardar token (el modelo debe tener recovery_token)
     user.recovery_token = token
     db.session.commit()
 
@@ -60,3 +61,16 @@ def recover():
     )
 
     return jsonify({"success": True}), 200
+
+def send_email(to, subject, body):
+    """
+    Envío de email simulado (dummy).
+    """
+    print("====================================")
+    print(" EMAIL SIMULADO ")
+    print("====================================")
+    print(f"Para: {to}")
+    print(f"Asunto: {subject}")
+    print(f"Cuerpo:\n{body}")
+    print("====================================")
+    return True

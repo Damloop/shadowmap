@@ -1,5 +1,9 @@
-from app import app
-from models import db, POI
+# scripts/seed_pois.py
+
+from src.api.app import create_app
+from src.api.models import db, POI
+
+app = create_app()
 
 with app.app_context():
     pois = [

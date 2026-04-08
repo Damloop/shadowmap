@@ -1,9 +1,15 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import StoreWrapper from "./js/store/appContext";
 import Layout from "./layout.jsx";
 
-// Importa el CSS global
-import "./styles/index.css";
+const root = ReactDOM.createRoot(document.getElementById("app"));
 
-const root = ReactDOM.createRoot(document.querySelector("#app"));
-root.render(<Layout />);
+root.render(
+  <StoreWrapper>
+    <BrowserRouter>
+      <Layout />
+    </BrowserRouter>
+  </StoreWrapper>,
+);

@@ -1,18 +1,19 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { avatarData } from "../data/avatarData";
 import "../styles/avatarSelector.css";
 
-const AvatarSelector = ({ onSelect }) => {
+const AvatarSelector = ({ onSelect, selected }) => {
   const [index, setIndex] = useState(0);
   const [glitch, setGlitch] = useState(false);
-  const audioRef = useRef(null);
 
-  const reproducirGlitch = () => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play();
+  useEffect(() => {
+    if (selected) {
+      const foundIndex = avatarData.findIndex(a => a.id === selected);
+      if (foundIndex !== -1) {
+        setIndex(foundIndex);
+      }
     }
-  };
+  }, [selected]);
 
   const activarGlitch = () => {
     setGlitch(true);
@@ -21,7 +22,6 @@ const AvatarSelector = ({ onSelect }) => {
 
   const siguiente = () => {
     activarGlitch();
-    reproducirGlitch();
     const nuevo = (index + 1) % avatarData.length;
     setIndex(nuevo);
     onSelect(avatarData[nuevo].id);
@@ -29,7 +29,6 @@ const AvatarSelector = ({ onSelect }) => {
 
   const anterior = () => {
     activarGlitch();
-    reproducirGlitch();
     const nuevo = (index - 1 + avatarData.length) % avatarData.length;
     setIndex(nuevo);
     onSelect(avatarData[nuevo].id);
@@ -40,17 +39,8 @@ const AvatarSelector = ({ onSelect }) => {
   return (
     <div className="avatar-carrusel-wrapper">
 
-      {/* Sonido glitch */}
-      <audio ref={audioRef} src="/sounds/glitch.mp3" preload="auto"></audio>
-
       <div className="avatar-carrusel">
-
-        {/* BOTONES CORREGIDOS */}
-        <button
-          type="button"
-          className="flecha flecha-izq"
-          onClick={anterior}
-        >
+        <button type="button" className="flecha flecha-izq" onClick={anterior}>
           ◀
         </button>
 
@@ -59,26 +49,20 @@ const AvatarSelector = ({ onSelect }) => {
             src={avatar.src}
             alt={avatar.nombre}
             className="avatar-imagen"
-            onError={(e) => (e.target.src = "/avatar/default.png")}
+            onError={e => (e.target.src = "/avatar/default.png")}
           />
         </div>
 
-        <button
-          type="button"
-          className="flecha flecha-der"
-          onClick={siguiente}
-        >
+        <button type="button" className="flecha flecha-der" onClick={siguiente}>
           ▶
         </button>
       </div>
 
       <div className="avatar-info">
         <h3>{avatar.nombre}</h3>
-        <p>{avatar.descripcion}</p>
         <p><strong>Fortaleza:</strong> {avatar.fortaleza}</p>
         <p><strong>Debilidad:</strong> {avatar.debilidad}</p>
       </div>
-
     </div>
   );
 };

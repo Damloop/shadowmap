@@ -3,19 +3,18 @@
 import places from "./places.js";
 
 const getState = ({ getStore, getActions, setStore }) => {
-    const placesState = places({ getStore, getActions, setStore });
-    const API_URL = import.meta.env.VITE_BACKEND_URL;
+
+    const API_URL = "https://solid-goldfish-xj5599r4x942vrp4-3001.app.github.dev";
+
+    const placesState = places({ getStore, getActions, setStore, API_URL });
 
     return {
         store: {
-            // POIs
             ...placesState.store,
 
-            // Auth
             token: null,
             user: null,
 
-            // Rutas
             selectedPoints: [],
             markerColor: "blue",
             routes: [],
@@ -24,20 +23,81 @@ const getState = ({ getStore, getActions, setStore }) => {
         },
 
         actions: {
-            // Acciones de POIs
             ...placesState.actions,
 
             // ---------------------------
-            // AUTH
+            // REGISTER
             // ---------------------------
-            syncTokenFromSessionStore: async () => {
-                const token = sessionStorage.getItem("token");
-                if (!token) return;
+            register: async (email, password, username, avatar) => {
+                try {
+                    const resp = await fetch(`${API_URL}/api/register`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            email,
+                            password,
+                            username,
+                            avatar
+                        })
+                    });
 
-                setStore({ ...getStore(), token });
-                await getActions().getCurrentUser();
+                    if (!resp.ok) {
+                        const error = await resp.json().catch(() => null);
+                        return {
+                            success: false,
+                            message: error?.msg || "No se pudo crear el usuario"
+                        };
+                    }
+
+                    const data = await resp.json();
+
+                    return {
+                        success: true,
+                        message: data.msg || "Especialista tenebroso creado"
+                    };
+
+                } catch (err) {
+                    console.error("Error en registro:", err);
+                    return { success: false, message: "Error de servidor" };
+                }
             },
 
+            // ---------------------------
+            // LOGIN
+            // ---------------------------
+            login: async (email, password) => {
+                try {
+                    const resp = await fetch(`${API_URL}/api/login`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    if (!resp.ok) {
+                        return { success: false, message: "Credenciales incorrectas" };
+                    }
+
+                    const data = await resp.json();
+
+                    sessionStorage.setItem("token", data.token);
+
+                    setStore({
+                        ...getStore(),
+                        token: data.token,
+                        user: data.user
+                    });
+
+                    return { success: true };
+
+                } catch (err) {
+                    console.error("Error en login:", err);
+                    return { success: false, message: "Error de servidor" };
+                }
+            },
+
+            // ---------------------------
+            // GET CURRENT USER
+            // ---------------------------
             getCurrentUser: async () => {
                 const store = getStore();
                 if (!store.token) return;
@@ -50,7 +110,11 @@ const getState = ({ getStore, getActions, setStore }) => {
                     if (!resp.ok) return;
 
                     const data = await resp.json();
-                    setStore({ ...store, user: data });
+
+                    setStore({
+                        ...store,
+                        user: data
+                    });
 
                 } catch (err) {
                     console.error("Error loading user:", err);
@@ -89,9 +153,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                 setStore({ ...getStore(), selectedPoints: [] });
             },
 
-            // ---------------------------
-            // PUBLICAR RUTA
-            // ---------------------------
             publishRoute: async ({ name, rating, notes, points }) => {
                 const store = getStore();
 
@@ -138,9 +199,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            // ---------------------------
-            // CARGAR RUTAS GUARDADAS
-            // ---------------------------
             loadRoutes: async () => {
                 const store = getStore();
 
@@ -166,9 +224,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            // ---------------------------
-            // CARGAR RUTAS COMPARTIDAS
-            // ---------------------------
             loadSharedRoutes: async () => {
                 try {
                     const resp = await fetch(`${API_URL}/api/routes/shared`);
@@ -186,9 +241,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            // ---------------------------
-            // COMPARTIR RUTA
-            // ---------------------------
             shareRoute: async routeId => {
                 const store = getStore();
 

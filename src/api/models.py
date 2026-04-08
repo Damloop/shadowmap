@@ -1,82 +1,65 @@
+# src/api/models.py
+
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 db = SQLAlchemy()
 
-# ============================
-# USER MODEL
-# ============================
 
+# ============================
+# USER
+# ============================
 class User(db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(120), nullable=False)
-    recovery_token = db.Column(db.String(255), nullable=True)
 
-    favorites = db.relationship(
-        "Favorite", back_populates="user", cascade="all, delete-orphan"
-    )
-    premium_routes = db.relationship(
-        "PremiumRoute", back_populates="user", cascade="all, delete-orphan"
-    )
+    shortname = db.Column(db.String(7), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+
+    avatar = db.Column(db.Integer, nullable=True)
+
+    # Para recuperación de contraseña
+    recovery_token = db.Column(db.String(200), nullable=True)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def serialize(self):
         return {
             "id": self.id,
-            "email": self.email
+            "shortname": self.shortname,
+            "email": self.email,
+            "avatar": self.avatar,
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }
 
 
 # ============================
-# PLACE MODEL
+# PLACE
 # ============================
-
 class Place(db.Model):
     __tablename__ = "places"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
-    description = db.Column(db.String(255), nullable=True)
+    lat = db.Column(db.Float, nullable=False)
+    lng = db.Column(db.Float, nullable=False)
+    description = db.Column(db.String(500), nullable=True)
+    category = db.Column(db.String(50), nullable=True)
 
-    favorites = db.relationship(
-        "Favorite", back_populates="place", cascade="all, delete-orphan"
-    )
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def serialize(self):
         return {
             "id": self.id,
             "name": self.name,
-            "description": self.description
+            "lat": self.lat,
+            "lng": self.lng,
+            "description": self.description,
+            "category": self.category,
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }
-
-
-# ============================
-# FAVORITE MODEL
-# ============================
-
-class Favorite(db.Model):
-    __tablename__ = "favorites"
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    place_id = db.Column(db.Integer, db.ForeignKey("places.id"), nullable=False)
-
-    user = db.relationship("User", back_populates="favorites")
-    place = db.relationship("Place", back_populates="favorites")
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "user_id": self.user_id,
-            "place_id": self.place_id
-        }
-
-
-# ============================
-# POI MODEL
-# ============================
 
 class POI(db.Model):
     __tablename__ = "pois"
@@ -85,7 +68,9 @@ class POI(db.Model):
     name = db.Column(db.String(120), nullable=False)
     lat = db.Column(db.Float, nullable=False)
     lng = db.Column(db.Float, nullable=False)
-    description = db.Column(db.String(255), nullable=True)
+    description = db.Column(db.String(500), nullable=True)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def serialize(self):
         return {
@@ -93,27 +78,56 @@ class POI(db.Model):
             "name": self.name,
             "lat": self.lat,
             "lng": self.lng,
-            "description": self.description
+            "description": self.description,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
+
+# ============================
+# FAVORITE
+# ============================
+class Favorite(db.Model):
+    __tablename__ = "favorites"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    place_id = db.Column(db.Integer, db.ForeignKey("places.id"), nullable=False)
+
+    user = db.relationship("User", backref="favorites", lazy=True)
+    place = db.relationship("Place", backref="favorited_by", lazy=True)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "place_id": self.place_id,
+            "place": self.place.serialize() if self.place else None,
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }
 
 
 # ============================
-# ROUTE MODEL
+# ROUTE
 # ============================
-
 class Route(db.Model):
     __tablename__ = "routes"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     rating = db.Column(db.Integer, nullable=True)
-    notes = db.Column(db.String(255), nullable=True)
-    color = db.Column(db.String(50), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    notes = db.Column(db.String(500), nullable=True)
+    color = db.Column(db.String(20), nullable=False)
+
     is_shared = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     points = db.relationship(
-        "RoutePoint", backref="route", cascade="all, delete-orphan"
+        "RoutePoint",
+        backref="route",
+        cascade="all, delete-orphan",
+        lazy=True
     )
 
     def serialize(self):
@@ -123,21 +137,21 @@ class Route(db.Model):
             "rating": self.rating,
             "notes": self.notes,
             "color": self.color,
-            "created_at": self.created_at.isoformat(),
             "is_shared": self.is_shared,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
             "points": [p.serialize() for p in self.points]
         }
 
 
 # ============================
-# ROUTE POINT MODEL
+# ROUTE POINT
 # ============================
-
 class RoutePoint(db.Model):
     __tablename__ = "route_points"
 
     id = db.Column(db.Integer, primary_key=True)
     route_id = db.Column(db.Integer, db.ForeignKey("routes.id"), nullable=False)
+
     order = db.Column(db.Integer, nullable=False)
     lat = db.Column(db.Float, nullable=False)
     lng = db.Column(db.Float, nullable=False)
@@ -152,19 +166,20 @@ class RoutePoint(db.Model):
 
 
 # ============================
-# PREMIUM ROUTE MODEL
+# PREMIUM ROUTE
 # ============================
-
 class PremiumRoute(db.Model):
     __tablename__ = "premium_routes"
 
     id = db.Column(db.Integer, primary_key=True)
+
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    title = db.Column(db.String(120), nullable=False)
-    description = db.Column(db.String(255), nullable=True)
+    title = db.Column(db.String(150), nullable=False)
+    description = db.Column(db.String(1000), nullable=True)
+
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    user = db.relationship("User", back_populates="premium_routes")
+    user = db.relationship("User", backref="premium_routes", lazy=True)
 
     def serialize(self):
         return {
@@ -172,5 +187,5 @@ class PremiumRoute(db.Model):
             "user_id": self.user_id,
             "title": self.title,
             "description": self.description,
-            "created_at": self.created_at.isoformat()
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }

@@ -1,26 +1,59 @@
-// src/front/js/views/profile.jsx
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../store/appContext.jsx";
+import { useNavigate } from "react-router-dom";
 import "../../styles/profile.css";
 
 const Profile = () => {
-    const { store } = useContext(Context);
+    const { store, actions } = useContext(Context);
+    const navigate = useNavigate();
 
-    // RUTAS EXACTAS según tu carpeta real
+    const API_URL = "https://solid-goldfish-xj5599r4x942vrp4-3001.app.github.dev";
+
     const avatars = [
-        "/img/avatar/avatar_silas.jpg",
-        "/img/avatar/avatar_elias.jpg",
-        "/img/avatar/avatar_rhea.jpg",
-        "/img/avatar/avatar_lfrank.jpg",
-        "/img/avatar/avatar_unit47.jpg"
+        "/avatar/avatar_elias.jpg",
+        "/avatar/avatar_lfrank.jpg",
+        "/avatar/avatar_rhea.jpg",
+        "/avatar/avatar_silas.jpg",
+        "/avatar/avatar_unit47.jpg"
     ];
 
-    const [selectedAvatar, setSelectedAvatar] = useState(avatars[0]);
+    const [selectedAvatar, setSelectedAvatar] = useState(null);
+
+    useEffect(() => {
+        if (!store.user) {
+            actions.getCurrentUser();
+        }
+    }, []);
+
+    useEffect(() => {
+        if (store.user?.avatar) {
+            const index = store.user.avatar - 1;
+            setSelectedAvatar(avatars[index] || avatars[0]);
+        }
+    }, [store.user]);
+
+    const handleAvatarChange = async (index) => {
+        setSelectedAvatar(avatars[index]);
+
+        try {
+            await fetch(`${API_URL}/api/user/avatar`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + store.token
+                },
+                body: JSON.stringify({ avatar: index + 1 })
+            });
+
+            actions.getCurrentUser();
+        } catch (err) {
+            console.error("Error actualizando avatar:", err);
+        }
+    };
 
     return (
         <div className="profile-container">
 
-            {/* SIDEBAR */}
             <aside className="sidebar">
                 <h2>Filters</h2>
                 <ul>
@@ -31,33 +64,37 @@ const Profile = () => {
                     <li>Active Scans</li>
                     <li>Archive</li>
                 </ul>
+
+                <button className="logout-btn" onClick={() => {
+                    actions.logout();
+                    navigate("/login");
+                }}>
+                    Log Out
+                </button>
             </aside>
 
-            {/* MAIN */}
             <main className="profile-main">
 
-                <h1 className="shadow-title">ShadowMap</h1>
+                <h1 className="shadow-title">SHADOWMAP</h1>
 
-                {/* PROFILE CARD */}
                 <div className="profile-card">
                     <img src={selectedAvatar} className="profile-avatar" />
 
                     <div className="profile-info">
-                        <h2>{store.user?.name || "Unknown Operative"}</h2>
-                        <p className="title">Senior Investigator</p>
+                        <h2>{store.user?.shortname || "Operative"}</h2>
+                        <p className="title">Field Investigator</p>
 
                         <div className="stats">
-                            <p><strong>Level:</strong> 42</p>
+                            <p><strong>Email:</strong> {store.user?.email}</p>
+                            <p><strong>Operative ID:</strong> #{store.user?.id || "0000"}</p>
                             <p><strong>Signal Strength:</strong> 94.2%</p>
-                            <p><strong>Total Observations:</strong> 1,402</p>
                             <p><strong>Entity Classification:</strong> Class IV</p>
                             <p><strong>Places Discovered:</strong> 42</p>
-                            <p><strong>Member Since:</strong> 2018</p>
+                            <p><strong>Member Since:</strong> {store.user?.created_at || "Unknown"}</p>
                         </div>
                     </div>
                 </div>
 
-                {/* AVATAR SELECTOR */}
                 <div className="avatar-selector">
                     <h3>Select Your Operative Identity</h3>
 
@@ -67,7 +104,7 @@ const Profile = () => {
                                 key={i}
                                 src={a}
                                 className={`avatar-option ${selectedAvatar === a ? "active" : ""}`}
-                                onClick={() => setSelectedAvatar(a)}
+                                onClick={() => handleAvatarChange(i)}
                             />
                         ))}
                     </div>

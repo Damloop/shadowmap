@@ -1,169 +1,160 @@
-/* ===========================
-   SHADOWMAP — CIBERPUNK TENEBROSO
-   Gótico + Neon púrpura + Ritual oscuro
-   =========================== */
-
-/* Fondo negro púrpura */
-.sm-page {
+/* CONTENEDOR GENERAL */
+.login-wrapper {
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #03000a; /* Negro púrpura profundo */
-  color: #e6e6e6;
-  padding: 20px;
-  position: relative;
-  overflow: hidden;
+  background: linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 40%, #0d0d0d 100%);
+  color: #f5f5f5;
+  font-family: "Inter", sans-serif;
 }
 
-/* Vignette más cerrada y oscura */
-.sm-page::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(circle, transparent 25%, rgba(0, 0, 0, 0.95) 100%);
-}
-
-/* Tarjeta */
-.sm-card {
+/* CAJA */
+.login-box {
   width: 100%;
-  max-width: 360px;
-  background: rgba(12, 5, 25, 0.88);
-  border: 1px solid rgba(150, 80, 255, 0.25);
-  border-radius: 12px;
-  padding: 32px 26px;
-  box-shadow: 0 0 60px rgba(150, 80, 255, 0.25);
+  max-width: 420px;
+  background: rgba(15, 15, 15, 0.95);
+  padding: 2.8rem 2.4rem;
+  border-radius: 18px;
+  box-shadow:
+    0 0 0 1px rgba(120, 120, 120, 0.25),
+    0 24px 60px rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(14px);
-  animation: fadeIn 0.8s ease-out;
 }
 
-/* Fuente gótica + ciberpunk */
-@import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap');
-
-/* Título gótico ciberpunk — MÁS GRANDE */
-.sm-title {
-  font-family: "UnifrakturMaguntia", serif;
-  font-size: 3rem; /* MÁS GRANDE */
+/* TÍTULO MORADO TENEBROSO */
+.login-title {
   text-align: center;
-  margin-bottom: 14px;
-  color: #c9a8ff; /* Morado único */
-  letter-spacing: 3px;
+  font-size: 2.2rem;
+  letter-spacing: 0.32em;
+  text-indent: 0.32em;
+  margin-bottom: 2rem;
+  color: #b38cff;
   text-transform: uppercase;
-
-  /* Glow ciberpunk */
   text-shadow:
-    0 0 35px rgba(150, 80, 255, 0.7),
-    0 0 12px rgba(150, 80, 255, 0.5),
-    0 0 4px rgba(150, 80, 255, 0.3);
-
-  line-height: 1.05;
-  max-width: 100%;
-  overflow-wrap: break-word;
+    0 0 18px rgba(179, 140, 255, 0.7),
+    0 0 28px rgba(100, 60, 180, 0.5);
 }
 
-/* Subtítulo */
-.sm-card-subtitle {
-  text-align: center;
-  font-size: 1rem;
-  margin-bottom: 22px;
-  color: #9a7ed6;
-}
-
-/* Formulario */
-.sm-form {
+/* FORMULARIO */
+.login-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 1rem;
 }
 
-/* Label */
-.sm-label {
-  font-size: 0.85rem;
-  color: #d8caff;
-  margin-bottom: 4px;
-}
-
-/* Input */
-.sm-input {
-  width: 100%;
-  padding: 12px 14px;
-  background: rgba(22, 15, 40, 0.85);
-  border: 1px solid rgba(150, 80, 255, 0.35);
-  border-radius: 8px;
-  color: #eaeaea;
-  font-size: 0.95rem;
-  transition: 0.25s ease;
-}
-
-.sm-input:focus {
+.login-input {
+  padding: 0.8rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid rgba(120, 120, 120, 0.6);
+  background: rgba(20, 20, 20, 0.95);
+  color: #f5f5ff;
   outline: none;
-  border-color: #c7a2ff;
-  box-shadow: 0 0 14px rgba(150, 80, 255, 0.45);
 }
 
-/* Botón */
-.sm-btn {
-  width: 100%;
-  padding: 12px;
-  margin-top: 6px;
-  background: linear-gradient(135deg, #5a2de0, #3a1a9b);
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: 0.25s ease;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+.login-input:focus {
+  border-color: #b38cff;
+  box-shadow: 0 0 0 1px rgba(179, 140, 255, 0.4);
 }
 
-.sm-btn:hover {
-  background: linear-gradient(135deg, #7a4dff, #4a2ad6);
-  box-shadow: 0 0 22px rgba(150, 80, 255, 0.55);
-}
-
-/* Divider tenue */
-.sm-faint-divider {
-  width: 100%;
-  height: 1px;
-  background: rgba(150, 80, 255, 0.15);
-  margin: 22px 0;
-}
-
-/* Error */
-.sm-error {
-  background: rgba(255, 60, 60, 0.12);
-  border: 1px solid rgba(255, 60, 60, 0.35);
-  padding: 10px;
-  border-radius: 8px;
-  color: #ff8a8a;
-  font-size: 0.85rem;
+/* ERROR */
+.login-error {
+  background: rgba(120, 20, 40, 0.9);
+  border: 1px solid rgba(255, 90, 120, 0.7);
+  color: #ffd6e0;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
   text-align: center;
-  margin-top: -4px;
 }
 
-/* Enlaces */
-.sm-link-muted {
-  color: #bfa2ff;
+/* BOTÓN GLITCH MORADO */
+.glitch-btn {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle at 20% 0,
+    #e0b3ff 0%,
+    #7b3fe4 40%,
+    #3a1b6f 100%
+  );
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow:
+    0 0 18px rgba(123, 63, 228, 0.7),
+    0 10px 30px rgba(0, 0, 0, 0.9);
+}
+
+.glitch-btn .glitch-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.glitch-btn .glitch-layer:nth-child(1) {
+  animation: glitch 0.6s infinite;
+}
+
+.glitch-btn .glitch-layer:nth-child(2) {
+  animation: glitch 0.6s infinite reverse;
+  opacity: 0.6;
+}
+
+.glitch-btn .glitch-layer:nth-child(3) {
+  animation: glitch 0.6s infinite;
+  opacity: 0.3;
+}
+
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(2px, -2px);
+  }
+  60% {
+    transform: translate(-1px, -1px);
+  }
+  80% {
+    transform: translate(1px, 1px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+
+/* ENLACES IZQUIERDA / DERECHA */
+.login-links-row {
+  margin-top: 1.6rem;
+  display: flex;
+  justify-content: space-between;
   font-size: 0.9rem;
-  text-decoration: none;
-  transition: 0.25s ease;
 }
 
-.sm-link-muted:hover {
-  color: #e8d9ff;
-  text-shadow: 0 0 8px rgba(150, 80, 255, 0.6);
+.login-link-left,
+.login-link-right {
+  cursor: pointer;
+  color: #b7b7b7;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 4px;
 }
 
-/* Fade-in */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.login-link-left:hover,
+.login-link-right:hover {
+  color: #e0e0e0;
 }

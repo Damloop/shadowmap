@@ -1,7 +1,6 @@
-# src/api/routes_favorites.py
-
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
+
 from src.api.models import db, Favorite, Place
 
 favorites_api = Blueprint("favorites_api", __name__)

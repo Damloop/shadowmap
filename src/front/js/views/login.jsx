@@ -1,61 +1,88 @@
-import React, { useContext, useState } from "react";
-import { Context } from "../store/appContext.jsx";
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { Context } from "../store/appContext";
 import "../../styles/login.css";
 
 const Login = () => {
   const { actions } = useContext(Context);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: ""
+  });
+
+  const [error, setError] = useState("");
+
+  const handleChange = e => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async e => {
     e.preventDefault();
-    const ok = await actions.login(email, password);
-    if (!ok) setError("Credenciales incorrectas");
+    setError("");
+
+    const resp = await actions.login(formData.email, formData.password);
+
+    if (!resp.success) {
+      setError(resp.message || "Acceso denegado.");
+      return;
+    }
+
+    navigate("/profile");
   };
 
   return (
-    <div className="sm-page">
-      <div className="sm-card">
+    <div className="login-wrapper">
 
-        <h1 className="sm-title">ShadowMap</h1>
-        <p className="sm-card-subtitle">Acceso restringido</p>
+      <div className="login-box">
 
-        {error && <div className="sm-error">{error}</div>}
+        {/* TÍTULO TENEBROSO MORADO */}
+        <h1 className="login-title">SHADOWMAP</h1>
 
-        <form className="sm-form" onSubmit={handleLogin}>
-          <div>
-            <label className="sm-label">Email</label>
-            <input
-              type="email"
-              className="sm-input"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+        {error && <div className="login-error">{error}</div>}
 
-          <div>
-            <label className="sm-label">Contraseña</label>
-            <input
-              type="password"
-              className="sm-input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="login-form">
 
-          <button className="sm-btn" type="submit">
-            Entrar
+          <input
+            type="email"
+            name="email"
+            placeholder="Correo electrónico"
+            className="login-input"
+            onChange={handleChange}
+          />
+
+          <input
+            type="password"
+            name="password"
+            placeholder="Contraseña"
+            className="login-input"
+            onChange={handleChange}
+          />
+
+          {/* BOTÓN GLITCH MORADO */}
+          <button type="submit" className="login-btn glitch-btn">
+            <span className="glitch-layer">Entrar</span>
+            <span className="glitch-layer">Entrar</span>
+            <span className="glitch-layer">Entrar</span>
           </button>
+
         </form>
 
-        <div className="sm-faint-divider"></div>
+        {/* ENLACES ABAJO, IZQUIERDA Y DERECHA */}
+        <div className="login-links-row">
+          <span className="login-link-left" onClick={() => navigate("/register")}>
+            Regístrate
+          </span>
 
-        <a href="/register" className="sm-link-muted">
-          Crear cuenta
-        </a>
+          <span className="login-link-right" onClick={() => navigate("/recover")}>
+            ¿Olvidaste algo?
+          </span>
+        </div>
+
       </div>
     </div>
   );

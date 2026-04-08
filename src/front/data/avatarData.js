@@ -3,40 +3,40 @@ export const avatarData = [
     id: 1,
     src: "/avatar/avatar_elias.jpg",
     nombre: "Elias",
-    descripcion: "Un observador silencioso capaz de detectar patrones que otros pasan por alto.",
-    fortaleza: "Percepción aguda y análisis preciso.",
-    debilidad: "Tiende a sobrepensar y puede bloquearse bajo presión."
+    // JÓVENES / ADOLESCENTES
+    fortaleza: "Lectura emocional instantánea — detecta intenciones y microgestos al momento",
+    debilidad: "Hiperconectado: se dispersa entre demasiados estímulos digitales"
   },
   {
     id: 2,
     src: "/avatar/avatar_lfrank.jpg",
     nombre: "L. Frank",
-    descripcion: "Un estratega impredecible con tácticas poco convencionales.",
-    fortaleza: "Creatividad y capacidad de adaptación.",
-    debilidad: "Impulsivo; a veces toma riesgos innecesarios."
+    // INCLASIFICABLE
+    fortaleza: "Creatividad caótica — soluciones que nadie más imaginaría",
+    debilidad: "Lógica no lineal: difícil de predecir incluso para sí mismo"
   },
   {
     id: 3,
     src: "/avatar/avatar_rhea.jpg",
     nombre: "Rhea",
-    descripcion: "Una operativa tranquila con fuerte conexión a las anomalías.",
-    fortaleza: "Gran intuición y sensibilidad emocional.",
-    debilidad: "Evita el conflicto incluso cuando es necesario."
+    // JÓVENES / ADOLESCENTES
+    fortaleza: "Intuición algorítmica — detecta patrones ocultos en segundos",
+    debilidad: "Sensibilidad extrema: absorbe el ambiente y se satura rápido"
   },
   {
     id: 4,
     src: "/avatar/avatar_silas.jpg",
     nombre: "Silas",
-    descripcion: "Un agente disciplinado endurecido por condiciones extremas.",
-    fortaleza: "Resistencia y determinación inquebrantable.",
-    debilidad: "Demasiado rígido; le cuesta improvisar."
+    // ADULTO / MAYOR
+    fortaleza: "Experiencia táctica — toma decisiones frías y precisas bajo presión",
+    debilidad: "Carga emocional acumulada: arrastra recuerdos que lo ralentizan"
   },
   {
     id: 5,
     src: "/avatar/avatar_unit47.jpg",
-    nombre: "Unit 47",
-    descripcion: "Un prototipo experimental diseñado para extracción de datos.",
-    fortaleza: "Procesamiento rápido y memoria perfecta.",
-    debilidad: "Casi nula comprensión emocional; interacción social limitada."
+    nombre: "Unit‑47",
+    // INCLASIFICABLE / NO HUMANO
+    fortaleza: "Procesamiento autónomo — análisis en milisegundos sin margen de error",
+    debilidad: "Protocolos rígidos: incapaz de improvisar fuera de parámetros"
   }
 ];

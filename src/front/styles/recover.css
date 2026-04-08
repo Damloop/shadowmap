@@ -1,67 +1,144 @@
-/* SHADOWMAP — RECOVER (ULTRA MINIMAL) */
-
-@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@300;400;600&display=swap");
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: "Inter", sans-serif;
-  background: radial-gradient(circle at 20% 30%, #1a1028, #05050a 70%);
-  color: #e8e0ff;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.recover-page {
-  height: 100vh;
+.recover-wrapper {
+  min-height: 100vh;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  text-align: center;
-  gap: 20px;
+  background: linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 40%, #0d0d0d 100%);
+  color: #f5f5f5;
+  font-family: "Inter", sans-serif;
+}
+
+.recover-box {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(15, 15, 15, 0.95);
+  padding: 2.8rem 2.4rem;
+  border-radius: 18px;
+  box-shadow:
+    0 0 0 1px rgba(120, 120, 120, 0.25),
+    0 24px 60px rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(14px);
 }
 
 .recover-title {
-  font-family: "Orbitron", sans-serif;
-  font-size: 2rem;
-  color: #caaaff;
+  text-align: center;
+  font-size: 2.2rem;
+  letter-spacing: 0.32em;
+  text-indent: 0.32em;
+  margin-bottom: 1.2rem;
+  color: #b38cff;
+  text-transform: uppercase;
+  text-shadow:
+    0 0 18px rgba(179, 140, 255, 0.7),
+    0 0 28px rgba(100, 60, 180, 0.5);
+}
+
+.recover-subtitle {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #b8b8b8;
+  margin-bottom: 1.8rem;
+}
+
+.recover-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .recover-input {
-  width: 320px;
-  padding: 12px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 8px;
-  color: white;
-  margin-bottom: 12px;
+  padding: 0.8rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid rgba(120, 120, 120, 0.6);
+  background: rgba(20, 20, 20, 0.95);
+  color: #f5f5ff;
+  outline: none;
+}
+
+.recover-input:focus {
+  border-color: #b38cff;
+  box-shadow: 0 0 0 1px rgba(179, 140, 255, 0.4);
 }
 
 .recover-btn {
-  width: 320px;
-  padding: 12px;
-  background: #7f5af0;
+  margin-top: 0.5rem;
+}
+
+/* GLITCH MORADO */
+.glitch-btn {
+  position: relative;
+  overflow: hidden;
   border: none;
-  border-radius: 10px;
-  color: white;
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border-radius: 999px;
+  background: radial-gradient(circle at 20% 0, #e0b3ff 0%, #7b3fe4 40%, #3a1b6f 100%);
+  color: #fff;
+  font-weight: 600;
   font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   cursor: pointer;
-  animation: heartbeat 1.8s infinite ease-in-out;
+  box-shadow:
+    0 0 18px rgba(123, 63, 228, 0.7),
+    0 10px 30px rgba(0, 0, 0, 0.9);
 }
 
-@keyframes heartbeat {
-  0% { transform: scale(1); }
-  30% { transform: scale(1.06); }
-  60% { transform: scale(0.98); }
-  100% { transform: scale(1); }
+.glitch-btn .glitch-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
 }
 
-.recover-return a {
-  color: #b28cff;
-  text-decoration: none;
+.glitch-btn .glitch-layer:nth-child(1) {
+  animation: glitch 0.6s infinite;
 }
 
-.recover-return a:hover {
+.glitch-btn .glitch-layer:nth-child(2) {
+  animation: glitch 0.6s infinite reverse;
+  opacity: 0.6;
+}
+
+.glitch-btn .glitch-layer:nth-child(3) {
+  animation: glitch 0.6s infinite;
+  opacity: 0.3;
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(2px, -2px); }
+  60% { transform: translate(-1px, -1px); }
+  80% { transform: translate(1px, 1px); }
+  100% { transform: translate(0); }
+}
+
+/* MENSAJE */
+.recover-message {
+  background: rgba(20, 90, 60, 0.9);
+  border: 1px solid rgba(120, 230, 170, 0.7);
+  color: #d6ffef;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* LINK ABAJO */
+.recover-link {
+  margin-top: 1.6rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #b7b7b7;
+  cursor: pointer;
   text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 4px;
+}
+
+.recover-link:hover {
+  color: #e0e0e0;
 }

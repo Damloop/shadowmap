@@ -1,0 +1,97 @@
+/* Fondo general */
+.place-details-wrapper {
+    min-height: 100vh;
+    background: #050509;
+    padding: 40px 0;
+    display: flex;
+    justify-content: center;
+    color: #e8e8f2;
+    font-family: "Inter", system-ui, sans-serif;
+}
+
+/* Contenedor principal */
+.place-details-card {
+    width: 900px;
+    background: radial-gradient(circle at top, #1b1028 0%, #0a0a12 60%, #050509 100%);
+    padding: 40px;
+    border-radius: 18px;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.7);
+}
+
+/* Título */
+.place-details-card h2 {
+    font-size: 32px;
+    color: #dcd2ff;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+/* Tag del tipo */
+.tag {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 8px;
+    margin-bottom: 20px;
+}
+
+/* Colores según tipo */
+.tag-ghost { background: #7a2ff2; color: white; }
+.tag-demon { background: #ff4d4d; color: white; }
+.tag-entity { background: #4da6ff; color: white; }
+.tag-unknown { background: #777; color: white; }
+
+/* Descripción */
+.place-details-card p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #cfcfe8;
+}
+
+/* Coordenadas */
+.place-coords {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #b8b8d4;
+}
+
+/* Botones */
+.place-details-buttons {
+    margin-top: 30px;
+    display: flex;
+    gap: 12px;
+}
+
+.place-details-buttons .btn {
+    padding: 10px 18px;
+    font-size: 14px;
+    border-radius: 8px;
+}
+
+/* Hover mejorado */
+.btn-warning:hover {
+    background-color: #ffcc66 !important;
+}
+
+.btn-danger:hover {
+    background-color: #ff6666 !important;
+}
+
+.btn-secondary:hover {
+    background-color: #666 !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .place-details-card {
+        width: 92%;
+        padding: 25px;
+    }
+
+    .place-details-buttons {
+        flex-direction: column;
+    }
+}

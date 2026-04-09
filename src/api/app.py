@@ -12,7 +12,6 @@ from src.api.models import db
 migrate = Migrate()
 jwt = JWTManager()
 
-
 def create_app():
     app = Flask(__name__)
 
@@ -23,20 +22,14 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["JWT_SECRET_KEY"] = "super-secret-key"
 
-    # Email opcional
-    app.config["MAIL_SERVER"] = "smtp.gmail.com"
-    app.config["MAIL_PORT"] = 587
-    app.config["MAIL_USE_TLS"] = True
-    app.config["MAIL_USERNAME"] = None
-    app.config["MAIL_PASSWORD"] = None
-
     # ============================
-    # CORS (ANTES DE BLUEPRINTS)
+    # CORS — CONFIGURACIÓN COMPLETA
     # ============================
     CORS(app, resources={r"/api/*": {
         "origins": "*",
-        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
+        "expose_headers": ["Content-Type", "Authorization"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "supports_credentials": True
     }})
 
@@ -51,7 +44,6 @@ def create_app():
     # ============================
     # BLUEPRINTS
     # ============================
-    from src.api.routes import api
     from src.api.routes_auth import auth_api
     from src.api.routes_routes import routes_api
     from src.api.routes_recover import recover_bp
@@ -62,7 +54,6 @@ def create_app():
     from src.api.routes_health import health_api
     from src.api.routes_favorites import favorites_api
 
-    app.register_blueprint(api, url_prefix="/api")
     app.register_blueprint(auth_api, url_prefix="/api")
     app.register_blueprint(routes_api, url_prefix="/api")
     app.register_blueprint(recover_bp, url_prefix="/api")
@@ -72,15 +63,5 @@ def create_app():
     app.register_blueprint(pois_api, url_prefix="/api")
     app.register_blueprint(health_api, url_prefix="/api")
     app.register_blueprint(favorites_api, url_prefix="/api")
-
-    # ============================
-    # CORS GLOBAL (SOLUCIÓN FINAL)
-    # ============================
-    @app.after_request
-    def add_cors_headers(response):
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-        return response
 
     return app

@@ -1,19 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { avatarData } from "../data/avatarData";
-import "../styles/avatarSelector.css";
+import "../styles/avatarSelector.css"; // aquí importamos el CSS del selector
 
-const AvatarSelector = ({ onSelect, selected }) => {
+const AvatarSelector = ({ onSelect, onConfirm }) => {
   const [index, setIndex] = useState(0);
   const [glitch, setGlitch] = useState(false);
-
-  useEffect(() => {
-    if (selected) {
-      const foundIndex = avatarData.findIndex(a => a.id === selected);
-      if (foundIndex !== -1) {
-        setIndex(foundIndex);
-      }
-    }
-  }, [selected]);
 
   const activarGlitch = () => {
     setGlitch(true);
@@ -22,47 +13,63 @@ const AvatarSelector = ({ onSelect, selected }) => {
 
   const siguiente = () => {
     activarGlitch();
-    const nuevo = (index + 1) % avatarData.length;
-    setIndex(nuevo);
-    onSelect(avatarData[nuevo].id);
+    setIndex((index + 1) % avatarData.length);
   };
 
   const anterior = () => {
     activarGlitch();
-    const nuevo = (index - 1 + avatarData.length) % avatarData.length;
-    setIndex(nuevo);
-    onSelect(avatarData[nuevo].id);
+    setIndex((index - 1 + avatarData.length) % avatarData.length);
   };
 
   const avatar = avatarData[index];
+
+  const fijarIdentidad = () => {
+    onSelect(avatar.id);
+    onConfirm();
+  };
+
+  const renderBar = (valor, max = 5) => {
+    const porcentaje = (valor / max) * 100;
+    const esMaximo = valor === 5;
+
+    return (
+      <div className={`stat-bar ${esMaximo ? "stat-max" : ""}`}>
+        <div className="stat-fill" style={{ width: `${porcentaje}%` }}></div>
+      </div>
+    );
+  };
 
   return (
     <div className="avatar-carrusel-wrapper">
 
       <div className="avatar-carrusel">
-        <button type="button" className="flecha flecha-izq" onClick={anterior}>
-          ◀
-        </button>
+        <button className="flecha flecha-izq" onClick={anterior}>◀</button>
 
         <div className={`avatar-mostrado ${glitch ? "glitch" : ""}`}>
           <img
             src={avatar.src}
             alt={avatar.nombre}
             className="avatar-imagen"
-            onError={e => (e.target.src = "/avatar/default.png")}
           />
         </div>
 
-        <button type="button" className="flecha flecha-der" onClick={siguiente}>
-          ▶
-        </button>
+        <button className="flecha flecha-der" onClick={siguiente}>▶</button>
       </div>
 
       <div className="avatar-info">
         <h3>{avatar.nombre}</h3>
-        <p><strong>Fortaleza:</strong> {avatar.fortaleza}</p>
-        <p><strong>Debilidad:</strong> {avatar.debilidad}</p>
+
+        <div className="stat-row"><span>Fuerza</span>{renderBar(avatar.fuerza)}</div>
+        <div className="stat-row"><span>Rapidez</span>{renderBar(avatar.rapidez)}</div>
+        <div className="stat-row"><span>Resistencia</span>{renderBar(avatar.resistencia)}</div>
+        <div className="stat-row"><span>Inteligencia</span>{renderBar(avatar.inteligencia)}</div>
       </div>
+
+      {/* 🔥 BOTÓN FIJAR IDENTIDAD IGUAL QUE EL DE LOGIN */}
+      <button className="btn-entrar" onClick={fijarIdentidad}>
+        Fijar identidad
+      </button>
+
     </div>
   );
 };

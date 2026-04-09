@@ -22,18 +22,20 @@
   backdrop-filter: blur(14px);
 }
 
-/* TÍTULO MORADO TENEBROSO */
+/* SHADOWMAP MÁS MORADO + MÁS BRILLANTE */
 .login-title {
   text-align: center;
-  font-size: 2.2rem;
+  font-size: 2.3rem;
   letter-spacing: 0.32em;
-  text-indent: 0.32em;
-  margin-bottom: 2rem;
-  color: #b38cff;
+  margin-bottom: 1.6rem;
+  color: #c08bff;
   text-transform: uppercase;
+
   text-shadow:
-    0 0 18px rgba(179, 140, 255, 0.7),
-    0 0 28px rgba(100, 60, 180, 0.5);
+    0 0 28px rgba(180, 90, 255, 1),
+    0 0 55px rgba(120, 40, 220, 0.9),
+    0 0 95px rgba(90, 0, 180, 0.8),
+    0 0 140px rgba(60, 0, 120, 0.7);
 }
 
 /* FORMULARIO */
@@ -68,7 +70,45 @@
   text-align: center;
 }
 
-/* BOTÓN GLITCH MORADO */
+/* BOTÓN MORADO LÚGUBRE */
+.login-btn {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 1rem 1.2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(160, 0, 255, 0.55);
+  background: rgba(90, 0, 160, 0.25);
+  color: #e8d4ff;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  backdrop-filter: blur(6px);
+
+  box-shadow:
+    0 0 18px rgba(120, 0, 255, 0.45),
+    inset 0 0 14px rgba(90, 0, 160, 0.35);
+
+  transition: 0.25s ease;
+}
+
+.login-btn:hover {
+  background: rgba(140, 0, 255, 0.35);
+  box-shadow:
+    0 0 26px rgba(180, 0, 255, 0.8),
+    inset 0 0 18px rgba(150, 0, 255, 0.45);
+  transform: translateY(-1px);
+}
+
+.login-btn:active {
+  transform: scale(0.97);
+  box-shadow:
+    0 0 12px rgba(180, 0, 255, 0.5),
+    inset 0 0 8px rgba(150, 0, 255, 0.3);
+}
+
+/* GLITCH */
 .glitch-btn {
   position: relative;
   overflow: hidden;
@@ -117,27 +157,15 @@
 }
 
 @keyframes glitch {
-  0% {
-    transform: translate(0);
-  }
-  20% {
-    transform: translate(-2px, 2px);
-  }
-  40% {
-    transform: translate(2px, -2px);
-  }
-  60% {
-    transform: translate(-1px, -1px);
-  }
-  80% {
-    transform: translate(1px, 1px);
-  }
-  100% {
-    transform: translate(0);
-  }
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(2px, -2px); }
+  60% { transform: translate(-1px, -1px); }
+  80% { transform: translate(1px, 1px); }
+  100% { transform: translate(0); }
 }
 
-/* ENLACES IZQUIERDA / DERECHA */
+/* ENLACES */
 .login-links-row {
   margin-top: 1.6rem;
   display: flex;
@@ -157,4 +185,31 @@
 .login-link-left:hover,
 .login-link-right:hover {
   color: #e0e0e0;
+}
+
+/* BOTÓN ENTRAR QUE SIEMPRE SE VE */
+.btn-entrar {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: #7b3fe4;
+  border: 1px solid #b38cff;
+  color: #fff;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  box-shadow: 0 0 18px rgba(123, 63, 228, 0.7);
+  transition: 0.25s ease;
+}
+
+.btn-entrar:hover {
+  background: #9d63ff;
+  box-shadow: 0 0 26px rgba(180, 0, 255, 0.8);
+  transform: translateY(-2px);
+}
+
+.btn-entrar:active {
+  transform: scale(0.97);
 }

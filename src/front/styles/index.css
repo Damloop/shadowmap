@@ -264,3 +264,39 @@ a:hover {
     font-size: 1.3rem;
   }
 }
+/* ===========================
+   EFECTO ÉPICO DE TRANSICIÓN
+=========================== */
+
+.white-flash {
+  animation: sm-flash 0.6s ease-out forwards;
+}
+
+@keyframes sm-flash {
+  0% {
+    background: white;
+    filter: brightness(2);
+  }
+  40% {
+    background: #dcdcdc;
+    filter: brightness(1.4);
+  }
+  100% {
+    background: radial-gradient(circle at 20% 20%, #1a1a24, #0a0a0f 70%);
+    filter: brightness(1);
+  }
+}
+
+/* Glitch rápido para transiciones */
+.sm-glitch-fx {
+  animation: sm-glitch 0.25s steps(2, end);
+}
+
+@keyframes sm-glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(2px, -2px); }
+  60% { transform: translate(-1px, 1px); }
+  80% { transform: translate(1px, -1px); }
+  100% { transform: translate(0); }
+}

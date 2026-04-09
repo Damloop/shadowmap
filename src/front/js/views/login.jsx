@@ -37,10 +37,8 @@ const Login = () => {
 
   return (
     <div className="login-wrapper">
-
       <div className="login-box">
 
-        {/* TÍTULO TENEBROSO MORADO */}
         <h1 className="login-title">SHADOWMAP</h1>
 
         {error && <div className="login-error">{error}</div>}
@@ -63,16 +61,13 @@ const Login = () => {
             onChange={handleChange}
           />
 
-          {/* BOTÓN GLITCH MORADO */}
-          <button type="submit" className="login-btn glitch-btn">
-            <span className="glitch-layer">Entrar</span>
-            <span className="glitch-layer">Entrar</span>
-            <span className="glitch-layer">Entrar</span>
+          {/* BOTÓN ENTRAR QUE SIEMPRE SE VE Y FUNCIONA */}
+          <button type="submit" className="btn-entrar">
+            Entrar
           </button>
 
         </form>
 
-        {/* ENLACES ABAJO, IZQUIERDA Y DERECHA */}
         <div className="login-links-row">
           <span className="login-link-left" onClick={() => navigate("/register")}>
             Regístrate

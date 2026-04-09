@@ -1,115 +1,119 @@
-import React, { useContext, useEffect, useState } from "react";
+// /src/front/js/views/profile.jsx
+import React, { useContext, useEffect } from "react";
 import { Context } from "../store/appContext.jsx";
 import { useNavigate } from "react-router-dom";
+import { getAvatarLore } from "../../data/avatarLore";
 import "../../styles/profile.css";
 
 const Profile = () => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate();
 
-    const API_URL = "https://solid-goldfish-xj5599r4x942vrp4-3001.app.github.dev";
-
-    const avatars = [
-        "/avatar/avatar_elias.jpg",
-        "/avatar/avatar_lfrank.jpg",
-        "/avatar/avatar_rhea.jpg",
-        "/avatar/avatar_silas.jpg",
-        "/avatar/avatar_unit47.jpg"
-    ];
-
-    const [selectedAvatar, setSelectedAvatar] = useState(null);
-
     useEffect(() => {
-        if (!store.user) {
-            actions.getCurrentUser();
-        }
+        if (!store.user) actions.getCurrentUser();
     }, []);
 
-    useEffect(() => {
-        if (store.user?.avatar) {
-            const index = store.user.avatar - 1;
-            setSelectedAvatar(avatars[index] || avatars[0]);
-        }
-    }, [store.user]);
+    if (!store.user) return <div className="profile-main">Cargando identidad...</div>;
 
-    const handleAvatarChange = async (index) => {
-        setSelectedAvatar(avatars[index]);
+    const {
+        avatar,
+        shortname,
+        routesVisited,
+        routesCreated,
+        routesShared,
+        explorerScore,
+        creatorScore,
+        isPremium
+    } = store.user;
 
-        try {
-            await fetch(`${API_URL}/api/user/avatar`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: "Bearer " + store.token
-                },
-                body: JSON.stringify({ avatar: index + 1 })
-            });
+    const lore = getAvatarLore(avatar);
 
-            actions.getCurrentUser();
-        } catch (err) {
-            console.error("Error actualizando avatar:", err);
-        }
-    };
+    const suggestedRoutes = [
+        "Sector 9 — Señal intermitente",
+        "Bosque de Blackwood — Eco residual",
+        "Túnel 14 — Anomalía térmica",
+        "Distrito 7 — Patrón no identificado"
+    ];
 
     return (
         <div className="profile-container">
 
+            {/* SIDEBAR */}
             <aside className="sidebar">
-                <h2>Filters</h2>
+                <h2>Actividad</h2>
                 <ul>
-                    <li>Spectral Parameters</li>
-                    <li>All Entities</li>
-                    <li>Signal Strength</li>
-                    <li>Historical Records</li>
-                    <li>Active Scans</li>
-                    <li>Archive</li>
+                    <li><span>Rutas visitadas</span><span>{routesVisited || 0}</span></li>
+                    <li><span>Rutas creadas</span><span>{routesCreated || 0}</span></li>
+                    <li><span>Compartidas conmigo</span><span>{routesShared || 0}</span></li>
                 </ul>
 
-                <button className="logout-btn" onClick={() => {
-                    actions.logout();
-                    navigate("/login");
-                }}>
+                <h2>Puntuación</h2>
+                <ul>
+                    <li><span>Explorador</span><span>{explorerScore || 0}</span></li>
+                    <li><span>Creador</span><span>{creatorScore || 0}</span></li>
+                </ul>
+
+                <h2>Estado</h2>
+                <ul>
+                    <li><span>Cuenta</span><span>{isPremium ? "Premium" : "Estándar"}</span></li>
+                </ul>
+
+                {!isPremium && (
+                    <p className="sidebar-note">
+                        Avatar fijado. Solo Premium puede reconfigurar identidad.
+                    </p>
+                )}
+
+                <button
+                    className="logout-btn"
+                    onClick={() => {
+                        actions.logout();
+                        navigate("/login");
+                    }}
+                >
                     Log Out
                 </button>
             </aside>
 
+            {/* MAIN */}
             <main className="profile-main">
-
                 <h1 className="shadow-title">SHADOWMAP</h1>
 
+                {/* PROFILE CARD */}
                 <div className="profile-card">
-                    <img src={selectedAvatar} className="profile-avatar" />
+                    <img src={lore.src} className="profile-avatar" />
 
                     <div className="profile-info">
-                        <h2>{store.user?.shortname || "Operative"}</h2>
-                        <p className="title">Field Investigator</p>
+                        <h2>{shortname}</h2>
 
-                        <div className="stats">
-                            <p><strong>Email:</strong> {store.user?.email}</p>
-                            <p><strong>Operative ID:</strong> #{store.user?.id || "0000"}</p>
-                            <p><strong>Signal Strength:</strong> 94.2%</p>
-                            <p><strong>Entity Classification:</strong> Class IV</p>
-                            <p><strong>Places Discovered:</strong> 42</p>
-                            <p><strong>Member Since:</strong> {store.user?.created_at || "Unknown"}</p>
-                        </div>
+                        {/* NIVEL */}
+                        <p className="title">Nivel {lore.level}</p>
+
+                        {/* HISTORIA */}
+                        <p style={{
+                            marginTop: "20px",
+                            fontSize: "15px",
+                            lineHeight: "1.6",
+                            maxWidth: "600px",
+                            color: "#d4d4d4"
+                        }}>
+                            <strong>{lore.title}:</strong> {lore.origin}
+                        </p>
                     </div>
                 </div>
 
+                {/* RUTAS SUGERIDAS */}
                 <div className="avatar-selector">
-                    <h3>Select Your Operative Identity</h3>
+                    <h3>¿Por dónde empezamos?</h3>
 
-                    <div className="avatar-grid">
-                        {avatars.map((a, i) => (
-                            <img
-                                key={i}
-                                src={a}
-                                className={`avatar-option ${selectedAvatar === a ? "active" : ""}`}
-                                onClick={() => handleAvatarChange(i)}
-                            />
+                    <ul style={{ listStyle: "none", padding: 0 }}>
+                        {suggestedRoutes.map((route, i) => (
+                            <li key={i} className="suggested-route">
+                                {route}
+                            </li>
                         ))}
-                    </div>
+                    </ul>
                 </div>
-
             </main>
 
         </div>

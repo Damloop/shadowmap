@@ -37,11 +37,37 @@
     cursor: pointer;
     color: #bbb;
     transition: 0.2s;
+    display: flex;
+    justify-content: space-between;
 }
 
 .sidebar li:hover {
     color: #a855f7;
     text-shadow: 0 0 8px #a855f7;
+}
+
+.sidebar-note {
+    margin-top: 15px;
+    font-size: 12px;
+    color: #999;
+}
+
+.logout-btn {
+    margin-top: 30px;
+    width: 100%;
+    padding: 12px;
+    background: #a855f7;
+    border: none;
+    color: #030308;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.logout-btn:hover {
+    background: #c084fc;
+    box-shadow: 0 0 12px rgba(168,85,247,0.6);
 }
 
 /* ===== MAIN ===== */
@@ -51,7 +77,6 @@
     position: relative;
 }
 
-/* Glitch background noise */
 .profile-main::before {
     content: "";
     position: absolute;
@@ -61,7 +86,6 @@
     pointer-events: none;
 }
 
-/* Title */
 .shadow-title {
     font-size: 42px;
     color: #a855f7;
@@ -84,7 +108,6 @@
     overflow: hidden;
 }
 
-/* Classified stamp */
 .profile-card::after {
     content: "CLASSIFIED";
     position: absolute;
@@ -97,26 +120,24 @@
     font-weight: bold;
 }
 
-/* Avatar */
+/* Avatar grande */
 .profile-avatar {
-    width: 180px;
-    height: 180px;
-    border-radius: 6px;
+    width: 240px;
+    height: 240px;
+    border-radius: 10px;
     object-fit: cover;
-    margin-right: 30px;
-    border: 2px solid rgba(168,85,247,0.6);
-    box-shadow: 0 0 15px rgba(168,85,247,0.4);
+    margin-right: 40px;
+    border: 3px solid rgba(168,85,247,0.7);
+    box-shadow: 0 0 25px rgba(168,85,247,0.5);
     transition: 0.3s;
 }
 
-/* Avatar glitch hover */
 .profile-avatar:hover {
     filter: contrast(1.3) brightness(1.2);
     transform: scale(1.03);
     box-shadow: 0 0 25px rgba(168,85,247,0.8);
 }
 
-/* Info */
 .profile-info h2 {
     font-size: 26px;
     margin-bottom: 5px;
@@ -129,48 +150,39 @@
     letter-spacing: 2px;
 }
 
-.stats p {
-    margin: 6px 0;
-    font-size: 14px;
-}
-
-/* ===== AVATAR SELECTOR ===== */
-.avatar-selector h3 {
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    color: #a855f7;
-    letter-spacing: 2px;
-}
-
-.avatar-grid {
-    display: flex;
-    gap: 15px;
-}
-
-/* Avatar options */
-.avatar-option {
-    width: 90px;
-    height: 90px;
+/* ===== RUTAS SUGERIDAS — EFECTO PULSO ===== */
+.suggested-route {
+    margin: 12px 0;
+    padding: 14px 18px;
+    background: rgba(168,85,247,0.08);
+    border: 1px solid rgba(168,85,247,0.25);
     border-radius: 6px;
-    object-fit: cover;
     cursor: pointer;
-    opacity: 0.55;
-    border: 2px solid transparent;
-    transition: 0.25s;
-    filter: grayscale(100%);
+    transition: 0.25s ease;
+    font-size: 15px;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
 }
 
-/* Hover effect */
-.avatar-option:hover {
-    opacity: 1;
-    filter: grayscale(0%);
-    transform: scale(1.05);
+.suggested-route::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(168,85,247,0.15);
+    opacity: 0;
+    animation: pulse 2.4s infinite;
 }
 
-/* Selected avatar */
-.avatar-option.active {
-    opacity: 1;
-    filter: grayscale(0%);
-    border-color: #a855f7;
-    box-shadow: 0 0 15px rgba(168,85,247,0.7);
+@keyframes pulse {
+    0% { opacity: 0; }
+    50% { opacity: 0.25; }
+    100% { opacity: 0; }
+}
+
+.suggested-route:hover {
+    background: rgba(168,85,247,0.18);
+    border-color: rgba(168,85,247,0.6);
+    box-shadow: 0 0 18px rgba(168,85,247,0.5);
+    transform: scale(1.03);
 }

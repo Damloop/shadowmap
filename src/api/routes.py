@@ -1,57 +1,61 @@
 # src/api/routes.py
 
-from flask import Blueprint, jsonify
+from flask import Blueprint, request, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
+from src.api.models import db, User
 
-# Importar todos los blueprints del proyecto
-from src.api.routes_auth import auth_api
-from src.api.routes_places import places_api
-from src.api.routes_favorites import favorites_api
-from src.api.routes_routes import routes_api
-from src.api.routes_premium import premium_api
-from src.api.routes_health import health_api
-from src.api.routes_recover import recover_bp
-from src.api.routes_reset_password import reset_bp
-from src.api.routes_pois import pois_api
-
-# Blueprint raíz
 api = Blueprint("api", __name__)
 
-# Registrar blueprints
-api.register_blueprint(auth_api)
-api.register_blueprint(places_api)
-api.register_blueprint(favorites_api)
-api.register_blueprint(routes_api)
-api.register_blueprint(premium_api)
-api.register_blueprint(health_api)
-api.register_blueprint(recover_bp)
-api.register_blueprint(reset_bp)
-api.register_blueprint(pois_api)
+# ============================
+# REGISTER
+# ============================
+@api.route("/register", methods=["POST"])
+def register():
+    data = request.get_json()
 
-# -----------------------------
-# HEALTH CHECK ROOT
-# -----------------------------
-@api.route("/health", methods=["GET"])
-def health():
-    return jsonify({"status": "ok"}), 200
+    shortname = data.get("shortname")
+    email = data.get("email")
+    password = data.get("password")
+    avatar = data.get("avatar")
 
-# -----------------------------
-# ROOT (opcional pero recomendado)
-# -----------------------------
-@api.route("/", methods=["GET"])
-def index():
+    if not shortname or not email or not password or not avatar:
+        return jsonify({"msg": "Faltan datos"}), 400
+
+    # ¿Existe ya?
+    existing = User.query.filter_by(email=email).first()
+    if existing:
+        return jsonify({"msg": "Ese correo ya está registrado"}), 400
+
+    # Crear usuario
+    user = User(
+        shortname=shortname,
+        email=email,
+        password=generate_password_hash(password),
+        avatar=avatar
+    )
+
+    db.session.add(user)
+    db.session.commit()
+
+    return jsonify({"msg": "Usuario creado correctamente"}), 201
+
+
+# ============================
+# LOGIN
+# ============================
+@api.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
+
+    email = data.get("email")
+    password = data.get("password")
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user or not check_password_hash(user.password, password):
+        return jsonify({"msg": "Credenciales incorrectas"}), 401
+
     return jsonify({
-        "message": "ShadowMap API funcionando",
-        "endpoints": [
-            "/api/register",
-            "/api/login",
-            "/api/profile",
-            "/api/places",
-            "/api/favorites",
-            "/api/routes",
-            "/api/premium-routes",
-            "/api/pois",
-            "/api/recover",
-            "/api/reset-password/<token>",
-            "/api/health"
-        ]
+        "token": "fake-token",
+        "user": user.serialize()
     }), 200

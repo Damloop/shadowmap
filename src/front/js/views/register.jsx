@@ -1,5 +1,3 @@
-// src/front/js/views/register.jsx
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AvatarSelector from "../../components/AvatarSelector";
@@ -18,7 +16,6 @@ const Register = () => {
   });
 
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const handleChange = e => {
     setFormData({
@@ -30,14 +27,12 @@ const Register = () => {
   const handleAvatarSelect = id => {
     setFormData({
       ...formData,
-      avatar: id + 1
+      avatar: id
     });
   };
 
-  const handleSubmit = async e => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setError("");
-    setSuccess("");
 
     if (!formData.shortname || formData.shortname.length > 7) {
       setError("El nombre debe tener máximo 7 caracteres.");
@@ -61,8 +56,8 @@ const Register = () => {
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
-          username: formData.shortname,   // 🔥 CORREGIDO
-          avatar: formData.avatar         // 🔥 CORREGIDO
+          shortname: formData.shortname,
+          avatar: formData.avatar
         })
       });
 
@@ -73,8 +68,7 @@ const Register = () => {
         return;
       }
 
-      setSuccess("Identidad fijada. Redirigiendo…");
-      setTimeout(() => navigate("/login"), 1500);
+      navigate("/profile");
 
     } catch (err) {
       console.error("Error en registro:", err);
@@ -85,7 +79,6 @@ const Register = () => {
   return (
     <div className="register-wrapper">
 
-      {/* LADO IZQUIERDO */}
       <div className="register-left">
         <h1 className="shadow-title">SHADOWMAP</h1>
 
@@ -96,17 +89,11 @@ const Register = () => {
           Elige bien: tu avatar será la forma que adopte tu presencia
           dentro de esta red de anomalías, señales y secretos.
         </p>
-      </div>
 
-      {/* LADO DERECHO */}
-      <div className="register-right">
         <div className="register-box">
-
           {error && <div className="sm-error">{error}</div>}
-          {success && <div className="sm-success">{success}</div>}
 
-          <form onSubmit={handleSubmit} className="sm-form">
-
+          <form className="sm-form" onSubmit={(e) => e.preventDefault()}>
             <input
               type="text"
               name="shortname"
@@ -131,25 +118,15 @@ const Register = () => {
               className="sm-input"
               onChange={handleChange}
             />
-
-            <AvatarSelector
-              onSelect={handleAvatarSelect}
-              selected={formData.avatar}
-            />
-
-            <button type="submit" className="sm-btn glitch-btn">
-              <span className="glitch-layer">Fijar Identidad</span>
-              <span className="glitch-layer">Fijar Identidad</span>
-              <span className="glitch-layer">Fijar Identidad</span>
-            </button>
-
           </form>
-
-          <p className="sm-link" onClick={() => navigate("/login")}>
-            ¿Ya estás registrado? Acceder
-          </p>
-
         </div>
+      </div>
+
+      <div className="register-right">
+        <AvatarSelector
+          onSelect={handleAvatarSelect}
+          onConfirm={handleSubmit}
+        />
       </div>
 
     </div>

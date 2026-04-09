@@ -3,40 +3,45 @@ export const avatarData = [
     id: 1,
     src: "/avatar/avatar_elias.jpg",
     nombre: "Elias",
-    // JÓVENES / ADOLESCENTES
-    fortaleza: "Lectura emocional instantánea — detecta intenciones y microgestos al momento",
-    debilidad: "Hiperconectado: se dispersa entre demasiados estímulos digitales"
+    fuerza: 2,
+    rapidez: 3,
+    resistencia: 2,
+    inteligencia: 3
   },
   {
     id: 2,
     src: "/avatar/avatar_lfrank.jpg",
     nombre: "L. Frank",
-    // INCLASIFICABLE
-    fortaleza: "Creatividad caótica — soluciones que nadie más imaginaría",
-    debilidad: "Lógica no lineal: difícil de predecir incluso para sí mismo"
+    fuerza: 1,
+    rapidez: 2,
+    resistencia: 2,
+    inteligencia: 5
   },
   {
     id: 3,
     src: "/avatar/avatar_rhea.jpg",
     nombre: "Rhea",
-    // JÓVENES / ADOLESCENTES
-    fortaleza: "Intuición algorítmica — detecta patrones ocultos en segundos",
-    debilidad: "Sensibilidad extrema: absorbe el ambiente y se satura rápido"
+    fuerza: 1,
+    rapidez: 5,
+    resistencia: 1,
+    inteligencia: 3
   },
   {
     id: 4,
     src: "/avatar/avatar_silas.jpg",
     nombre: "Silas",
-    // ADULTO / MAYOR
-    fortaleza: "Experiencia táctica — toma decisiones frías y precisas bajo presión",
-    debilidad: "Carga emocional acumulada: arrastra recuerdos que lo ralentizan"
+    fuerza: 5,
+    rapidez: 1,
+    resistencia: 3,
+    inteligencia: 1
   },
   {
     id: 5,
     src: "/avatar/avatar_unit47.jpg",
     nombre: "Unit‑47",
-    // INCLASIFICABLE / NO HUMANO
-    fortaleza: "Procesamiento autónomo — análisis en milisegundos sin margen de error",
-    debilidad: "Protocolos rígidos: incapaz de improvisar fuera de parámetros"
+    fuerza: 1,
+    rapidez: 2,
+    resistencia: 5,
+    inteligencia: 2
   }
 ];

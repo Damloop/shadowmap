@@ -1,0 +1,59 @@
+.carousel-container {
+    width: 100%;
+    max-width: 450px;
+    margin: 30px auto;
+    position: relative;
+}
+
+.carousel-btn {
+    width: 100%;
+    background: rgba(120, 0, 255, 0.2);
+    border: 1px solid #7a00ff;
+    color: #d8caff;
+    padding: 8px 0;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.carousel-btn:hover {
+    background: rgba(120, 0, 255, 0.35);
+}
+
+.carousel-list {
+    height: 380px;
+    overflow-y: auto;
+    padding-right: 10px;
+    scroll-behavior: smooth;
+}
+
+.carousel-card {
+    background: rgba(20, 20, 30, 0.6);
+    border: 1px solid #7a00ff;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.carousel-card:hover {
+    background: rgba(40, 0, 80, 0.6);
+    transform: scale(1.02);
+}
+
+.carousel-card.locked {
+    filter: grayscale(1) brightness(0.5);
+    cursor: not-allowed;
+    position: relative;
+}
+
+.locked-tag {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #7a00ff;
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+    color: white;
+}

@@ -1,13 +1,28 @@
-// /src/front/js/views/profile.jsx
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../store/appContext.jsx";
 import { useNavigate } from "react-router-dom";
 import { getAvatarLore } from "../../data/avatarLore";
+import { missions } from "../../data/missions";
+import { MissionCarousel } from "../component/MissionCarousel.jsx";
 import "../../styles/profile.css";
 
 const Profile = () => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate();
+
+    const [level, setLevel] = useState(0);
+    const [completedMissions, setCompletedMissions] = useState([]);
+    const [selectedMission, setSelectedMission] = useState(null);
+
+    // PEDIR LOCALIZACIÓN AL ENTRAR
+    useEffect(() => {
+        navigator.geolocation.getCurrentPosition(
+            () => {},
+            () => {
+                alert("ShadowMap requiere acceso a tu localización para funcionar.");
+            }
+        );
+    }, []);
 
     useEffect(() => {
         if (!store.user) actions.getCurrentUser();
@@ -34,6 +49,28 @@ const Profile = () => {
         "Túnel 14 — Anomalía térmica",
         "Distrito 7 — Patrón no identificado"
     ];
+
+    // DESBLOQUEAR SOLO LA MISIÓN 4
+    useEffect(() => {
+        if (completedMissions.length >= 3) {
+            missions.forEach(m => {
+                if (m.id === 4) m.locked = false;
+            });
+        }
+    }, [completedMissions]);
+
+    const handleSelectMission = (mission) => {
+        if (mission.locked) return;
+        setSelectedMission(mission);
+    };
+
+    const handleCompleteMission = (mission) => {
+        if (!completedMissions.includes(mission.id)) {
+            setCompletedMissions([...completedMissions, mission.id]);
+            setLevel(level + 5);
+        }
+        setSelectedMission(null);
+    };
 
     return (
         <div className="profile-container">
@@ -79,17 +116,13 @@ const Profile = () => {
             <main className="profile-main">
                 <h1 className="shadow-title">SHADOWMAP</h1>
 
-                {/* PROFILE CARD */}
                 <div className="profile-card">
                     <img src={lore.src} className="profile-avatar" />
 
                     <div className="profile-info">
                         <h2>{shortname}</h2>
+                        <p className="title">Nivel {level}</p>
 
-                        {/* NIVEL */}
-                        <p className="title">Nivel {lore.level}</p>
-
-                        {/* HISTORIA */}
                         <p style={{
                             marginTop: "20px",
                             fontSize: "15px",
@@ -102,7 +135,6 @@ const Profile = () => {
                     </div>
                 </div>
 
-                {/* RUTAS SUGERIDAS */}
                 <div className="avatar-selector">
                     <h3>¿Por dónde empezamos?</h3>
 
@@ -114,6 +146,40 @@ const Profile = () => {
                         ))}
                     </ul>
                 </div>
+
+                <h3 className="missions-title">Misiones</h3>
+
+                <MissionCarousel
+                    missions={[
+                        ...missions.filter(m => !m.locked),
+                        ...missions.filter(m => m.locked).slice(0, 1)
+                    ]}
+                    onSelect={(m) => handleSelectMission(m)}
+                />
+
+                {selectedMission && (
+                    <div className="mission-modal">
+                        <div className="mission-modal-content">
+                            <h3>{selectedMission.name}</h3>
+                            <p>{selectedMission.description}</p>
+
+                            <button
+                                className="btn-complete"
+                                onClick={() => handleCompleteMission(selectedMission)}
+                            >
+                                Completar misión
+                            </button>
+
+                            <button
+                                className="btn-close"
+                                onClick={() => setSelectedMission(null)}
+                            >
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                )}
+
             </main>
 
         </div>

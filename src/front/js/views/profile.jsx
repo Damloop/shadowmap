@@ -14,16 +14,15 @@ const Profile = () => {
     const [completedMissions, setCompletedMissions] = useState([]);
     const [selectedMission, setSelectedMission] = useState(null);
 
-    // PEDIR LOCALIZACIÓN AL ENTRAR
+    // Pedir localización (pero sin bloquear el perfil)
     useEffect(() => {
         navigator.geolocation.getCurrentPosition(
             () => {},
-            () => {
-                alert("ShadowMap requiere acceso a tu localización para funcionar.");
-            }
+            () => {}
         );
     }, []);
 
+    // Cargar usuario
     useEffect(() => {
         if (!store.user) actions.getCurrentUser();
     }, []);
@@ -43,18 +42,11 @@ const Profile = () => {
 
     const lore = getAvatarLore(avatar);
 
-    const suggestedRoutes = [
-        "Sector 9 — Señal intermitente",
-        "Bosque de Blackwood — Eco residual",
-        "Túnel 14 — Anomalía térmica",
-        "Distrito 7 — Patrón no identificado"
-    ];
-
-    // DESBLOQUEAR SOLO LA MISIÓN 4
+    // Desbloquear misión difícil si completa 3
     useEffect(() => {
         if (completedMissions.length >= 3) {
             missions.forEach(m => {
-                if (m.id === 4) m.locked = false;
+                if (m.id === 6) m.locked = false;
             });
         }
     }, [completedMissions]);
@@ -92,13 +84,17 @@ const Profile = () => {
 
                 <h2>Estado</h2>
                 <ul>
-                    <li><span>Cuenta</span><span>{isPremium ? "Premium" : "Estándar"}</span></li>
+                    <li><span>Cuenta Estándar</span></li>
                 </ul>
 
                 {!isPremium && (
-                    <p className="sidebar-note">
-                        Avatar fijado. Solo Premium puede reconfigurar identidad.
-                    </p>
+                    <div
+                        className="account-option"
+                        onClick={() => navigate("/premium")}
+                        style={{ cursor: "pointer", marginTop: "10px" }}
+                    >
+                        Acceso a Premium
+                    </div>
                 )}
 
                 <button
@@ -123,32 +119,16 @@ const Profile = () => {
                         <h2>{shortname}</h2>
                         <p className="title">Nivel {level}</p>
 
-                        <p style={{
-                            marginTop: "20px",
-                            fontSize: "15px",
-                            lineHeight: "1.6",
-                            maxWidth: "600px",
-                            color: "#d4d4d4"
-                        }}>
+                        <p className="lore-text">
                             <strong>{lore.title}:</strong> {lore.origin}
                         </p>
                     </div>
                 </div>
 
-                <div className="avatar-selector">
-                    <h3>¿Por dónde empezamos?</h3>
+                {/* TÍTULO DE MISIONES CENTRADO */}
+             
 
-                    <ul style={{ listStyle: "none", padding: 0 }}>
-                        {suggestedRoutes.map((route, i) => (
-                            <li key={i} className="suggested-route">
-                                {route}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-
-                <h3 className="missions-title">Misiones</h3>
-
+                {/* CARRUSEL DE MISIONES */}
                 <MissionCarousel
                     missions={[
                         ...missions.filter(m => !m.locked),
@@ -157,6 +137,7 @@ const Profile = () => {
                     onSelect={(m) => handleSelectMission(m)}
                 />
 
+                {/* MODAL DE MISIÓN */}
                 {selectedMission && (
                     <div className="mission-modal">
                         <div className="mission-modal-content">

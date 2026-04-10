@@ -12,6 +12,7 @@ import Recover from "./js/views/recover.jsx";
 import ResetPassword from "./js/views/resetPassword.jsx";
 import MapView from "./js/views/map.jsx";
 import PlaceDetails from "./js/views/placeDetails.jsx";
+import PremiumPage from "./js/views/premiumPage.jsx"; 
 
 // 🔥 Sonido principal
 import glitchPulse2 from "./sounds/glitch-pulse2.mp3";

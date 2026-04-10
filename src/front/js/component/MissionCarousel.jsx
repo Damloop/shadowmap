@@ -1,38 +1,70 @@
-import React, { useRef } from "react";
+// /src/front/js/component/MissionCarousel.jsx
+
+import React from "react";
 import "../../styles/missionCarousel.css";
 
 export const MissionCarousel = ({ missions, onSelect }) => {
-    const scrollRef = useRef(null);
+    if (!missions || missions.length === 0) return null;
 
-    const scrollUp = () => {
-        scrollRef.current.scrollBy({ top: -200, behavior: "smooth" });
+    // Clase según dificultad
+    const getDifficultyClass = (difficulty) => {
+        if (difficulty === "Fácil") return "easy";
+        if (difficulty === "Media") return "medium";
+        if (difficulty === "Difícil") return "hard";
+        return "";
     };
 
-    const scrollDown = () => {
-        scrollRef.current.scrollBy({ top: 200, behavior: "smooth" });
+    // Estrellas según dificultad
+    const getStars = (difficulty) => {
+        if (difficulty === "Fácil") return "⭐";
+        if (difficulty === "Media") return "⭐⭐";
+        if (difficulty === "Difícil") return "⭐⭐⭐";
+        return "";
     };
 
     return (
         <div className="carousel-container">
-            <button className="carousel-btn up" onClick={scrollUp}>▲</button>
-
-            <div className="carousel-list" ref={scrollRef}>
-                {missions.map(m => (
+            <div className="carousel-list">
+                {missions.map((m) => (
                     <div
                         key={m.id}
-                        className={`carousel-card ${m.locked ? "locked" : ""}`}
-                        onClick={() => !m.locked && onSelect(m)}
+                        className={`carousel-card ${getDifficultyClass(m.difficulty)} ${
+                            m.locked ? "locked" : ""
+                        }`}
+                        onClick={() => {
+                            if (!m.locked && onSelect) onSelect(m);
+                        }}
+                        style={{
+                            cursor: m.locked ? "not-allowed" : "pointer",
+                        }}
                     >
-                        <h4>{m.name}</h4>
-                        <p>{m.description}</p>
-                        <span className="difficulty">{m.difficulty}</span>
-
+                        {/* Etiqueta de bloqueo */}
                         {m.locked && <span className="locked-tag">BLOQUEADA</span>}
+
+                        {/* TÍTULO + NIVEL EN UNA SOLA LÍNEA */}
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                width: "100%",
+                                marginBottom: "6px"
+                            }}
+                        >
+                            <h4 style={{ margin: 0 }}>
+                                <strong>Misión:</strong> {m.name}
+                            </h4>
+
+                            <span style={{ fontSize: "14px", opacity: 0.9 }}>
+                                <strong>Nivel:</strong> {m.difficulty} {getStars(m.difficulty)}
+                            </span>
+                        </div>
+
+                        {/* DESCRIPCIÓN */}
+                        <p className="mission-description">{m.description}</p>
                     </div>
                 ))}
             </div>
-
-            <button className="carousel-btn down" onClick={scrollDown}>▼</button>
         </div>
     );
 };

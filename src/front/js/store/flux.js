@@ -1,10 +1,9 @@
 // src/front/js/store/flux.js
 
 import places from "./places.js";
+import { API_URL } from "../../api/config.js";   // ← IMPORTANTE
 
 const getState = ({ getStore, getActions, setStore }) => {
-
-    const API_URL = "https://solid-goldfish-xj5599r4x942vrp4-3001.app.github.dev";
 
     const placesState = places({ getStore, getActions, setStore, API_URL });
 

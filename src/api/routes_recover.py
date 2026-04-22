@@ -2,7 +2,7 @@
 
 from flask import Blueprint, request, jsonify
 from src.api.models import db, User
-from src.api.utils import send_email
+from src.api.extensions import mail   # ← USAR EL MAILER REAL
 import secrets
 import os
 
@@ -11,30 +11,23 @@ recover_bp = Blueprint("recover_bp", __name__)
 
 @recover_bp.route("/recover", methods=["POST"])
 def recover():
-    """
-    ShadowMap — Recovery Beacon
-    Genera un token de recuperación y envía un email con el enlace.
-    """
     data = request.get_json() or {}
     email = data.get("email")
 
+    # Seguridad: no revelar si existe o no
     user = User.query.filter_by(email=email).first()
-
-    # Seguridad: no revelar si existe
     if not user:
         return jsonify({"success": True}), 200
 
-    # Token seguro
+    # Generar token seguro
     token = secrets.token_urlsafe(32)
-
-    # Guardar token (el modelo debe tener recovery_token)
     user.recovery_token = token
     db.session.commit()
 
-    # Enlace al frontend
+    # Construir enlace al frontend
     reset_link = f"{os.getenv('FRONTEND_URL')}/reset-password/{token}"
 
-    # Email ShadowMap
+    # Email HTML ShadowMap
     html = f"""
     <h1 style='font-family: UnifrakturMaguntia, serif; color:#c9a8ff; text-shadow:0 0 12px rgba(150,80,255,0.7); text-align:center;'>
         SHADOWMAP — Recuperación
@@ -53,24 +46,11 @@ def recover():
     <p style='color:#777; margin-top:20px;'>Si no solicitaste este cambio, ignora este mensaje.</p>
     """
 
-    send_email(
-        to=email,
-        subject="Recuperación de contraseña - ShadowMap",
-        body=html,
-        html=True
-    )
+    # Enviar email REAL con SendGrid
+    mail.send({
+        "to": email,
+        "subject": "Recuperación de contraseña - ShadowMap",
+        "html": html
+    })
 
     return jsonify({"success": True}), 200
-
-def send_email(to, subject, body):
-    """
-    Envío de email simulado (dummy).
-    """
-    print("====================================")
-    print(" EMAIL SIMULADO ")
-    print("====================================")
-    print(f"Para: {to}")
-    print(f"Asunto: {subject}")
-    print(f"Cuerpo:\n{body}")
-    print("====================================")
-    return True

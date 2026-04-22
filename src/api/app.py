@@ -6,11 +6,18 @@ from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 
+from dotenv import load_dotenv
+import os
+
+# Cargar variables de entorno (.env)
+load_dotenv()
+
 from src.api.extensions import mail
 from src.api.models import db
 
 migrate = Migrate()
 jwt = JWTManager()
+
 
 def create_app():
     app = Flask(__name__)
@@ -65,3 +72,11 @@ def create_app():
     app.register_blueprint(favorites_api, url_prefix="/api")
 
     return app
+
+
+# ============================
+# RUN SERVER (NECESARIO)
+# ============================
+if __name__ == "__main__":
+    app = create_app()
+    app.run(host="0.0.0.0", port=3001, debug=True)

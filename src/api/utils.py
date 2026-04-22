@@ -1,54 +1,39 @@
-import secrets
+# src/api/utils.py
+
+import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 # ============================================================
-#  GENERADOR DE TOKEN DE RECUPERACIÓN
+#  EMAIL REAL CON SENDGRID
 # ============================================================
 
-def generate_recovery_token(user_id):
+def send_email(to, subject, html):
     """
-    Genera un token único basado en user_id + random hex.
+    Envía un email real usando SendGrid.
     """
-    return f"{user_id}-{secrets.token_hex(16)}"
+    api_key = os.getenv("SENDGRID_API_KEY")
+    sender = os.getenv("SENDGRID_FROM_EMAIL")
 
+    if not api_key or not sender:
+        print("❌ ERROR: Falta SENDGRID_API_KEY o SENDGRID_FROM_EMAIL en .env")
+        return False
 
-# ============================================================
-#  EMAIL DE RECUPERACIÓN (SIMULADO)
-# ============================================================
+    try:
+        sg = SendGridAPIClient(api_key)
 
-def send_recovery_email(email, token):
-    """
-    Placeholder seguro.
-    Cuando actives Flask-Mail, este método enviará emails reales.
-    """
-    link = f"https://shadowmap.app/reset-password/{token}"
+        message = Mail(
+            from_email=sender,
+            to_emails=to,
+            subject=subject,
+            html_content=html
+        )
 
-    print("====================================")
-    print(" EMAIL DE RECUPERACIÓN (SIMULADO) ")
-    print("====================================")
-    print(f"Para: {email}")
-    print(f"Token: {token}")
-    print(f"Enlace: {link}")
-    print("====================================")
-    print("Habilita Flask-Mail para envío real.")
-    print("====================================")
+        response = sg.send(message)
 
-    return True
+        print("📨 Email enviado:", response.status_code)
+        return True
 
-
-# ============================================================
-#  EMAIL GENÉRICO (SIMULADO) — NECESARIO PARA routes_recover
-# ============================================================
-
-def send_email(to, subject, body):
-    """
-    Envío de email simulado (dummy).
-    Compatible con routes_recover.py.
-    """
-    print("====================================")
-    print(" EMAIL SIMULADO ")
-    print("====================================")
-    print(f"Para: {to}")
-    print(f"Asunto: {subject}")
-    print(f"Cuerpo:\n{body}")
-    print("====================================")
-    return True
+    except Exception as e:
+        print("❌ Error enviando email:", str(e))
+        return False

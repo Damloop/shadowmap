@@ -1,15 +1,46 @@
 # src/api/extensions.py
 
-# Sistema de email desactivado (dummy)
-class DummyMail:
+import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+
+
+class Mailer:
     def init_app(self, app):
-        print("⚠️ Email desactivado (modo dummy). No se enviarán correos reales.")
+        print("📨 SendGrid habilitado. Emails reales activos.")
 
     def send(self, message):
-        print("=== EMAIL SIMULADO ===")
-        print(f"Para: {message.get('to')}")
-        print(f"Asunto: {message.get('subject')}")
-        print(f"Cuerpo:\n{message.get('body')}")
-        print("======================")
+        """
+        message = {
+            "to": "email",
+            "subject": "texto",
+            "html": "<p>contenido</p>"
+        }
+        """
+        api_key = os.getenv("SENDGRID_API_KEY")
+        sender = os.getenv("SENDGRID_FROM_EMAIL")
 
-mail = DummyMail()
+        if not api_key or not sender:
+            print("❌ ERROR: Falta SENDGRID_API_KEY o SENDGRID_FROM_EMAIL en .env")
+            return False
+
+        try:
+            sg = SendGridAPIClient(api_key)
+
+            email = Mail(
+                from_email=sender,
+                to_emails=message["to"],
+                subject=message["subject"],
+                html_content=message["html"]
+            )
+
+            response = sg.send(email)
+            print("📨 Email enviado:", response.status_code)
+            return True
+
+        except Exception as e:
+            print("❌ Error enviando email:", str(e))
+            return False
+
+
+mail = Mailer()

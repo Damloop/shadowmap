@@ -1,5 +1,8 @@
+// src/front/js/views/recover.jsx
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../../api/config";
 import "../../styles/recover.css";
 
 const Recover = () => {
@@ -7,21 +10,19 @@ const Recover = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
 
     try {
-      const resp = await fetch("https://solid-goldfish-xj5599r4x942vrp4-3001.app.github.dev/api/recover", {
+      const resp = await fetch(`${API_URL}/api/recover`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })
       });
 
-      const data = await resp.json().catch(() => null);
-
       if (!resp.ok) {
-        setMessage(data?.message || "No se pudo procesar la solicitud.");
+        setMessage("No se pudo procesar la solicitud.");
         return;
       }
 
@@ -48,7 +49,7 @@ const Recover = () => {
             placeholder="tu-correo@example.com"
             className="recover-input"
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
           />
 
           <button type="submit" className="recover-btn glitch-btn">

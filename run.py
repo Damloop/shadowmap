@@ -1,5 +1,11 @@
 # run.py
 
+import os
+from dotenv import load_dotenv
+
+# Cargar variables de entorno desde .env en la raíz
+load_dotenv()
+
 from src.api.app import create_app
 from src.api.models import db
 

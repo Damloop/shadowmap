@@ -1,21 +1,16 @@
 // src/front/js/views/resetPassword.jsx
 
 import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import "../../styles/recover.css"; // usa tu mismo estilo de recover
+import { useParams } from "react-router-dom";
+import { API_URL } from "../../api/config";
 
 const ResetPassword = () => {
   const { token } = useParams();
-  const navigate = useNavigate();
-
-  const API_URL = "https://solid-goldfish-xj5599r4x942vrp4-3001.app.github.dev";
-
   const [password, setPassword] = useState("");
-  const [status, setStatus] = useState(null);
+  const [done, setDone] = useState(false);
 
-  const handleReset = async e => {
+  const handleReset = async (e) => {
     e.preventDefault();
-    setStatus(null);
 
     try {
       const resp = await fetch(`${API_URL}/api/reset-password/${token}`, {
@@ -25,43 +20,35 @@ const ResetPassword = () => {
       });
 
       if (resp.ok) {
-        setStatus("success");
-        setTimeout(() => navigate("/login"), 1500);
+        setDone(true);
       } else {
-        setStatus("error");
+        console.error("Error en reset-password, status:", resp.status);
       }
-    } catch (err) {
-      setStatus("error");
+    } catch (error) {
+      console.error("Error en reset-password:", error);
     }
   };
 
   return (
-    <div className="recover-page">
+    <div className="reset-container">
+      <h1>Restaurar contraseña</h1>
 
-      {/* TÍTULO SHADOWMAP */}
-      <h1 className="recover-title">Nueva contraseña</h1>
+      {done ? (
+        <div className="alert alert-success">
+          Contraseña actualizada. Ya puedes iniciar sesión.
+        </div>
+      ) : (
+        <form onSubmit={handleReset}>
+          <input
+            type="password"
+            placeholder="Nueva contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
 
-      <form onSubmit={handleReset}>
-        <input
-          type="password"
-          className="recover-input"
-          placeholder="Introduce tu nueva contraseña"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          required
-        />
-
-        <button type="submit" className="recover-btn">
-          Guardar contraseña
-        </button>
-      </form>
-
-      {status === "success" && (
-        <p className="recover-success">✔ Contraseña actualizada correctamente</p>
-      )}
-
-      {status === "error" && (
-        <p className="recover-error">✖ Token inválido o expirado</p>
+          <button type="submit">Guardar</button>
+        </form>
       )}
     </div>
   );

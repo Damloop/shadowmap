@@ -2,32 +2,27 @@
 
 from flask import Blueprint, request, jsonify
 from src.api.models import db, User
-from src.api.extensions import mail   # ← USAR EL MAILER REAL
+from src.api.extensions import mail
 import secrets
 import os
 
 recover_bp = Blueprint("recover_bp", __name__)
-
 
 @recover_bp.route("/recover", methods=["POST"])
 def recover():
     data = request.get_json() or {}
     email = data.get("email")
 
-    # Seguridad: no revelar si existe o no
     user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({"success": True}), 200
 
-    # Generar token seguro
     token = secrets.token_urlsafe(32)
     user.recovery_token = token
     db.session.commit()
 
-    # Construir enlace al frontend
     reset_link = f"{os.getenv('FRONTEND_URL')}/reset-password/{token}"
 
-    # Email HTML ShadowMap
     html = f"""
     <h1 style='font-family: UnifrakturMaguntia, serif; color:#c9a8ff; text-shadow:0 0 12px rgba(150,80,255,0.7); text-align:center;'>
         SHADOWMAP — Recuperación
@@ -46,7 +41,6 @@ def recover():
     <p style='color:#777; margin-top:20px;'>Si no solicitaste este cambio, ignora este mensaje.</p>
     """
 
-    # Enviar email REAL con SendGrid
     mail.send({
         "to": email,
         "subject": "Recuperación de contraseña - ShadowMap",

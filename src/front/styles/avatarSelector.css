@@ -14,7 +14,6 @@
   border: 1px solid rgba(150, 80, 255, 0.25);
   box-shadow: 0 0 35px rgba(150, 80, 255, 0.25);
 
-  /* SUBIR TODO */
   margin-top: -60px;
   transform: translateY(-30px);
 }
@@ -28,7 +27,6 @@
   justify-content: center;
   gap: 26px;
 
-  /* SUBIR MÁS */
   margin-top: -20px;
 }
 
@@ -36,8 +34,8 @@
    AVATAR + HALO RESPIRANTE
 =========================== */
 .avatar-mostrado {
-  width: 320px;   /* MÁS GRANDE */
-  height: 320px;  /* MÁS GRANDE */
+  width: 320px;
+  height: 320px;
   border-radius: 14px;
   overflow: hidden;
   border: 3px solid rgba(150, 80, 255, 0.6);
@@ -114,7 +112,6 @@
   border: 1px solid rgba(150, 80, 255, 0.25);
   box-shadow: 0 0 18px rgba(150, 80, 255, 0.25);
 
-  /* SUBIR */
   margin-top: -18px;
 }
 
@@ -166,20 +163,7 @@
 }
 
 /* ===========================
-   ELIMINAR BOTÓN COMPLETAMENTE
-=========================== */
-.glitch-btn,
-.sm-btn {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* ===========================
-   TEXTO FIJAR IDENTIDAD
+   FIJAR IDENTIDAD
 =========================== */
 .avatar-fijar-identidad {
   margin-top: -10px;

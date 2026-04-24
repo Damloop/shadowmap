@@ -1,16 +1,20 @@
 // src/front/js/views/resetPassword.jsx
 
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { API_URL } from "../../api/config";
+import "../../styles/recover.css";
 
 const ResetPassword = () => {
   const { token } = useParams();
+  const navigate = useNavigate();
+
   const [password, setPassword] = useState("");
-  const [done, setDone] = useState(false);
+  const [status, setStatus] = useState(null); // success | error
 
   const handleReset = async (e) => {
     e.preventDefault();
+    setStatus(null);
 
     try {
       const resp = await fetch(`${API_URL}/api/reset-password/${token}`, {
@@ -20,36 +24,49 @@ const ResetPassword = () => {
       });
 
       if (resp.ok) {
-        setDone(true);
+        setStatus("success");
+        setTimeout(() => navigate("/login"), 1500);
       } else {
-        console.error("Error en reset-password, status:", resp.status);
+        setStatus("error");
       }
-    } catch (error) {
-      console.error("Error en reset-password:", error);
+    } catch (err) {
+      setStatus("error");
     }
   };
 
   return (
-    <div className="reset-container">
-      <h1>Restaurar contraseña</h1>
+    <div className="recover-wrapper">
+      <div className="recover-box">
 
-      {done ? (
-        <div className="alert alert-success">
-          Contraseña actualizada. Ya puedes iniciar sesión.
-        </div>
-      ) : (
-        <form onSubmit={handleReset}>
+        <h1 className="recover-title">SHADOWMAP</h1>
+        <h2 className="recover-subtitle">Nueva contraseña</h2>
+
+        {status === "success" && (
+          <div className="recover-success">✔ Contraseña actualizada correctamente</div>
+        )}
+
+        {status === "error" && (
+          <div className="recover-error">✖ Token inválido o expirado</div>
+        )}
+
+        <form onSubmit={handleReset} className="recover-form">
           <input
             type="password"
-            placeholder="Nueva contraseña"
+            placeholder="Introduce tu nueva contraseña"
+            className="recover-input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
 
-          <button type="submit">Guardar</button>
+          <button type="submit" className="recover-btn glitch-btn">
+            <span className="glitch-layer">Guardar contraseña</span>
+            <span className="glitch-layer">Guardar contraseña</span>
+            <span className="glitch-layer">Guardar contraseña</span>
+          </button>
         </form>
-      )}
+
+      </div>
     </div>
   );
 };

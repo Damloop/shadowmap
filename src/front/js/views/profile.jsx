@@ -14,15 +14,10 @@ const Profile = () => {
     const [completedMissions, setCompletedMissions] = useState([]);
     const [selectedMission, setSelectedMission] = useState(null);
 
-    // Pedir localización (pero sin bloquear el perfil)
     useEffect(() => {
-        navigator.geolocation.getCurrentPosition(
-            () => {},
-            () => {}
-        );
+        navigator.geolocation.getCurrentPosition(() => {}, () => {});
     }, []);
 
-    // Cargar usuario
     useEffect(() => {
         if (!store.user) actions.getCurrentUser();
     }, []);
@@ -31,7 +26,7 @@ const Profile = () => {
 
     const {
         avatar,
-        shortname,
+        username,
         routesVisited,
         routesCreated,
         routesShared,
@@ -42,7 +37,6 @@ const Profile = () => {
 
     const lore = getAvatarLore(avatar);
 
-    // Desbloquear misión difícil si completa 3
     useEffect(() => {
         if (completedMissions.length >= 3) {
             missions.forEach(m => {
@@ -67,7 +61,6 @@ const Profile = () => {
     return (
         <div className="profile-container">
 
-            {/* SIDEBAR */}
             <aside className="sidebar">
                 <h2>Actividad</h2>
                 <ul>
@@ -108,7 +101,6 @@ const Profile = () => {
                 </button>
             </aside>
 
-            {/* MAIN */}
             <main className="profile-main">
                 <h1 className="shadow-title">SHADOWMAP</h1>
 
@@ -116,7 +108,7 @@ const Profile = () => {
                     <img src={lore.src} className="profile-avatar" />
 
                     <div className="profile-info">
-                        <h2>{shortname}</h2>
+                        <h2>{username}</h2>
                         <p className="title">Nivel {level}</p>
 
                         <p className="lore-text">
@@ -125,10 +117,6 @@ const Profile = () => {
                     </div>
                 </div>
 
-                {/* TÍTULO DE MISIONES CENTRADO */}
-             
-
-                {/* CARRUSEL DE MISIONES */}
                 <MissionCarousel
                     missions={[
                         ...missions.filter(m => !m.locked),
@@ -137,7 +125,6 @@ const Profile = () => {
                     onSelect={(m) => handleSelectMission(m)}
                 />
 
-                {/* MODAL DE MISIÓN */}
                 {selectedMission && (
                     <div className="mission-modal">
                         <div className="mission-modal-content">

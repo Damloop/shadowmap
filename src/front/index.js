@@ -11,5 +11,5 @@ root.render(
     <BrowserRouter>
       <Layout />
     </BrowserRouter>
-  </StoreWrapper>,
+  </StoreWrapper>
 );

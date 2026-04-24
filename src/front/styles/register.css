@@ -14,10 +14,10 @@
   flex-direction: column;
   justify-content: center;
   background: linear-gradient(
-      160deg,
-      rgba(40, 40, 40, 0.4),
-      rgba(0, 0, 0, 0.9)
-    );
+    160deg,
+    rgba(40, 40, 40, 0.4),
+    rgba(0, 0, 0, 0.9)
+  );
   box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.9);
 }
 
@@ -153,4 +153,21 @@
 
 .sm-link:hover {
   color: #e0e0e0;
+}
+.avatar-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; /* 👈 Asegura que se vea */
+}
+
+.avatar-modal-content {
+  background: transparent;
+  padding: 20px;
 }

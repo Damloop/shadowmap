@@ -14,14 +14,12 @@ const Map = () => {
     const { actions } = useContext(Context);
 
     useEffect(() => {
-        actions.loadPois();          // OK
-        actions.loadSharedRoutes();  // AHORA SÍ EXISTE
+        actions.loadPois();
+        actions.loadSharedRoutes();
     }, []);
 
     return (
         <div className="map-page">
-
-            {/* PANEL IZQUIERDO */}
             <div className="left-panel">
                 <h2 className="left-title">ROUTES</h2>
 
@@ -34,13 +32,11 @@ const Map = () => {
                 <SharedRoutes />
             </div>
 
-            {/* MAPA */}
             <div className="map-container">
                 <MapView />
                 <RouteCreator />
                 <RouteColorSelector />
             </div>
-
         </div>
     );
 };

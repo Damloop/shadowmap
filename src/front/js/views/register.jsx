@@ -1,17 +1,21 @@
-// src/front/js/views/register.jsx
-
 import React, { useState } from "react";
 import { API_URL } from "../../api/config";
+import { Link, useNavigate } from "react-router-dom";
+import "../../styles/register.css";
+
+import AvatarSelector from "../component/AvatarSelector.jsx";
 
 const Register = () => {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
+    shortname: "",
     email: "",
     password: "",
-    username: "",
-    avatar: ""
+    avatar: null
   });
 
-  const [created, setCreated] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setForm({
@@ -20,75 +24,111 @@ const Register = () => {
     });
   };
 
+  const handleAvatarSelect = (avatarId) => {
+    setForm({ ...form, avatar: avatarId });
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
+    setError("");
 
-    try {
-      const resp = await fetch(`${API_URL}/api/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form)
-      });
+    const resp = await fetch(`${API_URL}/api/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form)
+    });
 
-      if (resp.ok) {
-        setCreated(true);
-      } else {
-        const error = await resp.json().catch(() => null);
-        console.error("Error en register:", error);
-      }
-    } catch (error) {
-      console.error("Error en register:", error);
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      setError(data.msg || "Error al crear la cuenta");
+      return;
     }
+
+    navigate("/login");
   };
 
   return (
-    <div className="register-container">
-      <h1>Crear cuenta</h1>
+    <div className="register-wrapper">
 
-      {created ? (
-        <div className="alert alert-success">
-          Cuenta creada. Revisa tu correo.
+      <div style={{
+        display: "flex",
+        width: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: "80px",
+        marginTop: "40px"
+      }}>
+
+        <div style={{
+          flex: 1,
+          maxWidth: "420px",
+          marginLeft: "60px"
+        }}>
+          <h1 className="shadow-title">SHADOWMAP</h1>
+          <h2 className="shadow-subtitle">Registro de usuario</h2>
+
+          <form className="sm-form" onSubmit={handleRegister}>
+
+            {error && <div className="sm-error">{error}</div>}
+
+            <label className="sm-label">Nombre</label>
+            <input
+              type="text"
+              name="shortname"
+              className="sm-input"
+              value={form.shortname}
+              onChange={handleChange}
+              required
+            />
+
+            <label className="sm-label">Correo</label>
+            <input
+              type="email"
+              name="email"
+              className="sm-input"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+
+            <label className="sm-label">Contraseña</label>
+            <input
+              type="password"
+              name="password"
+              className="sm-input"
+              value={form.password}
+              onChange={handleChange}
+              required
+            />
+
+            <button type="submit" className="sm-btn">
+              Crear cuenta
+            </button>
+
+            <Link to="/login" className="sm-link">
+              ¿Ya tienes cuenta? Inicia sesión
+            </Link>
+
+          </form>
         </div>
-      ) : (
-        <form onSubmit={handleRegister}>
-          <input
-            type="text"
-            name="username"
-            placeholder="Nombre"
-            value={form.username}
-            onChange={handleChange}
-            required
-          />
 
-          <input
-            type="email"
-            name="email"
-            placeholder="Correo"
-            value={form.email}
-            onChange={handleChange}
-            required
+        <div style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          transform: "scale(1.15)",
+          transformOrigin: "top center",
+          marginTop: "10px"
+        }}>
+          <AvatarSelector
+            onSelect={handleAvatarSelect}
+            onConfirm={() => navigate("/login")}
           />
+        </div>
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Contraseña"
-            value={form.password}
-            onChange={handleChange}
-            required
-          />
-
-          <input
-            type="text"
-            name="avatar"
-            placeholder="Avatar (opcional)"
-            value={form.avatar}
-            onChange={handleChange}
-          />
-
-          <button type="submit">Registrarse</button>
-        </form>
-      )}
+      </div>
     </div>
   );
 };

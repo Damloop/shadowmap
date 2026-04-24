@@ -1,4 +1,4 @@
-// /src/front/data/avatarLore.js
+// src/front/data/avatarLore.js
 import { avatarData } from "./avatarData";
 
 export function getAvatarLore(avatarId) {
@@ -56,7 +56,6 @@ export function getAvatarLore(avatarId) {
       origin = "Este operador mantiene su historial completamente clasificado.";
   }
 
-  // Nivel basado en estadísticas del avatar
   const level = Math.floor(
     (avatar.fuerza + avatar.rapidez + avatar.resistencia + avatar.inteligencia) / 2
   );

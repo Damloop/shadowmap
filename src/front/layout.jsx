@@ -1,10 +1,7 @@
-// src/front/layout.jsx
-
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import ScrollToTop from "./js/component/scrollToTop";
 
-// VIEWS
 import Login from "./js/views/login.jsx";
 import Register from "./js/views/register.jsx";
 import Profile from "./js/views/profile.jsx";
@@ -12,12 +9,10 @@ import Recover from "./js/views/recover.jsx";
 import ResetPassword from "./js/views/resetPassword.jsx";
 import MapView from "./js/views/map.jsx";
 import PlaceDetails from "./js/views/placeDetails.jsx";
-import PremiumPage from "./js/views/premiumPage.jsx"; 
+import PremiumPage from "./js/views/premiumPage.jsx";
 
-// 🔥 Sonido principal
-import glitchPulse2 from "./sounds/glitch-pulse2.mp3";
+import introSound from "./sounds/login_register.mp3";
 
-// PROTECCIÓN DE RUTAS
 const PrivateRoute = ({ children }) => {
     const token = sessionStorage.getItem("token");
     return token ? children : <Login />;
@@ -25,20 +20,15 @@ const PrivateRoute = ({ children }) => {
 
 const Layout = () => {
     const location = useLocation();
+    const introPlayed = useRef(false);
 
-    // 🔥 Sonido + eco paranormal al cambiar de pantalla
     useEffect(() => {
-        const base = new Audio(glitchPulse2);
-        base.volume = 0.6;
-        base.play().catch(() => {});
-
-        // Eco suave (delay 120ms)
-        setTimeout(() => {
-            const echo = new Audio(glitchPulse2);
-            echo.volume = 0.25; // eco más suave
-            echo.play().catch(() => {});
-        }, 120);
-
+        if (!introPlayed.current && location.pathname === "/login") {
+            const audio = new Audio(introSound);
+            audio.volume = 0.6;
+            audio.play().catch(() => {});
+            introPlayed.current = true;
+        }
     }, [location.pathname]);
 
     return (
@@ -46,14 +36,12 @@ const Layout = () => {
             <ScrollToTop />
 
             <Routes>
-                {/* PUBLIC ROUTES */}
                 <Route path="/" element={<Login />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/recover" element={<Recover />} />
                 <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-                {/* PRIVATE ROUTES */}
                 <Route
                     path="/profile"
                     element={
@@ -81,7 +69,15 @@ const Layout = () => {
                     }
                 />
 
-                {/* 404 → LOGIN */}
+                <Route
+                    path="/premium"
+                    element={
+                        <PrivateRoute>
+                            <PremiumPage />
+                        </PrivateRoute>
+                    }
+                />
+
                 <Route path="*" element={<Login />} />
             </Routes>
         </>

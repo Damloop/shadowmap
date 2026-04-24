@@ -61,7 +61,6 @@ const Login = () => {
             onChange={handleChange}
           />
 
-          {/* BOTÓN ENTRAR QUE SIEMPRE SE VE Y FUNCIONA */}
           <button type="submit" className="btn-entrar">
             Entrar
           </button>

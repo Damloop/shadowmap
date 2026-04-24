@@ -21,14 +21,15 @@ const Recover = () => {
         body: JSON.stringify({ email })
       });
 
+      const data = await resp.json().catch(() => null);
+
       if (!resp.ok) {
-        setMessage("No se pudo procesar la solicitud.");
+        setMessage(data?.message || "No se pudo procesar la solicitud.");
         return;
       }
 
       setMessage("Solicitud enviada. Revisa tu correo si existe en el Archivo Sombrío.");
     } catch (err) {
-      console.error("Error en recuperación:", err);
       setMessage("Error interno del sistema.");
     }
   };
@@ -38,7 +39,6 @@ const Recover = () => {
       <div className="recover-box">
 
         <h1 className="recover-title">SHADOWMAP</h1>
-
         <h2 className="recover-subtitle">¿Olvidaste algo?</h2>
 
         {message && <div className="recover-message">{message}</div>}

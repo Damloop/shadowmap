@@ -1,31 +1,72 @@
-import React, { useState } from "react";
+// src/front/js/component/PremiumLevel.jsx
+
+import React, { useState, useEffect } from "react";
 import "../../styles/premium.css";
 
-const LEVEL_UPGRADES = {
-    1: ["Mapa más nítido", "Rutas básicas optimizadas", "Perfil mejorado"],
-    2: ["Análisis de zonas", "Historial extendido", "Velocidad x1.2"],
-    3: ["Misiones avanzadas", "Capas adicionales", "Rutas inteligentes"],
-    4: ["Alertas de actividad", "Mapa nocturno mejorado", "Velocidad x1.4"],
-    5: ["Estadísticas premium", "Rutas predictivas", "Exploración profunda"],
-    6: ["Análisis térmico", "Mapa espectral", "Velocidad x1.6"],
-    7: ["Misiones ocultas", "Rutas secretas", "Detección avanzada"],
-    8: ["Exploración remota", "Capas experimentales", "Velocidad x1.8"],
-    9: ["Análisis completo", "Mapa hiperrealista", "Rutas élite"],
-    10: ["Modo Maestro", "Acceso total", "Velocidad máxima"]
+const nicknames = {
+    1: "Explorador del Velo",
+    2: "Rastreador Umbrío",
+    3: "Navegante Espectral",
+    4: "Guardián del Umbral",
+    5: "Oráculo del Velo",
+    6: "Vigía Arcano",
+    7: "Adivino de Penumbra",
+    8: "Iluminado del Abismo",
+    9: "Ascendido Eterno",
+    10: "Soberano de ShadowMap"
 };
 
-// ⭐ SOBRENOMBRES POR NIVEL
-const LEVEL_TITLES = {
-    1: "Iniciado",
-    2: "Rastreador",
-    3: "Explorador Sombrío",
-    4: "Vigilante",
-    5: "Cazador de Ecos",
-    6: "Tejedor de Rutas",
-    7: "Señor del Mapa",
-    8: "Oráculo del Terreno",
-    9: "Maestro del Velo",
-    10: "Dios de ShadowMap"
+const upgrades = {
+    1: [
+        { name: "Eco de Ubicación", desc: "Muestra un rastro tenue de tus pasos recientes." },
+        { name: "Sombras de Precisión", desc: "Los marcadores se colocan con mayor exactitud." },
+        { name: "Visión Nocturna Suave", desc: "Ilumina ligeramente zonas oscuras del mapa." }
+    ],
+    2: [
+        { name: "Rutas Susurradas", desc: "Sugiere caminos alternativos según tu posición." },
+        { name: "Marcadores Inteligentes", desc: "Detecta zonas de interés automáticamente." },
+        { name: "Silencio Cartográfico", desc: "Reduce ruido visual en el mapa." }
+    ],
+    3: [
+        { name: "Sombras Reactivas", desc: "El mapa reacciona a tu movimiento." },
+        { name: "Rastreo Oculto", desc: "Sigue entidades invisibles (solo visual)." },
+        { name: "Análisis de Terreno", desc: "Resalta zonas densas o peligrosas." }
+    ],
+    4: [
+        { name: "Ecos del Pasado", desc: "Muestra rutas antiguas en el mapa." },
+        { name: "Visión Astral", desc: "Resalta puntos energéticos ocultos." },
+        { name: "Sombras Vivientes", desc: "Sombras animadas en el mapa." }
+    ],
+    5: [
+        { name: "Proyección de Ruta", desc: "Predice tu camino probable." },
+        { name: "Mapa Astral", desc: "Capa visual alternativa basada en energía." },
+        { name: "Rutas Fantasma", desc: "Líneas temporales que desaparecen." }
+    ],
+    6: [
+        { name: "Sombras Inteligentes", desc: "Alertan zonas de interés cercanas." },
+        { name: "Predicción Avanzada", desc: "Sugiere rutas óptimas." },
+        { name: "Ecos Remotos", desc: "Detecta actividad lejana." }
+    ],
+    7: [
+        { name: "Rutas Paralelas", desc: "Caminos alternativos ocultos." },
+        { name: "Sombras Cuánticas", desc: "Marcadores que cambian según contexto." },
+        { name: "Visión Remota", desc: "Permite ver zonas alejadas." }
+    ],
+    8: [
+        { name: "Ecos Infinitos", desc: "Registra actividad pasada y futura." },
+        { name: "Mapa Fractal", desc: "Capa visual multidimensional." },
+        { name: "Sombras Eternas", desc: "Marcadores permanentes." }
+    ],
+    9: [
+        { name: "Rutas Divinas", desc: "Caminos perfectos y optimizados." },
+        { name: "Sombras Supremas", desc: "Marcadores con poder total." },
+        { name: "Ecos Totales", desc: "Acceso a toda la información espectral." }
+    ],
+    10: [
+        { name: "Control Absoluto", desc: "Dominio total del mapa." },
+        { name: "Visión Omnisciente", desc: "Todo es visible." },
+        { name: "Sombras Infinitas", desc: "Marcadores ilimitados." }
+    ]
 };
 
 const PremiumLevel = () => {
@@ -34,58 +75,68 @@ const PremiumLevel = () => {
     );
 
     const [animating, setAnimating] = useState(false);
-    const [showFlash, setShowFlash] = useState(false);
-    const [showParticles, setShowParticles] = useState(false);
-    const [showAscendMessage, setShowAscendMessage] = useState(false);
 
-    const ascend = () => {
+    useEffect(() => {
+        sessionStorage.setItem("premiumLevel", level.toString());
+    }, [level]);
+
+    const handleLevelUp = () => {
         if (level >= 10) return;
 
-        const newLevel = level + 1;
-        sessionStorage.setItem("premiumLevel", newLevel);
-        setLevel(newLevel);
-
-        // Animaciones
         setAnimating(true);
-        setShowFlash(true);
-        setShowParticles(true);
-        setShowAscendMessage(true);
 
-        setTimeout(() => setShowFlash(false), 600);
-        setTimeout(() => setShowParticles(false), 1200);
-        setTimeout(() => setAnimating(false), 1500);
-        setTimeout(() => setShowAscendMessage(false), 2000);
+        setTimeout(() => {
+            setLevel(level + 1);
+            setAnimating(false);
+        }, 1200);
     };
 
     return (
-        <div className="premium-card level-container">
-            <h2 className="premium-section-title">Nivel Premium</h2>
+        <div className="premium-level-box">
 
-            <div className={`level-box ${animating ? "level-anim" : ""}`}>
-                <h1 className="level-number">
-                    Nivel {level}
-                </h1>
+            <h2 className="premium-level-title">Nivel Premium</h2>
 
-                {/* ⭐ SOBRENOMBRE */}
-                <p className="level-title">
-                    {LEVEL_TITLES[level]}
-                </p>
+            <div className={`level-display ${animating ? "flash" : ""}`}>
+                <span className="level-number">{level}</span>
+                <span className="nickname">{nicknames[level]}</span>
+            </div>
 
+            {/* BOTÓN SELLAR ASCENSO (MÁGICO) */}
+            <button
+                className={`level-up-btn magic-btn ${animating ? "disabled" : ""}`}
+                onClick={handleLevelUp}
+            >
+                {level < 10 ? (
+                    <>
+                        Sellar Ascenso  
+                        <span className="price-tag">4,95€</span>
+                    </>
+                ) : (
+                    "Nivel Máximo"
+                )}
+            </button>
+
+            {/* MEJORAS */}
+            <div className="premium-upgrades">
+                {upgrades[level].map((u, i) => (
+                    <div key={i} className="upgrade-item">
+                        <strong className="upgrade-name">{u.name}</strong>
+                        <p className="upgrade-desc">{u.desc}</p>
+                    </div>
+                ))}
+            </div>
+
+            {/* BOTÓN VOLVER MÁS ABAJO */}
+            <div className="premium-back-container">
                 <button
-                    className="premium-button"
-                    onClick={ascend}
-                    disabled={level >= 10}
+                    className="back-button-inline"
+                    onClick={() => window.history.back()}
                 >
-                    {level < 10 ? "Sellar ascenso" : "Ascenso completado"}
+                    Volver
                 </button>
             </div>
 
-            {showAscendMessage && (
-                <div className="ascend-message">Ascenso logrado</div>
-            )}
-
-            {showFlash && <div className="level-flash"></div>}
-            {showParticles && <div className="level-particles"></div>}
+            {animating && <div className="particle-effect"></div>}
         </div>
     );
 };

@@ -117,6 +117,39 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
+            // ======================================================
+            // PREMIUM — ACTIVAR PREMIUM
+            // ======================================================
+            activatePremium: async () => {
+                const store = getStore();
+                if (!store.token) return { success: false };
+
+                try {
+                    const resp = await fetch(`${API_URL}/api/premium`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: "Bearer " + store.token
+                        }
+                    });
+
+                    const data = await resp.json();
+
+                    if (!resp.ok) return { success: false, message: data.msg };
+
+                    // refrescar usuario
+                    await getActions().getCurrentUser();
+
+                    return { success: true };
+
+                } catch (err) {
+                    return { success: false, message: "Error de servidor" };
+                }
+            },
+
+            // ======================================================
+            // GET CURRENT USER
+            // ======================================================
             getCurrentUser: async () => {
                 const store = getStore();
                 if (!store.token) return;
@@ -137,7 +170,8 @@ const getState = ({ getStore, getActions, setStore }) => {
                         ...store,
                         user: {
                             ...data.user,
-                            avatar: Number(data.user.avatar) || 1
+                            avatar: Number(data.user.avatar) || 1,
+                            is_premium: data.user.is_premium || false
                         }
                     });
 

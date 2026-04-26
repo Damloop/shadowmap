@@ -1,12 +1,14 @@
 // /src/front/js/component/MissionCarousel.jsx
 
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "../../styles/missionCarousel.css";
 
 export const MissionCarousel = ({ missions, onSelect }) => {
+    const navigate = useNavigate();
+
     if (!missions || missions.length === 0) return null;
 
-    // Clase según dificultad
     const getDifficultyClass = (difficulty) => {
         if (difficulty === "Fácil") return "easy";
         if (difficulty === "Media") return "medium";
@@ -14,12 +16,21 @@ export const MissionCarousel = ({ missions, onSelect }) => {
         return "";
     };
 
-    // Estrellas según dificultad
     const getStars = (difficulty) => {
         if (difficulty === "Fácil") return "⭐";
         if (difficulty === "Media") return "⭐⭐";
         if (difficulty === "Difícil") return "⭐⭐⭐";
         return "";
+    };
+
+    const handleMissionClick = (m) => {
+        if (m.locked) return;
+
+        sessionStorage.setItem("selectedMission", JSON.stringify(m));
+
+        if (onSelect) onSelect(m);
+
+        navigate("/map");
     };
 
     return (
@@ -31,17 +42,13 @@ export const MissionCarousel = ({ missions, onSelect }) => {
                         className={`carousel-card ${getDifficultyClass(m.difficulty)} ${
                             m.locked ? "locked" : ""
                         }`}
-                        onClick={() => {
-                            if (!m.locked && onSelect) onSelect(m);
-                        }}
+                        onClick={() => handleMissionClick(m)}
                         style={{
                             cursor: m.locked ? "not-allowed" : "pointer",
                         }}
                     >
-                        {/* Etiqueta de bloqueo */}
                         {m.locked && <span className="locked-tag">BLOQUEADA</span>}
 
-                        {/* TÍTULO + NIVEL EN UNA SOLA LÍNEA */}
                         <div
                             style={{
                                 display: "flex",
@@ -60,7 +67,6 @@ export const MissionCarousel = ({ missions, onSelect }) => {
                             </span>
                         </div>
 
-                        {/* DESCRIPCIÓN */}
                         <p className="mission-description">{m.description}</p>
                     </div>
                 ))}

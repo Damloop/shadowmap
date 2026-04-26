@@ -10,6 +10,7 @@ import ResetPassword from "./js/views/resetPassword.jsx";
 import MapView from "./js/views/map.jsx";
 import PlaceDetails from "./js/views/placeDetails.jsx";
 import PremiumPage from "./js/views/premiumPage.jsx";
+import PremiumLevel from "./js/component/PremiumLevel.jsx";
 
 import introSound from "./sounds/login_register.mp3";
 

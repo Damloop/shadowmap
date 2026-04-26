@@ -237,3 +237,90 @@
   position: relative;
   z-index: 999999999 !important;
 }
+/* SUBIR AVATAR SIN QUE PISE LAS MISIONES */
+.profile-avatar {
+    margin-top: -10px !important; /* súbelo un poco */
+    margin-bottom: 10px !important; /* reduce espacio hacia abajo */
+    z-index: 5;
+    position: relative;
+}
+
+/* BAJAR UN POCO EL CAROUSEL PARA QUE NO SE SUPERPONGA */
+.mission-section {
+    margin-top: 25px !important;
+}
+
+/* BAJAR MISIONES PARA QUE NO SE PISEN */
+.mission-section {
+    margin-top: 60px !important;
+    position: relative;
+    z-index: 1;
+}
+/* SHADOWMAP MINI EN SIDEBAR */
+.sidebar-logo-mini {
+    font-size: 16px;
+    font-weight: bold;
+    color: #a67cff;
+    text-shadow: 0 0 8px #a67cffaa;
+    margin-bottom: 15px;
+    margin-top: -10px; /* sube todo el sidebar */
+    letter-spacing: 2px;
+}
+
+/* AVATAR SUBIDO Y SEPARADO */
+.profile-avatar-wrapper {
+    margin-top: -10px;
+    margin-bottom: 40px; /* separación real */
+    display: flex;
+    justify-content: center;
+}
+
+.profile-avatar {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 25px #7df9ff55;
+}
+
+/* MISIONES MÁS ABAJO */
+.mission-section {
+    margin-top: 60px !important;
+    position: relative;
+    z-index: 1;
+}
+
+/* SHADOWMAP MINI */
+.sidebar-logo-mini {
+    font-size: 16px;
+    font-weight: bold;
+    color: #a67cff;
+    text-shadow: 0 0 8px #a67cffaa;
+    margin-bottom: 20px;
+    margin-top: -5px;
+    letter-spacing: 2px;
+}
+
+/* AVATAR MÁS GRANDE, CUADRADO Y SUBIDO */
+.profile-avatar-wrapper {
+    margin-top: -20px;
+    margin-bottom: 50px;
+    display: flex;
+    justify-content: center;
+}
+
+.profile-avatar {
+    width: 220px;       /* más grande */
+    height: 220px;      /* cuadrado */
+    border-radius: 12px; /* ya NO es redondo */
+    object-fit: cover;
+    box-shadow: 0 0 25px #7df9ff55;
+}
+
+/* BAJAR MISIONES PARA QUE SE VEA LA ÚLTIMA */
+.mission-section {
+    margin-top: 80px !important;
+    padding-bottom: 80px; /* asegura que se vea la última misión */
+    position: relative;
+    z-index: 1;
+}

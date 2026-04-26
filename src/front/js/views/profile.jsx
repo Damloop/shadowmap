@@ -1,3 +1,5 @@
+// /src/front/js/views/profile.jsx
+
 import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../store/appContext.jsx";
 import { useNavigate } from "react-router-dom";
@@ -42,7 +44,11 @@ const Profile = () => {
 
     const handleSelectMission = (mission) => {
         if (mission.locked) return;
+
+        sessionStorage.setItem("selectedMission", JSON.stringify(mission));
         setSelectedMission(mission);
+
+        navigate("/map");
     };
 
     const handleCompleteMission = (mission) => {
@@ -58,55 +64,40 @@ const Profile = () => {
 
             {/* ===== SIDEBAR ===== */}
             <aside className="sidebar">
+                <div className="sidebar-logo-mini">SHADOWMAP</div>
+
                 <h2>Actividad</h2>
                 <ul>
-
                     <li className="tooltip">
                         <span>Rutas visitadas</span>
                         <span>{routesVisited || 0}</span>
-                        <div className="tooltip-text">
-                            Lugares que has explorado dentro del mapa.
-                            Aumenta cada vez que abres una ruta.
-                        </div>
+                        <div className="tooltip-text">Lugares explorados.</div>
                     </li>
 
                     <li className="tooltip">
                         <span>Rutas creadas</span>
                         <span>{routesCreated || 0}</span>
-                        <div className="tooltip-text">
-                            Rutas que tú mismo has diseñado y publicado.
-                        </div>
+                        <div className="tooltip-text">Rutas diseñadas por ti.</div>
                     </li>
 
                     <li className="tooltip">
                         <span>Compartidas conmigo</span>
                         <span>{routesShared || 0}</span>
-                        <div className="tooltip-text">
-                            Rutas que otros usuarios te han enviado.
-                        </div>
+                        <div className="tooltip-text">Rutas enviadas por otros.</div>
                     </li>
-
                 </ul>
 
                 <h2>Puntuación</h2>
                 <ul>
-
                     <li className="tooltip">
                         <span>Explorador</span>
                         <span>{explorerScore || 0}</span>
-                        <div className="tooltip-text">
-                            Puntos obtenidos por visitar lugares nuevos.
-                        </div>
                     </li>
 
                     <li className="tooltip">
                         <span>Creador</span>
                         <span>{creatorScore || 0}</span>
-                        <div className="tooltip-text">
-                            Puntos obtenidos por crear rutas y contenido.
-                        </div>
                     </li>
-
                 </ul>
 
                 <h2>Estado</h2>
@@ -117,10 +108,7 @@ const Profile = () => {
                 </ul>
 
                 {!isPremium && (
-                    <div
-                        className="account-option"
-                        onClick={() => navigate("/premium")}
-                    >
+                    <div className="account-option" onClick={() => navigate("/premium")}>
                         Acceso a Premium
                     </div>
                 )}
@@ -138,10 +126,10 @@ const Profile = () => {
 
             {/* ===== MAIN ===== */}
             <main className="profile-main">
-                <h1 className="shadow-title">SHADOWMAP</h1>
 
                 <div className="profile-card">
 
+                    {/* AVATAR SUBIDO Y MÁS GRANDE */}
                     <div className="profile-avatar-wrapper">
                         <img src={avatarInfo.src} className="profile-avatar" />
                     </div>
@@ -156,13 +144,16 @@ const Profile = () => {
                     </div>
                 </div>
 
-                <MissionCarousel
-                    missions={[
-                        ...missions.filter(m => !m.locked),
-                        ...missions.filter(m => m.locked).slice(0, 1)
-                    ]}
-                    onSelect={(m) => handleSelectMission(m)}
-                />
+                {/* MISIONES MÁS ABAJO */}
+                <div className="mission-section">
+                    <MissionCarousel
+                        missions={[
+                            ...missions.filter(m => !m.locked),
+                            ...missions.filter(m => m.locked).slice(0, 1)
+                        ]}
+                        onSelect={(m) => handleSelectMission(m)}
+                    />
+                </div>
 
                 {selectedMission && (
                     <div className="mission-modal">

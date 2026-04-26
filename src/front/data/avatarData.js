@@ -2,7 +2,7 @@ export const avatarData = [
   {
     id: 1,
     src: "/avatar/avatar_elias.jpg",
-    nombre: "Elias",
+    nombre: "Elias Ward",
     fuerza: 2,
     rapidez: 3,
     resistencia: 2,
@@ -11,7 +11,7 @@ export const avatarData = [
   {
     id: 2,
     src: "/avatar/avatar_lfrank.jpg",
-    nombre: "L. Frank",
+    nombre: "L. Frank Doyle",
     fuerza: 1,
     rapidez: 2,
     resistencia: 2,
@@ -20,7 +20,7 @@ export const avatarData = [
   {
     id: 3,
     src: "/avatar/avatar_rhea.jpg",
-    nombre: "Rhea",
+    nombre: "Rhea Blackwood",
     fuerza: 1,
     rapidez: 5,
     resistencia: 1,
@@ -29,7 +29,7 @@ export const avatarData = [
   {
     id: 4,
     src: "/avatar/avatar_silas.jpg",
-    nombre: "Silas",
+    nombre: "Silas Crow",
     fuerza: 5,
     rapidez: 1,
     resistencia: 3,
@@ -38,7 +38,7 @@ export const avatarData = [
   {
     id: 5,
     src: "/avatar/avatar_unit47.jpg",
-    nombre: "Unit‑47",
+    nombre: "Unit‑47 Echo",
     fuerza: 1,
     rapidez: 2,
     resistencia: 5,

@@ -7,12 +7,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from src.api.app import create_app
-from src.api.models import db
 
 app = create_app()
 
-with app.app_context():
-    db.create_all()
+# ❌ ELIMINADO: db.create_all()
+# Flask-Migrate ya gestiona la base de datos correctamente.
 
 if __name__ == "__main__":
+    print("📨 SendGrid habilitado. Emails reales activos.")
     app.run(host="0.0.0.0", port=3001, debug=True)

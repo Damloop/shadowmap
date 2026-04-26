@@ -1,0 +1,228 @@
+/* ===== CONTENEDOR GENERAL ===== */
+.premium-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 20px;
+    color: #e5e5e5;
+    font-family: "Inter", sans-serif;
+}
+
+/* ===== CABECERA ===== */
+.premium-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.premium-title {
+    font-size: 42px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.premium-subtitle {
+    font-size: 18px;
+    opacity: 0.75;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* ===== TARJETA PRINCIPAL ===== */
+.premium-card {
+    background: #111218;
+    border: 1px solid #2a2b33;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.25);
+    margin-bottom: 40px;
+}
+
+/* ===== TÍTULO DE SECCIÓN ===== */
+.premium-section-title {
+    font-size: 24px;
+    margin-bottom: 25px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+/* ===== BOTÓN ===== */
+.premium-button {
+    width: 100%;
+    padding: 15px;
+    background: #ffd700;
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.premium-button:hover {
+    background: #f5c400;
+}
+
+/* ===== MODAL ===== */
+.premium-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.65);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.premium-modal {
+    background: #111218;
+    padding: 30px;
+    border-radius: 12px;
+    width: 400px;
+    border: 1px solid #2a2b33;
+}
+
+.premium-modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.modal-confirm {
+    background: #ffd700;
+    color: #000;
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+.modal-cancel {
+    background: #2a2b33;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+/* ===== DASHBOARD ===== */
+.premium-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.premium-dashboard-item {
+    background: #0d0e13;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #2a2b33;
+}
+
+/* ===== COMPARADOR ===== */
+.comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.comparison-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #2a2b33;
+}
+
+/* ===== SISTEMA DE NIVELES ===== */
+.level-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.level-box {
+    text-align: center;
+    padding: 20px 0;
+    transition: transform 0.4s ease;
+}
+
+.level-anim {
+    transform: scale(1.05);
+}
+
+.level-number {
+    font-size: 48px;
+    font-weight: 700;
+    color: #ffd700;
+    text-shadow: 0 0 12px rgba(255,215,0,0.4);
+    margin-bottom: 10px;
+}
+
+/* ===== SOBRENOMBRE ===== */
+.level-title {
+    margin-top: -5px;
+    margin-bottom: 20px;
+    font-size: 20px;
+    color: #a855f7;
+    text-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
+    letter-spacing: 2px;
+}
+
+/* ===== MENSAJE DE ASCENSO ===== */
+.ascend-message {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,215,0,0.1);
+    border: 1px solid rgba(255,215,0,0.3);
+    padding: 10px 20px;
+    border-radius: 8px;
+    color: #ffd700;
+    font-size: 18px;
+    animation: ascendFade 1.8s ease-out forwards;
+}
+
+@keyframes ascendFade {
+    0% { opacity: 0; transform: translate(-50%, 10px); }
+    20% { opacity: 1; transform: translate(-50%, 0); }
+    100% { opacity: 0; transform: translate(-50%, -10px); }
+}
+
+/* ===== FLASH ===== */
+.level-flash {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,215,0,0.15);
+    animation: flashAnim 0.6s ease-out forwards;
+}
+
+@keyframes flashAnim {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* ===== PARTÍCULAS ===== */
+.level-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background-image:
+        radial-gradient(circle, rgba(255,215,0,0.4) 2px, transparent 2px),
+        radial-gradient(circle, rgba(255,215,0,0.3) 2px, transparent 2px),
+        radial-gradient(circle, rgba(255,215,0,0.2) 2px, transparent 2px);
+    background-size: 4px 4px, 6px 6px, 8px 8px;
+    animation: particleFade 1.2s ease-out forwards;
+}
+
+@keyframes particleFade {
+    0% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.4); }
+}

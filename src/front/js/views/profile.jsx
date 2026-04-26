@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../store/appContext.jsx";
 import { useNavigate } from "react-router-dom";
 import { getAvatarLore } from "../../data/avatarLore";
+import { avatarData } from "../../data/avatarData";
 import { missions } from "../../data/missions";
 import { MissionCarousel } from "../component/MissionCarousel.jsx";
 import "../../styles/profile.css";
@@ -22,10 +23,14 @@ const Profile = () => {
         if (!store.user) actions.getCurrentUser();
     }, []);
 
-    if (!store.user) return <div className="profile-main">Cargando identidad...</div>;
+    if (!store.user) return <div className="profile-loading">Cargando identidad...</div>;
+
+    const user = store.user;
+
+    const avatarInfo = avatarData.find(a => a.id === Number(user.avatar));
+    const lore = getAvatarLore(Number(user.avatar));
 
     const {
-        avatar,
         username,
         routesVisited,
         routesCreated,
@@ -33,17 +38,7 @@ const Profile = () => {
         explorerScore,
         creatorScore,
         isPremium
-    } = store.user;
-
-    const lore = getAvatarLore(avatar);
-
-    useEffect(() => {
-        if (completedMissions.length >= 3) {
-            missions.forEach(m => {
-                if (m.id === 6) m.locked = false;
-            });
-        }
-    }, [completedMissions]);
+    } = user;
 
     const handleSelectMission = (mission) => {
         if (mission.locked) return;
@@ -61,30 +56,70 @@ const Profile = () => {
     return (
         <div className="profile-container">
 
+            {/* ===== SIDEBAR ===== */}
             <aside className="sidebar">
                 <h2>Actividad</h2>
                 <ul>
-                    <li><span>Rutas visitadas</span><span>{routesVisited || 0}</span></li>
-                    <li><span>Rutas creadas</span><span>{routesCreated || 0}</span></li>
-                    <li><span>Compartidas conmigo</span><span>{routesShared || 0}</span></li>
+
+                    <li className="tooltip">
+                        <span>Rutas visitadas</span>
+                        <span>{routesVisited || 0}</span>
+                        <div className="tooltip-text">
+                            Lugares que has explorado dentro del mapa.
+                            Aumenta cada vez que abres una ruta.
+                        </div>
+                    </li>
+
+                    <li className="tooltip">
+                        <span>Rutas creadas</span>
+                        <span>{routesCreated || 0}</span>
+                        <div className="tooltip-text">
+                            Rutas que tú mismo has diseñado y publicado.
+                        </div>
+                    </li>
+
+                    <li className="tooltip">
+                        <span>Compartidas conmigo</span>
+                        <span>{routesShared || 0}</span>
+                        <div className="tooltip-text">
+                            Rutas que otros usuarios te han enviado.
+                        </div>
+                    </li>
+
                 </ul>
 
                 <h2>Puntuación</h2>
                 <ul>
-                    <li><span>Explorador</span><span>{explorerScore || 0}</span></li>
-                    <li><span>Creador</span><span>{creatorScore || 0}</span></li>
+
+                    <li className="tooltip">
+                        <span>Explorador</span>
+                        <span>{explorerScore || 0}</span>
+                        <div className="tooltip-text">
+                            Puntos obtenidos por visitar lugares nuevos.
+                        </div>
+                    </li>
+
+                    <li className="tooltip">
+                        <span>Creador</span>
+                        <span>{creatorScore || 0}</span>
+                        <div className="tooltip-text">
+                            Puntos obtenidos por crear rutas y contenido.
+                        </div>
+                    </li>
+
                 </ul>
 
                 <h2>Estado</h2>
                 <ul>
-                    <li><span>Cuenta Estándar</span></li>
+                    <li>
+                        <span>{isPremium ? "Cuenta Premium" : "Cuenta Estándar"}</span>
+                    </li>
                 </ul>
 
                 {!isPremium && (
                     <div
                         className="account-option"
                         onClick={() => navigate("/premium")}
-                        style={{ cursor: "pointer", marginTop: "10px" }}
                     >
                         Acceso a Premium
                     </div>
@@ -101,11 +136,15 @@ const Profile = () => {
                 </button>
             </aside>
 
+            {/* ===== MAIN ===== */}
             <main className="profile-main">
                 <h1 className="shadow-title">SHADOWMAP</h1>
 
                 <div className="profile-card">
-                    <img src={lore.src} className="profile-avatar" />
+
+                    <div className="profile-avatar-wrapper">
+                        <img src={avatarInfo.src} className="profile-avatar" />
+                    </div>
 
                     <div className="profile-info">
                         <h2>{username}</h2>

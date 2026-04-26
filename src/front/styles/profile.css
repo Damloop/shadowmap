@@ -1,48 +1,41 @@
-/* ULTRA SHADOWMAP PROFILE UI */
-/* Oscuro, violeta, glitch, noir, classified */
-.profile-main {
-  margin-top: -40px; /* SUBE TODO EL CONTENIDO PRINCIPAL */
-  padding-top: 10px;
-}
-
+/* ===== CONTENEDOR GENERAL ===== */
 .profile-container {
   display: flex;
   min-height: 100vh;
-  background: #030308;
+  background: radial-gradient(circle at 20% 20%, #0a0a12, #000);
   color: #e5e5e5;
-  font-family: "Orbitron", system-ui, sans-serif;
-  overflow: hidden;
+  font-family: "Orbitron", sans-serif;
 }
 
 /* ===== SIDEBAR ===== */
 .sidebar {
   width: 260px;
-  background: rgba(255, 255, 255, 0.02);
+  padding: 35px 25px;
+  background: rgba(255, 255, 255, 0.03);
   border-right: 1px solid rgba(168, 85, 247, 0.4);
-  padding: 40px 25px;
   backdrop-filter: blur(6px);
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.1);
 }
 
 .sidebar h2 {
   color: #a855f7;
-  margin-bottom: 20px;
-  text-transform: uppercase;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
   letter-spacing: 2px;
 }
 
 .sidebar ul {
   list-style: none;
   padding: 0;
+  margin-bottom: 25px;
 }
 
 .sidebar li {
-  margin: 14px 0;
-  cursor: pointer;
-  color: #bbb;
-  transition: 0.2s;
   display: flex;
   justify-content: space-between;
+  padding: 6px 0;
+  color: #cfcfcf;
+  font-size: 0.85rem;
+  transition: 0.2s;
 }
 
 .sidebar li:hover {
@@ -50,21 +43,31 @@
   text-shadow: 0 0 8px #a855f7;
 }
 
-.sidebar-note {
-  margin-top: 15px;
-  font-size: 12px;
-  color: #999;
+.account-option {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  border-radius: 6px;
+  text-align: center;
+  color: #ffd700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.account-option:hover {
+  background: rgba(255, 215, 0, 0.15);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
 }
 
 .logout-btn {
-  margin-top: 30px;
+  margin-top: 25px;
   width: 100%;
   padding: 12px;
   background: #a855f7;
   border: none;
-  color: #030308;
-  font-weight: bold;
   border-radius: 6px;
+  color: #000;
+  font-weight: bold;
   cursor: pointer;
   transition: 0.2s;
 }
@@ -81,67 +84,71 @@
   position: relative;
 }
 
-.profile-main::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: url("https://grainy-gradients.vercel.app/noise.svg");
-  opacity: 0.07;
-  pointer-events: none;
-}
-
 .shadow-title {
-  font-size: 42px;
+  font-size: 40px;
   color: #a855f7;
   letter-spacing: 6px;
   margin-bottom: 40px;
-  text-transform: uppercase;
   text-shadow: 0 0 12px rgba(168, 85, 247, 0.6);
 }
 
-/* ===== PROFILE CARD ===== */
+/* ===== TARJETA DE PERFIL ===== */
 .profile-card {
   display: flex;
-  background: rgba(255, 255, 255, 0.03);
+  gap: 30px;
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(168, 85, 247, 0.4);
   padding: 30px;
-  border-radius: 10px;
+  border-radius: 12px;
   backdrop-filter: blur(6px);
   margin-bottom: 40px;
   position: relative;
-  overflow: hidden;
 }
 
-.profile-card::after {
-  content: "CLASSIFIED";
-  position: absolute;
-  top: 10px;
-  right: -40px;
-  font-size: 32px;
-  color: rgba(168, 85, 247, 0.15);
-  transform: rotate(25deg);
-  letter-spacing: 4px;
-  font-weight: bold;
+/* ===== AVATAR GLITCH ===== */
+.profile-avatar-wrapper {
+  position: relative;
+  width: 240px;
+  height: 240px;
 }
 
-/* Avatar grande */
 .profile-avatar {
   width: 240px;
   height: 240px;
-  border-radius: 10px;
+  border-radius: 12px;
   object-fit: cover;
-  margin-right: 40px;
-  border: 3px solid rgba(168, 85, 247, 0.7);
-  box-shadow: 0 0 25px rgba(168, 85, 247, 0.5);
-  transition: 0.3s;
+  position: relative;
+  z-index: 2;
 }
 
-.profile-avatar:hover {
-  filter: contrast(1.3) brightness(1.2);
-  transform: scale(1.03);
-  box-shadow: 0 0 25px rgba(168, 85, 247, 0.8);
+.profile-avatar-wrapper::before,
+.profile-avatar-wrapper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  border: 3px solid #a855f7;
+  filter: drop-shadow(0 0 12px #a855f7);
+  animation: glitchBorder 0.6s infinite;
+  pointer-events: none;
 }
 
+.profile-avatar-wrapper::after {
+  border-color: #7a00ff;
+  animation-delay: 0.2s;
+  opacity: 0.6;
+}
+
+@keyframes glitchBorder {
+  0% { transform: translate(0, 0); opacity: 1; }
+  20% { transform: translate(-2px, 2px); opacity: 0.8; }
+  40% { transform: translate(2px, -2px); opacity: 1; }
+  60% { transform: translate(-1px, -1px); opacity: 0.7; }
+  80% { transform: translate(1px, 1px); opacity: 1; }
+  100% { transform: translate(0, 0); opacity: 1; }
+}
+
+/* ===== INFO ===== */
 .profile-info h2 {
   font-size: 26px;
   margin-bottom: 5px;
@@ -154,62 +161,79 @@
   letter-spacing: 2px;
 }
 
-/* ===== RUTAS SUGERIDAS — EFECTO PULSO ===== */
-.suggested-route {
-  margin: 12px 0;
-  padding: 14px 18px;
-  background: rgba(168, 85, 247, 0.08);
-  border: 1px solid rgba(168, 85, 247, 0.25);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.25s ease;
-  font-size: 15px;
-  letter-spacing: 1px;
-  position: relative;
-  overflow: hidden;
+.lore-text {
+  max-width: 420px;
+  line-height: 1.5;
+  color: #d8caff;
 }
 
-.suggested-route::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(168, 85, 247, 0.15);
+/* ===== ANIMACIÓN DE MISIONES ===== */
+.mission-item {
   opacity: 0;
-  animation: pulse 2.4s infinite;
+  transform: translateY(20px);
+  animation: missionFadeIn 0.6s forwards ease-out;
 }
 
-@keyframes pulse {
-  0% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 0.25;
-  }
-  100% {
-    opacity: 0;
-  }
+@keyframes missionFadeIn {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
-.suggested-route:hover {
-  background: rgba(168, 85, 247, 0.18);
-  border-color: rgba(168, 85, 247, 0.6);
-  box-shadow: 0 0 18px rgba(168, 85, 247, 0.5);
-  transform: scale(1.03);
+/* ===== LOADING ===== */
+.profile-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 1.4rem;
+  color: #d8caff;
+  text-shadow: 0 0 6px #7a00ff;
 }
 
-.account-option {
-  margin-top: 15px;
+
+
+/* ===== TOOLTIP PERFIL (ÚNICO Y DEFINITIVO) ===== */
+.tooltip {
+  position: relative;
+  overflow: visible !important; /* evita que se corte */
+  z-index: 999999; /* el li queda por encima */
+}
+
+.tooltip .tooltip-text {
+  position: absolute;
+
+  /* posición fija al lado del li */
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 12px;
+
+  /* estilo */
+  width: 220px;
+  background: #111218;
+  color: #ffd700;
   padding: 10px 12px;
   border-radius: 6px;
-  color: #e5e5e5;
-  font-weight: bold;
-  transition: 0.25s;
-  border: 1px solid rgba(255, 215, 0, 0.2); /* borde dorado suave */
+  border: 1px solid rgba(168, 85, 247, 0.5);
+  font-size: 12px;
+  line-height: 1.4;
+
+  /* oculto por defecto */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+
+  /* 🔥 esto lo pone por encima de avatar, tarjeta, pseudo-elementos, TODO */
+  z-index: 999999999 !important;
+
+  white-space: normal;
 }
 
-.account-option:hover {
-  color: #ffd700; /* dorado */
-  border-color: #ffd700;
-  box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
-  transform: scale(1.03);
+.tooltip:hover .tooltip-text {
+  opacity: 1;
+}
+/* SUBIR LA SIDEBAR POR ENCIMA DEL AVATAR GLITCH */
+.sidebar {
+  position: relative;
+  z-index: 999999999 !important;
 }

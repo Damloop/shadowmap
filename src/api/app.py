@@ -19,17 +19,35 @@ jwt = JWTManager()
 def create_app():
     app = Flask(__name__)
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///shadowmap.db"
+    # ============================================================
+    # BASE DE DATOS — RUTA ABSOLUTA CORRECTA
+    # ============================================================
+    BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+    DB_PATH = os.path.join(BASE_DIR, "instance", "database.db")
+
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_PATH}"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["JWT_SECRET_KEY"] = "super-secret-key"
 
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    # ============================================================
+    # CORS — CONFIGURACIÓN QUE SÍ FUNCIONA EN CODESPACES
+    # ============================================================
+    CORS(
+        app,
+        resources={r"/*": {"origins": "*"}},
+        supports_credentials=True,
+        allow_headers=["Content-Type", "Authorization"],
+        expose_headers=["Content-Type", "Authorization"],
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    )
 
+    # Extensiones
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
     mail.init_app(app)
 
+    # Blueprints
     from src.api.routes_auth import auth_api
     from src.api.routes_routes import routes_api
     from src.api.routes_recover import recover_bp
@@ -54,4 +72,5 @@ def create_app():
 
 if __name__ == "__main__":
     app = create_app()
+    print("📨 SendGrid habilitado. Emails reales activos.")
     app.run(host="0.0.0.0", port=3001, debug=True)

@@ -104,7 +104,10 @@ const getState = ({ getStore, getActions, setStore }) => {
                     setStore({
                         ...getStore(),
                         token: data.token,
-                        user: data.user
+                        user: {
+                            ...data.user,
+                            avatar: Number(data.user.avatar) || 1
+                        }
                     });
 
                     return { success: true };
@@ -119,8 +122,11 @@ const getState = ({ getStore, getActions, setStore }) => {
                 if (!store.token) return;
 
                 try {
-                    const resp = await fetch(`${API_URL}/api/auth/me`, {
-                        headers: { Authorization: "Bearer " + store.token }
+                    const resp = await fetch(`${API_URL}/api/current-user`, {
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: "Bearer " + store.token
+                        }
                     });
 
                     if (!resp.ok) return;
@@ -129,7 +135,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 
                     setStore({
                         ...store,
-                        user: data
+                        user: {
+                            ...data.user,
+                            avatar: Number(data.user.avatar) || 1
+                        }
                     });
 
                 } catch (err) {}

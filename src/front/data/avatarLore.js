@@ -1,4 +1,3 @@
-// src/front/data/avatarLore.js
 import { avatarData } from "./avatarData";
 
 export function getAvatarLore(avatarId) {
@@ -8,62 +7,60 @@ export function getAvatarLore(avatarId) {
     return {
       title: "Operador desconocido",
       origin:
-        "Los registros centrales no contienen información sobre este individuo. Su señal aparece y desaparece sin patrón alguno.",
-      src: "/avatar/avatar_elias.jpg",
-      level: 1
+        "Los registros de ShadowMap no contienen datos fiables sobre esta identidad. Algunos mapas lo marcan como 'fuera de rango'."
     };
   }
 
   let origin = "";
 
   switch (avatar.nombre) {
-    case "Elias":
+    case "Elias Ward":
       origin = `
-      Elias trabajaba como técnico en la Zona 6 hasta que un apagón total lo dejó atrapado bajo tierra durante once horas. 
-      Cuando lo encontraron, afirmaba haber visto perfectamente en la oscuridad. 
-      Desde entonces, las cámaras térmicas registran una anomalía constante alrededor de su silueta, como si algo caminara con él.`;
+      Los mapas antiguos mencionan un enclave prohibido llamado “La Fosa de Elias”.
+      Se dice que quienes caminan junto a él escuchan pasos adicionales, como si algo
+      invisible siguiera su sombra. Algunos exploradores aseguran que Elias conoce rutas
+      que no aparecen en ningún registro oficial, caminos que llevan a lugares donde la
+      señal se distorsiona y el tiempo parece detenerse.`;
       break;
 
-    case "L. Frank":
+    case "L. Frank Doyle":
       origin = `
-      L. Frank era analista de señales. Una noche detectó un patrón espectral idéntico a un archivo prohibido de ShadowMap. 
-      En lugar de reportarlo, lo siguió… y el patrón respondió. 
-      Desde entonces, asegura que “algo” le devuelve la mirada cuando analiza el ruido blanco.`;
+      L. Frank descifró un patrón espectral que no debía existir. Desde entonces,
+      cada mapa que toca revela zonas muertas, regiones donde la realidad se dobla.
+      Susurros digitales lo siguen, como si entidades atrapadas en viejas transmisiones
+      intentaran comunicarse a través de él.`;
       break;
 
-    case "Rhea":
+    case "Rhea Blackwood":
       origin = `
-      Rhea desapareció durante 72 horas en el Bosque de Blackwood. 
-      Regresó con un mapa dibujado a mano que mostraba rutas que no existen en ningún registro oficial. 
-      Las coordenadas coinciden con zonas donde la señal se distorsiona sin explicación.`;
+      Rhea regresó del Bosque de Blackwood con un mapa dibujado a mano que mostraba
+      rutas imposibles. Los árboles parecían moverse a su alrededor, guiándola hacia
+      un claro donde la luz no llegaba. Desde entonces, sus mapas vibran cuando se
+      acercan a lugares encantados o malditos.`;
       break;
 
-    case "Silas":
+    case "Silas Crow":
       origin = `
-      Silas fue encontrado en un búnker abandonado, rodeado de símbolos de contención. 
-      No recuerda quién lo encerró ni por qué, pero su pulso se sincroniza con anomalías de Clase III. 
-      ShadowMap lo vigila de cerca… aunque nadie se atreve a decírselo.`;
+      Silas fue encontrado en un búnker sellado con símbolos de contención. Los mapas
+      cercanos a él muestran interferencias, como si una presencia antigua intentara
+      manifestarse. Algunos creen que Silas es un faro para entidades atrapadas entre
+      planos.`;
       break;
 
-    case "Unit‑47":
+    case "Unit‑47 Echo":
       origin = `
-      Unit‑47 fue reactivado accidentalmente durante una inspección rutinaria. 
-      Sus registros estaban corruptos, pero su señal era perfecta. 
-      Opera como si recordara misiones que nunca realizó… o que aún no han ocurrido.`;
+      Unit‑47 registra coordenadas de misiones que nunca ocurrieron… o que aún no han
+      sucedido. Sus sensores detectan actividad en zonas donde no debería haber vida.
+      Los mapas que genera muestran estructuras fantasma, ciudades que desaparecieron
+      hace siglos.`;
       break;
 
     default:
       origin = "Este operador mantiene su historial completamente clasificado.";
   }
 
-  const level = Math.floor(
-    (avatar.fuerza + avatar.rapidez + avatar.resistencia + avatar.inteligencia) / 2
-  );
-
   return {
     title: avatar.nombre,
-    origin,
-    src: avatar.src,
-    level
+    origin
   };
 }

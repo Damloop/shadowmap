@@ -4,7 +4,7 @@ import getState from "./flux.js";
 export const Context = React.createContext(null);
 
 const StoreWrapper = ({ children }) => {
-    // Inicialización correcta SIN usar state antes de existir
+
     const [state, setState] = useState(() => {
         let initialState = {};
 
@@ -21,12 +21,12 @@ const StoreWrapper = ({ children }) => {
         return initialState;
     });
 
-    // Cargar token si existe
+    // ❗ FIX: evitar bucle infinito
     useEffect(() => {
         if (state.actions && state.actions.syncTokenFromSessionStore) {
             state.actions.syncTokenFromSessionStore();
         }
-    }, [state.actions]);
+    }, []); // ← SOLO UNA VEZ
 
     return (
         <Context.Provider value={state}>

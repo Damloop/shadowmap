@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "../../styles/register.css";
 
 import AvatarSelector from "../component/AvatarSelector.jsx";
+import { getAvatarLore } from "../../data/avatarLore";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -32,6 +33,11 @@ const Register = () => {
     e.preventDefault();
     setError("");
 
+    if (!form.avatar) {
+      setError("Debes elegir un avatar para continuar.");
+      return;
+    }
+
     const resp = await fetch(`${API_URL}/api/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -51,84 +57,73 @@ const Register = () => {
   return (
     <div className="register-wrapper">
 
-      <div style={{
-        display: "flex",
-        width: "100%",
-        justifyContent: "center",
-        alignItems: "center",
-        gap: "80px",
-        marginTop: "40px"
-      }}>
+      {/* IZQUIERDA → FORMULARIO */}
+      <div className="register-left">
 
-        <div style={{
-          flex: 1,
-          maxWidth: "420px",
-          marginLeft: "60px"
-        }}>
-          <h1 className="shadow-title">SHADOWMAP</h1>
-          <h2 className="shadow-subtitle">Registro de usuario</h2>
+        <h1 className="shadow-title">SHADOWMAP</h1>
+        <h2 className="shadow-subtitle">Registro de usuario</h2>
 
-          <form className="sm-form" onSubmit={handleRegister}>
+        <form className="sm-form" onSubmit={handleRegister}>
 
-            {error && <div className="sm-error">{error}</div>}
+          {error && <div className="sm-error">{error}</div>}
 
-            <label className="sm-label">Nombre</label>
-            <input
-              type="text"
-              name="shortname"
-              className="sm-input"
-              value={form.shortname}
-              onChange={handleChange}
-              required
-            />
-
-            <label className="sm-label">Correo</label>
-            <input
-              type="email"
-              name="email"
-              className="sm-input"
-              value={form.email}
-              onChange={handleChange}
-              required
-            />
-
-            <label className="sm-label">Contraseña</label>
-            <input
-              type="password"
-              name="password"
-              className="sm-input"
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
-
-            <button type="submit" className="sm-btn">
-              Crear cuenta
-            </button>
-
-            <Link to="/login" className="sm-link">
-              ¿Ya tienes cuenta? Inicia sesión
-            </Link>
-
-          </form>
-        </div>
-
-        <div style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          transform: "scale(1.15)",
-          transformOrigin: "top center",
-          marginTop: "10px"
-        }}>
-          <AvatarSelector
-            onSelect={handleAvatarSelect}
-            onConfirm={() => navigate("/login")}
+          <label className="sm-label">Nombre</label>
+          <input
+            type="text"
+            name="shortname"
+            className="sm-input"
+            value={form.shortname}
+            onChange={handleChange}
+            required
           />
-        </div>
 
+          <label className="sm-label">Correo</label>
+          <input
+            type="email"
+            name="email"
+            className="sm-input"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
+
+          <label className="sm-label">Contraseña</label>
+          <input
+            type="password"
+            name="password"
+            className="sm-input"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
+
+          <button type="submit" className="sm-btn">
+            Crear cuenta
+          </button>
+
+          <Link to="/login" className="sm-link">
+            ¿Ya tienes cuenta? Inicia sesión
+          </Link>
+
+          {/* MÁS INFO DEBAJO */}
+          {form.avatar && (
+            <div className="register-lore-box">
+              <h4>{getAvatarLore(form.avatar).title}</h4>
+              <p>{getAvatarLore(form.avatar).origin}</p>
+            </div>
+          )}
+
+        </form>
       </div>
+
+      {/* DERECHA → AVATAR */}
+      <div className="register-right">
+        <AvatarSelector
+          onSelect={handleAvatarSelect}
+          selectedAvatar={form.avatar}
+        />
+      </div>
+
     </div>
   );
 };

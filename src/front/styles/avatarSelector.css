@@ -1,180 +1,130 @@
-/* ===========================
-   SHADOWMAP — CARRUSEL DE AVATARES
-   Estilo Ciberpunk Tenebroso ULTRA
-=========================== */
-
-.avatar-carrusel-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 22px;
-  padding: 10px;
-  background: rgba(10, 5, 20, 0.45);
-  border-radius: 12px;
-  border: 1px solid rgba(150, 80, 255, 0.25);
-  box-shadow: 0 0 35px rgba(150, 80, 255, 0.25);
-
-  margin-top: -60px;
-  transform: translateY(-30px);
+.avatar-selector-wrapper {
+  text-align: center;
+  width: 100%;
 }
 
-/* ===========================
-   CARRUSEL
-=========================== */
-.avatar-carrusel {
+/* BAJAR EL TÍTULO UN POCO */
+.avatar-title-small {
+  color: #b084f7;
+  font-size: 1.3rem;
+  margin-top: 20px;      /* ← antes 60px */
+  margin-bottom: 15px;
+  text-shadow: 0 0 6px #7a00ff;
+}
+
+.carousel-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 26px;
-
-  margin-top: -20px;
+  gap: 25px;
 }
 
-/* ===========================
-   AVATAR + HALO RESPIRANTE
-=========================== */
-.avatar-mostrado {
-  width: 320px;
-  height: 320px;
-  border-radius: 14px;
-  overflow: hidden;
-  border: 3px solid rgba(150, 80, 255, 0.6);
-  background: rgba(20, 10, 35, 0.6);
-  box-shadow:
-    0 0 25px rgba(150, 80, 255, 0.6),
-    0 0 45px rgba(150, 80, 255, 0.4);
-  animation: haloRespirar 3s infinite ease-in-out;
-}
-
-@keyframes haloRespirar {
-  0% { box-shadow: 0 0 25px rgba(150, 80, 255, 0.4); }
-  50% { box-shadow: 0 0 70px rgba(200, 120, 255, 0.9); }
-  100% { box-shadow: 0 0 25px rgba(150, 80, 255, 0.4); }
-}
-
-.avatar-imagen {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* ===========================
-   EFECTO GLITCH
-=========================== */
-.glitch {
-  animation: glitchEffect 0.25s linear;
-}
-
-@keyframes glitchEffect {
-  0% { transform: translate(0); filter: hue-rotate(0deg); }
-  20% { transform: translate(-4px, 2px); filter: hue-rotate(40deg); }
-  40% { transform: translate(3px, -3px); filter: hue-rotate(90deg); }
-  60% { transform: translate(-2px, 1px); filter: hue-rotate(180deg); }
-  80% { transform: translate(2px, -2px); filter: hue-rotate(260deg); }
-  100% { transform: translate(0); filter: hue-rotate(0deg); }
-}
-
-/* ===========================
-   FLECHAS PULSANTES
-=========================== */
-.flecha {
-  background: none;
+/* FLECHAS */
+.arrow-btn {
+  background: transparent;
   border: none;
-  color: #c9a8ff;
-  font-size: 3rem;
+  color: #b084f7;
+  font-size: 2.6rem;
   cursor: pointer;
-  animation: palpitar 1.4s infinite;
-  transition: 0.2s ease;
+  transition: 0.2s;
 }
 
-.flecha:hover {
+.arrow-btn:hover {
   color: #ffffff;
-  text-shadow: 0 0 12px rgba(150, 80, 255, 0.8);
+  transform: scale(1.25);
 }
 
-@keyframes palpitar {
-  0% { transform: scale(1); opacity: 0.6; }
-  50% { transform: scale(1.3); opacity: 1; }
-  100% { transform: scale(1); opacity: 0.6; }
-}
-
-/* ===========================
-   INFO DEL AVATAR
-=========================== */
-.avatar-info {
-  text-align: center;
-  color: #d8caff;
-  max-width: 420px;
-  line-height: 1.55;
-  padding: 14px;
-  background: rgba(20, 10, 35, 0.35);
-  border-radius: 10px;
-  border: 1px solid rgba(150, 80, 255, 0.25);
-  box-shadow: 0 0 18px rgba(150, 80, 255, 0.25);
-
-  margin-top: -18px;
-}
-
-.avatar-info h3 {
-  margin-bottom: 12px;
-  font-size: 1.5rem;
-  color: #e6d4ff;
-  letter-spacing: 1px;
-  text-shadow: 0 0 8px rgba(150, 80, 255, 0.6);
-}
-
-/* ===========================
-   BARRAS RPG
-=========================== */
-.stat-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 8px 0;
-  font-size: 1rem;
-}
-
-.stat-bar {
-  width: 180px;
-  height: 10px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 5px;
-  overflow: hidden;
-  margin-left: 12px;
+/* AVATAR EN SU SITIO ORIGINAL + 20px MÁS ABAJO */
+.avatar-display {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 25px;
+  border-radius: 14px;
+  width: 300px;
+  transition: 0.3s;
   position: relative;
+  margin-top: 20px;     /* ← antes 40px */
 }
 
-.stat-fill {
+.avatar-big {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 12px;
+  transition: transform 0.3s;
+}
+
+/* PULSO */
+.pulse {
+  animation: pulseAnim 2.2s infinite ease-in-out;
+}
+
+@keyframes pulseAnim {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+.avatar-name-big {
+  margin-top: 12px;
+  font-size: 1.4rem;
+  color: #e0d0ff;
+  text-shadow: 0 0 6px #7a00ff;
+}
+
+/* BARRAS */
+.stats-box {
+  margin-top: 12px;
+  text-align: left;
+}
+
+.stat {
+  margin-bottom: 8px;
+  color: #c8b4ff;
+  font-size: 0.9rem;
+}
+
+.bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 3px;
+}
+
+.bar div {
   height: 100%;
-  background: linear-gradient(90deg, #7a2bff, #c77dff);
-  transition: width 0.35s ease;
+  background: linear-gradient(90deg, #7a00ff, #b084f7);
+  box-shadow: 0 0 8px #7a00ff;
 }
 
-.stat-max .stat-fill {
-  background: linear-gradient(90deg, #ff00ff, #b300ff);
-  box-shadow: 0 0 14px rgba(255, 0, 255, 0.8);
-  animation: pulsoMax 1.8s infinite ease-in-out;
+/* BOTÓN */
+.select-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #7a00ff;
+  color: white;
+  transition: 0.2s;
 }
 
-@keyframes pulsoMax {
-  0% { opacity: 0.8; }
-  50% { opacity: 1; }
-  100% { opacity: 0.8; }
+.select-btn:hover {
+  background: #9b3dff;
 }
 
-/* ===========================
-   FIJAR IDENTIDAD
-=========================== */
-.avatar-fijar-identidad {
-  margin-top: -10px;
-  font-size: 1.2rem;
-  color: #d8caff;
-  text-shadow: 0 0 8px rgba(150, 80, 255, 0.7);
-  animation: pulsoIdentidad 2.2s infinite ease-in-out;
+/* GLITCH */
+.glitch-selected {
+  animation: glitch 0.3s linear 2;
 }
 
-@keyframes pulsoIdentidad {
-  0% { opacity: 0.6; }
-  50% { opacity: 1; }
-  100% { opacity: 0.6; }
+@keyframes glitch {
+  0% { transform: translate(0); }
+  25% { transform: translate(-4px, 2px); }
+  50% { transform: translate(4px, -2px); }
+  75% { transform: translate(-2px, -1px); }
+  100% { transform: translate(0); }
 }

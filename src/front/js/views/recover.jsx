@@ -21,6 +21,7 @@ const Recover = () => {
         body: JSON.stringify({ email })
       });
 
+      // Intentar leer JSON, pero sin romper si viene vacío
       const data = await resp.json().catch(() => null);
 
       if (!resp.ok) {

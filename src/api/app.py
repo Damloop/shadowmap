@@ -20,7 +20,7 @@ def create_app():
     app = Flask(__name__)
 
     # ============================================================
-    # BASE DE DATOS — RUTA ABSOLUTA CORRECTA
+    # BASE DE DATOS — RUTA ABSOLUTA CORRECTA (SOLO UNA DB REAL)
     # ============================================================
     BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
     DB_PATH = os.path.join(BASE_DIR, "instance", "database.db")
@@ -30,7 +30,7 @@ def create_app():
     app.config["JWT_SECRET_KEY"] = "super-secret-key"
 
     # ============================================================
-    # CORS — CONFIGURACIÓN QUE SÍ FUNCIONA EN CODESPACES
+    # CORS — CONFIGURACIÓN COMPLETA PARA CODESPACES + LEAFLET
     # ============================================================
     CORS(
         app,

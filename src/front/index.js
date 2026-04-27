@@ -1,12 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import StoreWrapper from "./store/appContext";
+import injectContext from "./store/appContext.jsx";
 import Layout from "../layout.jsx";
 
-const root = ReactDOM.createRoot(document.getElementById("app"));
+const App = injectContext(Layout);
 
-root.render(
-  <StoreWrapper>
-    <Layout />
-  </StoreWrapper>
-);
+const root = ReactDOM.createRoot(document.getElementById("app"));
+root.render(<App />);

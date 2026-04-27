@@ -6,7 +6,9 @@ from src.api.models import db, POI
 
 pois_api = Blueprint("pois_api", __name__)
 
-# CREATE
+# ============================================================
+# CREATE POI
+# ============================================================
 @pois_api.route("/pois", methods=["POST"])
 @jwt_required()
 def create_poi():
@@ -36,23 +38,30 @@ def create_poi():
     }), 201
 
 
-# GET ALL
+# ============================================================
+# GET ALL POIS
+# ============================================================
 @pois_api.route("/pois", methods=["GET"])
 def get_pois():
     pois = POI.query.all()
     return jsonify([p.serialize() for p in pois]), 200
 
 
-# GET ONE
+# ============================================================
+# GET ONE POI
+# ============================================================
 @pois_api.route("/pois/<int:poi_id>", methods=["GET"])
 def get_poi(poi_id):
     poi = POI.query.get(poi_id)
     if not poi:
         return jsonify({"message": "POI no encontrado"}), 404
+
     return jsonify(poi.serialize()), 200
 
 
-# UPDATE
+# ============================================================
+# UPDATE POI
+# ============================================================
 @pois_api.route("/pois/<int:poi_id>", methods=["PUT"])
 @jwt_required()
 def update_poi(poi_id):
@@ -75,7 +84,9 @@ def update_poi(poi_id):
     }), 200
 
 
-# DELETE
+# ============================================================
+# DELETE POI
+# ============================================================
 @pois_api.route("/pois/<int:poi_id>", methods=["DELETE"])
 @jwt_required()
 def delete_poi(poi_id):

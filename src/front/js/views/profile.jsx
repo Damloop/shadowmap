@@ -1,4 +1,4 @@
-// /src/front/js/views/profile.jsx
+// src/front/js/views/profile.jsx
 
 import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../store/appContext.jsx";
@@ -17,22 +17,23 @@ const Profile = () => {
     const [completedMissions, setCompletedMissions] = useState([]);
     const [selectedMission, setSelectedMission] = useState(null);
 
-    // Evitar errores de geolocalización
+    const premiumLevel = sessionStorage.getItem("premiumLevel");
+    const premiumNick = sessionStorage.getItem("premiumNick");
+
     useEffect(() => {
-        navigator.geolocation.getCurrentPosition(() => {}, () => {});
+        actions.syncTokenFromSessionStore();
     }, []);
 
-    // Cargar usuario desde sessionStorage (NO llamar getCurrentUser)
     useEffect(() => {
         if (!store.user) {
-            const saved = sessionStorage.getItem("user");
-            if (saved) {
-                actions.setStore({ user: JSON.parse(saved) });
-            }
+            const saved = localStorage.getItem("user");
+            if (saved) actions.syncTokenFromSessionStore();
         }
-    }, []);
+    }, [store.user]);
 
-    if (!store.user) return <div className="profile-loading">Cargando identidad...</div>;
+    if (!store.user) {
+        return <div className="profile-loading">Cargando identidad...</div>;
+    }
 
     const user = store.user;
 
@@ -40,21 +41,19 @@ const Profile = () => {
     const lore = getAvatarLore(Number(user.avatar));
 
     const {
-        username,
+        shortname,
         routesVisited,
         routesCreated,
         routesShared,
         explorerScore,
         creatorScore,
-        isPremium
+        is_premium
     } = user;
 
     const handleSelectMission = (mission) => {
         if (mission.locked) return;
-
         sessionStorage.setItem("selectedMission", JSON.stringify(mission));
         setSelectedMission(mission);
-
         navigate("/map");
     };
 
@@ -69,52 +68,28 @@ const Profile = () => {
     return (
         <div className="profile-container">
 
-            {/* === SIDEBAR === */}
             <aside className="sidebar">
                 <div className="sidebar-logo-mini">SHADOWMAP</div>
 
                 <h2>Actividad</h2>
                 <ul>
-                    <li className="tooltip">
-                        <span>Rutas visitadas</span>
-                        <span>{routesVisited || 0}</span>
-                        <div className="tooltip-text">Lugares explorados.</div>
-                    </li>
-
-                    <li className="tooltip">
-                        <span>Rutas creadas</span>
-                        <span>{routesCreated || 0}</span>
-                        <div className="tooltip-text">Rutas diseñadas por ti.</div>
-                    </li>
-
-                    <li className="tooltip">
-                        <span>Compartidas conmigo</span>
-                        <span>{routesShared || 0}</span>
-                        <div className="tooltip-text">Rutas enviadas por otros.</div>
-                    </li>
+                    <li><span>Rutas visitadas</span><span>{routesVisited || 0}</span></li>
+                    <li><span>Rutas creadas</span><span>{routesCreated || 0}</span></li>
+                    <li><span>Compartidas conmigo</span><span>{routesShared || 0}</span></li>
                 </ul>
 
                 <h2>Puntuación</h2>
                 <ul>
-                    <li className="tooltip">
-                        <span>Explorador</span>
-                        <span>{explorerScore || 0}</span>
-                    </li>
-
-                    <li className="tooltip">
-                        <span>Creador</span>
-                        <span>{creatorScore || 0}</span>
-                    </li>
+                    <li><span>Explorador</span><span>{explorerScore || 0}</span></li>
+                    <li><span>Creador</span><span>{creatorScore || 0}</span></li>
                 </ul>
 
                 <h2>Estado</h2>
                 <ul>
-                    <li>
-                        <span>{isPremium ? "Cuenta Premium" : "Cuenta Estándar"}</span>
-                    </li>
+                    <li>{is_premium ? "Cuenta Premium" : "Cuenta Estándar"}</li>
                 </ul>
 
-                {!isPremium && (
+                {!is_premium && (
                     <div className="account-option" onClick={() => navigate("/premium")}>
                         Acceso a Premium
                     </div>
@@ -131,18 +106,26 @@ const Profile = () => {
                 </button>
             </aside>
 
-            {/* === MAIN === */}
             <main className="profile-main">
 
                 <div className="profile-card">
 
                     <div className="profile-avatar-wrapper">
-                        <img src={avatarInfo.src} className="profile-avatar" />
+                        <img
+                            src={avatarInfo.src}
+                            alt="avatar"
+                            className="profile-avatar"
+                        />
                     </div>
 
                     <div className="profile-info">
-                        <h2>{username}</h2>
-                        <p className="title">Nivel {level}</p>
+                        <h2>{shortname}</h2>
+
+                        {premiumLevel && (
+                            <p className="premium-level-display">
+                                Nivel {premiumLevel} — {premiumNick}
+                            </p>
+                        )}
 
                         <p className="lore-text">
                             <strong>{lore.title}:</strong> {lore.origin}

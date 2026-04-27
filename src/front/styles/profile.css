@@ -406,3 +406,48 @@
     transform: scale(0.82) !important;  /* 🔥 más pequeño */
     margin: 0 !important;
 }
+
+/* ============================================================
+   NIVEL PREMIUM + APODO — ESTILO DESTACADO SHADOWMAP
+   ============================================================ */
+
+.premium-level-display {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #b35bff;
+    letter-spacing: 2px;
+    margin-top: 5px;
+    margin-bottom: 12px;
+
+    text-shadow:
+        0 0 8px #b35bff,
+        0 0 14px #7a00ff,
+        0 0 22px #5a1fa8;
+
+    animation: premiumPulse 2.2s infinite ease-in-out;
+}
+
+/* Pulso suave violeta */
+@keyframes premiumPulse {
+    0% { text-shadow: 0 0 8px #b35bff; }
+    50% { text-shadow: 0 0 18px #d28bff; }
+    100% { text-shadow: 0 0 8px #b35bff; }
+}
+/* ============================================================
+   TEXTO DEL LORE — OCUPA TODO EL ANCHO DEL CUADRO
+   ============================================================ */
+
+.lore-text {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block;
+    white-space: normal;
+    overflow-wrap: break-word;
+    line-height: 1.55;
+    font-size: 0.95rem;
+    margin-top: 10px;
+}
+.profile-info {
+    width: 100% !important;
+    max-width: 100% !important;
+}

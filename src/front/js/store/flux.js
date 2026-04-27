@@ -1,3 +1,5 @@
+// src/front/js/store/flux.js
+
 import places from "./places.js";
 import { API_URL } from "../../api/config.js";
 
@@ -9,8 +11,8 @@ const getState = ({ getStore, getActions, setStore }) => {
         store: {
             ...placesState.store,
 
-            token: null,
-            user: null,
+            token: localStorage.getItem("token") || null,
+            user: JSON.parse(localStorage.getItem("user")) || null,
             userLocation: null,
 
             selectedPoints: [],
@@ -134,33 +136,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                 setStore({ token: null, user: null });
             },
 
-            getCurrentUser: async () => {
-                const store = getStore();
-                if (!store.token) return;
-
-                try {
-                    const resp = await fetch(`${API_URL}/api/current-user`, {
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: "Bearer " + store.token
-                        }
-                    });
-
-                    if (!resp.ok) return;
-
-                    const data = await resp.json();
-
-                    setStore({
-                        ...store,
-                        user: {
-                            ...data.user,
-                            avatar: Number(data.user.avatar) || 1,
-                            is_premium: data.user.is_premium || false
-                        }
-                    });
-
-                } catch (err) {}
-            },
+            // ============================================================
+            // ELIMINADO getCurrentUser (NO EXISTE EN TU BACKEND)
+            // ============================================================
 
             publishRoute: async (routeData) => {
                 const store = getStore();

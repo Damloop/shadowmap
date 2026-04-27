@@ -78,6 +78,7 @@ const PremiumLevel = () => {
 
     useEffect(() => {
         sessionStorage.setItem("premiumLevel", level.toString());
+        sessionStorage.setItem("premiumNick", nicknames[level]);
     }, [level]);
 
     const handleLevelUp = () => {
@@ -101,7 +102,6 @@ const PremiumLevel = () => {
                 <span className="nickname">{nicknames[level]}</span>
             </div>
 
-            {/* BOTÓN SELLAR ASCENSO (MÁGICO) */}
             <button
                 className={`level-up-btn magic-btn ${animating ? "disabled" : ""}`}
                 onClick={handleLevelUp}
@@ -116,7 +116,6 @@ const PremiumLevel = () => {
                 )}
             </button>
 
-            {/* MEJORAS */}
             <div className="premium-upgrades">
                 {upgrades[level].map((u, i) => (
                     <div key={i} className="upgrade-item">
@@ -126,7 +125,6 @@ const PremiumLevel = () => {
                 ))}
             </div>
 
-            {/* BOTÓN VOLVER MÁS ABAJO */}
             <div className="premium-back-container">
                 <button
                     className="back-button-inline"

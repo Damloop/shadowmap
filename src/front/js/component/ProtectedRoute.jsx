@@ -1,17 +1,24 @@
-import React, { useContext } from "react";
+// src/front/js/component/ProtectedRoute.jsx
+
+import React, { useContext, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 
 const ProtectedRoute = ({ children }) => {
-    const { store } = useContext(Context);
+    const { store, actions } = useContext(Context);
 
-    // Si el token no existe → fuera
+    // Sincronizar token al cargar
+    useEffect(() => {
+        actions.syncTokenFromSessionStore();
+    }, []);
+
+    // Si NO hay token → login
     if (!store.token) {
         return <Navigate to="/login" replace />;
     }
 
+    // Si hay token → renderizar el contenido protegido
     return children;
 };
 
 export default ProtectedRoute;
-

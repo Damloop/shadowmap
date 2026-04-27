@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 
 const ProtectedRoute = ({ children }) => {
-    const { store } = React.useContext(Context);
+    const { store } = useContext(Context);
 
+    // Si el token no existe → fuera
     if (!store.token) {
         return <Navigate to="/login" replace />;
     }
@@ -13,3 +14,4 @@ const ProtectedRoute = ({ children }) => {
 };
 
 export default ProtectedRoute;
+

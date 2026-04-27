@@ -1,51 +1,95 @@
-// /src/front/data/missions.js
-
 export const missions = [
-    // 3 FÁCILES
-    {
-        id: 1,
-        name: "Farola Parpadeante",
-        description: "Encuentra una farola que parpadee. Grábala en vídeo durante 10 segundos. Si el parpadeo cambia de ritmo cuando te acercas, revisa el vídeo con auriculares.",
-        difficulty: "Fácil",
-        locked: false
-    },
-    {
-        id: 2,
-        name: "Audio Fantasma",
-        description: "Graba un audio diciendo tu nombre y la hora exacta. Reprodúcelo después de 5 minutos. Si escuchas un ruido que no recuerdas haber hecho, guarda el archivo.",
-        difficulty: "Fácil",
-        locked: false
-    },
-    {
-        id: 3,
-        name: "Mensaje No Entregado",
-        description: "Escribe un mensaje a alguien diciendo 'Estoy llegando'. No lo envíes. Si recibes un mensaje relacionado sin haber enviado nada, captura pantalla inmediatamente.",
-        difficulty: "Fácil",
-        locked: false
-    },
-
-    // 2 MEDIAS
-    {
-        id: 4,
-        name: "Eco en la Calle Vacía",
-        description: "Busca una calle sin gente. Aplaude una vez y grábalo. Si el eco tarda demasiado o suena más veces de las que aplaudiste, sube el volumen y revisa el audio.",
-        difficulty: "Media",
-        locked: false
-    },
-    {
-        id: 5,
-        name: "Llamada Perdida",
-        description: "Tu móvil vibrará sin notificación. Marca tu propio número. Si escuchas silencio irregular, pasos o respiración, cuelga sin hablar y anota la hora exacta.",
-        difficulty: "Media",
-        locked: false
-    },
-
-    // 1 DIFÍCIL
-    {
-        id: 6,
-        name: "Red Inexistente",
-        description: "Busca redes WiFi. Si aparece una sin nombre, intenta conectarte. Si te muestra coordenadas, un nombre extraño o un mensaje incompleto, captura la pantalla y no sigas la ubicación solo.",
-        difficulty: "Difícil",
-        locked: true
+  // ---------------------------------------------------------
+  // 1) SENCILLAS — ACCIONES REALES + MIEDO LÓGICO
+  // ---------------------------------------------------------
+  {
+    id: 1,
+    name: "Última Señal",
+    description:
+      "Llega al punto marcado. Una vez allí, abre WhatsApp y revisa tu última conversación. Si ves un mensaje que no recuerdas haber enviado, toma una foto del lugar y vuelve a ShadowMap.",
+    difficulty: "Fácil",
+    locked: false,
+    type: "reach_point",
+    target: {
+      latOffset: 0.0004,
+      lngOffset: -0.0002,
+      radius: 20
     }
+  },
+
+  {
+    id: 2,
+    name: "Reflejo Inesperado",
+    description:
+      "Acércate al punto indicado. Abre Instagram y toma una foto desde la cámara de la app. Si notas un reflejo o brillo extraño en la previsualización, vuelve a ShadowMap.",
+    difficulty: "Fácil",
+    locked: false,
+    type: "reach_point",
+    target: {
+      latOffset: -0.0003,
+      lngOffset: 0.0004,
+      radius: 20
+    }
+  },
+
+  {
+    id: 3,
+    name: "Rastro Desconocido",
+    description:
+      "En el punto marcado, busca físicamente algo fuera de lugar: un cartel, una marca en el suelo, un objeto extraño. Haz una foto y vuelve a ShadowMap. No siempre es el entorno el que cambia.",
+    difficulty: "Fácil",
+    locked: false,
+    type: "reach_point",
+    target: {
+      latOffset: 0.0005,
+      lngOffset: 0.0001,
+      radius: 25
+    }
+  },
+
+  // ---------------------------------------------------------
+  // 2) MEDIAS — MIEDO PSICOLÓGICO + APPS + SENSORES
+  // ---------------------------------------------------------
+  {
+    id: 4,
+    name: "Conversación Fragmentada",
+    description:
+      "Camina hacia el punto marcado. Una vez allí, abre WhatsApp y graba un audio diciendo la hora exacta. Reprodúcelo. Si escuchas un desfase o eco extraño, toma una foto del lugar y vuelve a ShadowMap.",
+    difficulty: "Media",
+    locked: false,
+    type: "compass_path",
+    target: {
+      latOffset: 0.0004,
+      lngOffset: 0.0004,
+      distance: 40
+    }
+  },
+
+  {
+    id: 5,
+    name: "Presencia No Registrada",
+    description:
+      "Activa la cámara frontal desde Instagram o Facebook. Camina 10 segundos. Si la luz detrás de ti cambia sin motivo, tu móvil vibrará. Haz una foto del entorno sin girarte.",
+    difficulty: "Media",
+    locked: false,
+    type: "front_camera_light"
+  },
+
+  // ---------------------------------------------------------
+  // 3) DIFÍCIL — BLOQUEADA — MIEDO REALISTA + APPS + EXPLORACIÓN
+  // ---------------------------------------------------------
+  {
+    id: 6,
+    name: "La Publicación Ausente",
+    description:
+      "Tres puntos aparecerán en tu mapa. En uno de ellos deberás abrir Instagram o Facebook y revisar tu actividad reciente. Si encuentras una foto o interacción que no recuerdas haber hecho, toma una foto del lugar exacto donde estás. No todas las publicaciones deberían existir.",
+    difficulty: "Difícil",
+    locked: true,
+    type: "multi_checkpoint",
+    checkpoints: [
+      { id: "A", latOffset: 0.0004, lngOffset: 0.0003 },
+      { id: "B", latOffset: -0.0005, lngOffset: 0.0004 },
+      { id: "C", latOffset: -0.0003, lngOffset: -0.0004 }
+    ]
+  }
 ];

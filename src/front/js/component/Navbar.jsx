@@ -1,10 +1,9 @@
-import { useNavigate } from "react-router-dom";
+// /src/front/js/component/Navbar.jsx
 
-const navigate = useNavigate();
+import React from "react";
 
-<button
-    className="btn btn-success"
-    onClick={() => navigate("/add-place")}
->
-    + Agregar Lugar
-</button>
+const Navbar = () => {
+    return null;
+};
+
+export default Navbar;

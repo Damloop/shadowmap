@@ -1,85 +1,69 @@
 import React, { useEffect, useContext, useRef } from "react";
 import { Context } from "../store/appContext";
-import { useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-import blueMarker from "../../img/markers/blue-marker.png";
-import greenMarker from "../../img/markers/green-marker.png";
-import pinkMarker from "../../img/markers/pink-marker.png";
-import redMarker from "../../img/markers/red-marker.png";
-import yellowMarker from "../../img/markers/yellow-marker.png";
+export const MapView = ({ activeMission }) => {
+    const { store, actions } = useContext(Context);
+    const mapRef = useRef(null);
+    const missionMarkers = useRef([]);
 
-const icons = {
-  blue: L.icon({ iconUrl: blueMarker, iconSize: [38, 38], iconAnchor: [19, 38] }),
-  green: L.icon({ iconUrl: greenMarker, iconSize: [38, 38], iconAnchor: [19, 38] }),
-  pink: L.icon({ iconUrl: pinkMarker, iconSize: [38, 38], iconAnchor: [19, 38] }),
-  red: L.icon({ iconUrl: redMarker, iconSize: [38, 38], iconAnchor: [19, 38] }),
-  yellow: L.icon({ iconUrl: yellowMarker, iconSize: [38, 38], iconAnchor: [19, 38] })
-};
+    useEffect(() => {
+        if (mapRef.current) return;
 
-const routeColors = {
-  blue: "#3b82f6",
-  green: "#22c55e",
-  pink: "#ec4899",
-  red: "#ef4444",
-  yellow: "#eab308"
-};
+        const map = L.map("map", { zoomControl: false }).setView([40.4168, -3.7038], 13);
 
-export const MapView = () => {
-  const { store, actions } = useContext(Context);
-  const mapRef = useRef(null);
-  const markersRef = useRef([]);
-  const routeRef = useRef(null);
-  const navigate = useNavigate();
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19
+        }).addTo(map);
 
-  useEffect(() => {
-    if (mapRef.current) return;
+        map.on("click", e => {
+            actions.addPointToRoute(e.latlng.lat, e.latlng.lng);
+        });
 
-    const map = L.map("map", { zoomControl: false }).setView([40.4168, -3.7038], 13);
+        mapRef.current = map;
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19
-    }).addTo(map);
+        return () => map.remove();
+    }, []);
 
-    map.on("click", e => {
-      actions.addPointToRoute(e.latlng.lat, e.latlng.lng);
-    });
+    useEffect(() => {
+        if (!activeMission || !mapRef.current || !store.userLocation) return;
 
-    mapRef.current = map;
+        const map = mapRef.current;
+        const { lat, lng } = store.userLocation;
 
-    return () => map.remove();
-  }, []);
+        missionMarkers.current.forEach(m => map.removeLayer(m));
+        missionMarkers.current = [];
 
-  useEffect(() => {
-    if (!mapRef.current) return;
-    const map = mapRef.current;
+        if (activeMission.type === "reach_point") {
+            const tLat = lat + activeMission.target.latOffset;
+            const tLng = lng + activeMission.target.lngOffset;
 
-    if (routeRef.current) {
-      map.removeLayer(routeRef.current);
-    }
+            const marker = L.marker([tLat, tLng]).addTo(map);
+            missionMarkers.current.push(marker);
 
-    if (store.selectedPoints.length > 1) {
-      routeRef.current = L.polyline(
-        store.selectedPoints.map(p => [p.lat, p.lng]),
-        { color: routeColors[store.markerColor], weight: 4 }
-      ).addTo(map);
-    }
-  }, [store.selectedPoints, store.markerColor]);
+            map.setView([tLat, tLng], 16);
+        }
 
-  useEffect(() => {
-    if (!mapRef.current) return;
-    const map = mapRef.current;
+        if (activeMission.type === "multi_checkpoint") {
+            activeMission.checkpoints.forEach(cp => {
+                const cLat = lat + cp.latOffset;
+                const cLng = lng + cp.lngOffset;
 
-    if (store.selectedPoints.length > 0) {
-      const last = store.selectedPoints[store.selectedPoints.length - 1];
-      const icon = icons[store.markerColor];
-      const marker = L.marker([last.lat, last.lng], { icon }).addTo(map);
-      markersRef.current.push(marker);
-    }
-  }, [store.selectedPoints, store.markerColor]);
+                const marker = L.marker([cLat, cLng]).addTo(map);
+                missionMarkers.current.push(marker);
+            });
 
-  return <div id="map" className="map-view"></div>;
+            const first = activeMission.checkpoints[0];
+            const fLat = lat + first.latOffset;
+            const fLng = lng + first.lngOffset;
+
+            map.setView([fLat, fLng], 16);
+        }
+
+    }, [activeMission, store.userLocation]);
+
+    return <div id="map" className="map-view"></div>;
 };
 
 export default MapView;

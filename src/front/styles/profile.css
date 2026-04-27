@@ -324,3 +324,85 @@
     position: relative;
     z-index: 1;
 }
+/* ============================================================
+   AVATAR AJUSTADO — SIN ESPACIO VACÍO DEBAJO
+   ============================================================ */
+
+/* Contenedor del avatar: centrado, sin huecos, sin márgenes duplicados */
+.profile-avatar-wrapper {
+    width: 220px;
+    height: 220px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    margin-top: -10px;     /* sube el avatar */
+    margin-bottom: 5px;    /* elimina hueco inferior */
+    position: relative;
+}
+
+/* Avatar cuadrado, sin márgenes heredados, sin espacio sobrante */
+.profile-avatar {
+    width: 220px;
+    height: 220px;
+    border-radius: 12px;
+    object-fit: cover;
+
+    margin: 0 !important;  /* elimina márgenes que causaban huecos */
+    padding: 0 !important;
+
+    box-shadow: 0 0 25px #7df9ff55;
+    position: relative;
+    z-index: 3;
+}
+
+/* El cuadro del perfil se ajusta automáticamente al contenido */
+.profile-card {
+    padding-bottom: 15px !important; /* antes era demasiado grande */
+    display: flex;
+    gap: 25px;
+    align-items: flex-start;
+}
+
+/* ===== AVATAR MÁS GRANDE Y AJUSTADO ARRIBA ===== */
+.profile-avatar-wrapper {
+    width: 260px !important;
+    height: 260px !important;
+
+    margin-top: -55px !important;  /* sigue subido */
+    margin-bottom: 0 !important;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.profile-avatar {
+    width: 260px !important;   /* 🔥 MÁS GRANDE */
+    height: 260px !important;  /* 🔥 MÁS GRANDE */
+    border-radius: 12px !important;
+    object-fit: cover;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    position: relative;
+    z-index: 10;
+}
+
+
+/* ===== AJUSTE REAL DE ESPACIO ENTRE TARJETAS ===== */
+.mission-section .mission-carousel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px !important;     /* 🔥 menos espacio horizontal */
+    row-gap: 6px !important; /* 🔥 menos espacio vertical */
+}
+
+/* Cuadro más pequeño sin tocar la fuente */
+.mission-section .mission-card {
+    padding: 10px !important;
+    transform: scale(0.82) !important;  /* 🔥 más pequeño */
+    margin: 0 !important;
+}

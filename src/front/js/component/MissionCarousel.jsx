@@ -1,11 +1,8 @@
-// /src/front/js/component/MissionCarousel.jsx
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/missionCarousel.css";
 
 export const MissionCarousel = ({ missions, onSelect }) => {
-    const navigate = useNavigate();
 
     if (!missions || missions.length === 0) return null;
 
@@ -23,16 +20,6 @@ export const MissionCarousel = ({ missions, onSelect }) => {
         return "";
     };
 
-    const handleMissionClick = (m) => {
-        if (m.locked) return;
-
-        sessionStorage.setItem("selectedMission", JSON.stringify(m));
-
-        if (onSelect) onSelect(m);
-
-        navigate("/map");
-    };
-
     return (
         <div className="carousel-container">
             <div className="carousel-list">
@@ -42,7 +29,7 @@ export const MissionCarousel = ({ missions, onSelect }) => {
                         className={`carousel-card ${getDifficultyClass(m.difficulty)} ${
                             m.locked ? "locked" : ""
                         }`}
-                        onClick={() => handleMissionClick(m)}
+                        onClick={() => !m.locked && onSelect(m)}
                         style={{
                             cursor: m.locked ? "not-allowed" : "pointer",
                         }}

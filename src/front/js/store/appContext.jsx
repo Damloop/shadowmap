@@ -4,29 +4,30 @@ import getState from "./flux.js";
 export const Context = React.createContext(null);
 
 const StoreWrapper = ({ children }) => {
+    const [state, setState] = useState(null);
 
-    const [state, setState] = useState(() => {
-        let initialState = {};
-
-        initialState = getState({
+    useEffect(() => {
+        const initialState = getState({
             getStore: () => initialState.store,
             getActions: () => initialState.actions,
             setStore: updatedStore =>
-                setState(prevState => ({
-                    store: { ...prevState.store, ...updatedStore },
-                    actions: { ...prevState.actions }
+                setState(prev => ({
+                    store: { ...prev.store, ...updatedStore },
+                    actions: { ...prev.actions }
                 }))
         });
 
-        return initialState;
-    });
+        // Cargar token desde localStorage ANTES de montar el store
+        const token = localStorage.getItem("token");
+        const user = localStorage.getItem("user");
 
-    // ❗ FIX: evitar bucle infinito
-    useEffect(() => {
-        if (state.actions && state.actions.syncTokenFromSessionStore) {
-            state.actions.syncTokenFromSessionStore();
-        }
-    }, []); // ← SOLO UNA VEZ
+        if (token) initialState.store.token = token;
+        if (user) initialState.store.user = JSON.parse(user);
+
+        setState(initialState);
+    }, []);
+
+    if (!state) return null;
 
     return (
         <Context.Provider value={state}>

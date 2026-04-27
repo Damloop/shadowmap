@@ -3,9 +3,9 @@
   width: 100%;
   height: 100vh;
   overflow: hidden;
+  background: #000;
 }
 
-/* PANEL IZQUIERDO */
 .left-panel {
   width: 300px;
   background: rgba(10, 5, 20, 0.95);
@@ -14,6 +14,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  box-shadow: inset 0 0 25px #6a00ff33;
 }
 
 .left-title {
@@ -21,6 +22,7 @@
   color: #caaaff;
   text-align: center;
   margin-bottom: 10px;
+  text-shadow: 0 0 8px #b57bff;
 }
 
 .left-subtitle {
@@ -34,13 +36,20 @@
   font-size: 0.8rem;
 }
 
-/* MAPA */
 .map-container {
   flex: 1;
   position: relative;
+  height: 100vh;
+  background: linear-gradient(135deg, #0a0514 0%, #000000 100%);
+  border-left: 1px solid rgba(180, 120, 255, 0.3);
+  box-shadow: inset 0 0 40px #6a00ff33;
 }
 
 #map {
   width: 100%;
   height: 100%;
+  background: radial-gradient(circle at center, #0d0d0d 0%, #000000 100%);
+  border-left: 2px solid #6a00ff;
+  box-shadow: inset 0 0 25px #6a00ff33, 0 0 20px #6a00ff55;
+  filter: drop-shadow(0 0 10px #6a00ff);
 }

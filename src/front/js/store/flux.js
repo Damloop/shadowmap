@@ -1,5 +1,3 @@
-// src/front/js/store/flux.js
-
 import places from "./places.js";
 import { API_URL } from "../../api/config.js";
 
@@ -13,9 +11,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             token: null,
             user: null,
+            userLocation: null,
 
             selectedPoints: [],
             markerColor: "blue",
+
             routes: [],
             savedRoutes: [],
             sharedRoutes: []
@@ -25,15 +25,27 @@ const getState = ({ getStore, getActions, setStore }) => {
             ...placesState.actions,
 
             syncTokenFromSessionStore: () => {
-                const token = sessionStorage.getItem("token");
-                if (!token) return;
+                const token = localStorage.getItem("token");
+                const user = localStorage.getItem("user");
 
-                setStore({
-                    ...getStore(),
-                    token
-                });
+                if (token) setStore({ token });
+                if (user) setStore({ user: JSON.parse(user) });
+            },
 
-                getActions().getCurrentUser();
+            getUserLocation: () => {
+                if (!navigator.geolocation) return;
+
+                navigator.geolocation.getCurrentPosition(
+                    pos => {
+                        setStore({
+                            userLocation: {
+                                lat: pos.coords.latitude,
+                                lng: pos.coords.longitude
+                            }
+                        });
+                    },
+                    () => {}
+                );
             },
 
             recover: async (email) => {
@@ -45,7 +57,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                     });
 
                     if (!resp.ok) return { success: false };
-
                     return { success: true };
 
                 } catch (err) {
@@ -99,10 +110,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 
                     const data = await resp.json();
 
-                    sessionStorage.setItem("token", data.token);
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("user", JSON.stringify(data.user));
 
                     setStore({
-                        ...getStore(),
                         token: data.token,
                         user: {
                             ...data.user,
@@ -117,39 +128,12 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            // ======================================================
-            // PREMIUM — ACTIVAR PREMIUM
-            // ======================================================
-            activatePremium: async () => {
-                const store = getStore();
-                if (!store.token) return { success: false };
-
-                try {
-                    const resp = await fetch(`${API_URL}/api/premium`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: "Bearer " + store.token
-                        }
-                    });
-
-                    const data = await resp.json();
-
-                    if (!resp.ok) return { success: false, message: data.msg };
-
-                    // refrescar usuario
-                    await getActions().getCurrentUser();
-
-                    return { success: true };
-
-                } catch (err) {
-                    return { success: false, message: "Error de servidor" };
-                }
+            logout: () => {
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                setStore({ token: null, user: null });
             },
 
-            // ======================================================
-            // GET CURRENT USER
-            // ======================================================
             getCurrentUser: async () => {
                 const store = getStore();
                 if (!store.token) return;
@@ -178,9 +162,59 @@ const getState = ({ getStore, getActions, setStore }) => {
                 } catch (err) {}
             },
 
-            logout: () => {
-                sessionStorage.removeItem("token");
-                setStore({ ...getStore(), token: null, user: null });
+            publishRoute: async (routeData) => {
+                const store = getStore();
+                if (!store.token) return;
+
+                try {
+                    const resp = await fetch(`${API_URL}/api/routes`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: "Bearer " + store.token
+                        },
+                        body: JSON.stringify(routeData)
+                    });
+
+                    if (!resp.ok) return;
+
+                    getActions().loadSavedRoutes();
+
+                } catch (err) {}
+            },
+
+            loadSavedRoutes: async () => {
+                const store = getStore();
+                if (!store.token) return;
+
+                try {
+                    const resp = await fetch(`${API_URL}/api/saved-routes`, {
+                        headers: {
+                            Authorization: "Bearer " + store.token
+                        }
+                    });
+
+                    const data = await resp.json();
+                    setStore({ savedRoutes: data });
+
+                } catch (err) {}
+            },
+
+            loadSharedRoutes: async () => {
+                const store = getStore();
+                if (!store.token) return;
+
+                try {
+                    const resp = await fetch(`${API_URL}/api/shared-routes`, {
+                        headers: {
+                            Authorization: "Bearer " + store.token
+                        }
+                    });
+
+                    const data = await resp.json();
+                    setStore({ sharedRoutes: data });
+
+                } catch (err) {}
             }
         }
     };

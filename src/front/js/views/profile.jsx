@@ -17,12 +17,19 @@ const Profile = () => {
     const [completedMissions, setCompletedMissions] = useState([]);
     const [selectedMission, setSelectedMission] = useState(null);
 
+    // Evitar errores de geolocalización
     useEffect(() => {
         navigator.geolocation.getCurrentPosition(() => {}, () => {});
     }, []);
 
+    // Cargar usuario desde sessionStorage (NO llamar getCurrentUser)
     useEffect(() => {
-        if (!store.user) actions.getCurrentUser();
+        if (!store.user) {
+            const saved = sessionStorage.getItem("user");
+            if (saved) {
+                actions.setStore({ user: JSON.parse(saved) });
+            }
+        }
     }, []);
 
     if (!store.user) return <div className="profile-loading">Cargando identidad...</div>;
@@ -62,7 +69,7 @@ const Profile = () => {
     return (
         <div className="profile-container">
 
-            {/* ===== SIDEBAR ===== */}
+            {/* === SIDEBAR === */}
             <aside className="sidebar">
                 <div className="sidebar-logo-mini">SHADOWMAP</div>
 
@@ -124,12 +131,11 @@ const Profile = () => {
                 </button>
             </aside>
 
-            {/* ===== MAIN ===== */}
+            {/* === MAIN === */}
             <main className="profile-main">
 
                 <div className="profile-card">
 
-                    {/* AVATAR SUBIDO Y MÁS GRANDE */}
                     <div className="profile-avatar-wrapper">
                         <img src={avatarInfo.src} className="profile-avatar" />
                     </div>
@@ -144,7 +150,6 @@ const Profile = () => {
                     </div>
                 </div>
 
-                {/* MISIONES MÁS ABAJO */}
                 <div className="mission-section">
                     <MissionCarousel
                         missions={[

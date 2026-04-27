@@ -1,73 +1,72 @@
 /* CARRUSEL GRANDE, CENTRADO Y PROTAGONISTA */
 .carousel-container {
-    width: 100%;
-        max-width: 900px;
-            margin: 0 auto;
-                margin-top: -40px; /* SUBE TODO EL BLOQUE */
-                    transform: translateY(-20px); /* SUBE AÚN MÁS */
-                    }
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  margin-top: -40px; /* SUBE TODO EL BLOQUE */
+  transform: translateY(-20px); /* SUBE AÚN MÁS */
+}
 
-                    /* LISTA ALTA Y SIN SCROLL VISIBLE */
-                    .carousel-list {
-                        height: 600px; /* AHORA CABEN TODAS LAS TARJETAS */
-                            overflow-y: auto;
-                                padding-right: 10px;
-                                    scrollbar-width: none;
-                                    }
+/* LISTA ALTA Y SIN SCROLL VISIBLE */
+.carousel-list {
+  height: 600px; /* AHORA CABEN TODAS LAS TARJETAS */
+  overflow-y: auto;
+  padding-right: 10px;
+  scrollbar-width: none;
+}
 
-                                    .carousel-list::-webkit-scrollbar {
-                                        display: none;
-                                        }
+.carousel-list::-webkit-scrollbar {
+  display: none;
+}
 
-                                        /* TARJETAS GRANDES */
-                                        .carousel-card {
-                                            padding: 24px;
-                                                margin-bottom: 26px;
-                                                    border-radius: 12px;
-                                                        font-size: 17px;
-                                                            transition: 0.25s;
-                                                                border: 1px solid rgba(255,255,255,0.15);
-                                                                }
+/* TARJETAS GRANDES */
+.carousel-card {
+  padding: 24px;
+  margin-bottom: 26px;
+  border-radius: 12px;
+  font-size: 17px;
+  transition: 0.25s;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
 
-                                                                /* EFECTO HOVER */
-                                                                .carousel-card:hover {
-                                                                    transform: scale(1.04);
-                                                                    }
+/* EFECTO HOVER */
+.carousel-card:hover {
+  transform: scale(1.04);
+}
 
-                                                                    /* COLORES POR DIFICULTAD */
-                                                                    .carousel-card.easy {
-                                                                        background: rgba(0, 200, 120, 0.25);
-                                                                            border-color: rgba(0, 255, 150, 0.4);
-                                                                                color: #00ff9d;
-                                                                                }
+/* COLORES POR DIFICULTAD */
+.carousel-card.easy {
+  background: rgba(0, 200, 120, 0.25);
+  border-color: rgba(0, 255, 150, 0.4);
+  color: #00ff9d;
+}
 
-                                                                                .carousel-card.medium {
-                                                                                    background: rgba(255, 180, 0, 0.25);
-                                                                                        border-color: rgba(255, 210, 0, 0.4);
-                                                                                            color: #ffcc33;
-                                                                                            }
+.carousel-card.medium {
+  background: rgba(255, 180, 0, 0.25);
+  border-color: rgba(255, 210, 0, 0.4);
+  color: #ffcc33;
+}
 
-                                                                                            .carousel-card.hard {
-                                                                                                background: rgba(255, 0, 80, 0.25);
-                                                                                                    border-color: rgba(255, 0, 120, 0.4);
-                                                                                                        color: #ff3b7d;
-                                                                                                        }
+.carousel-card.hard {
+  background: rgba(255, 0, 80, 0.25);
+  border-color: rgba(255, 0, 120, 0.4);
+  color: #ff3b7d;
+}
 
-                                                                                                        /* BLOQUEADA */
-                                                                                                        .carousel-card.locked {
-                                                                                                            filter: grayscale(1) brightness(0.5);
-                                                                                                                cursor: not-allowed;
-                                                                                                                    position: relative;
-                                                                                                                    }
+/* BLOQUEADA */
+.carousel-card.locked {
+  filter: grayscale(1) brightness(0.5);
+  cursor: not-allowed;
+  position: relative;
+}
 
-                                                                                                                    .locked-tag {
-                                                                                                                        position: absolute;
-                                                                                                                            top: 10px;
-                                                                                                                                right: 10px;
-                                                                                                                                    background: #7a00ff;
-                                                                                                                                        padding: 4px 8px;
-                                                                                                                                            font-size: 12px;
-                                                                                                                                                border-radius: 4px;
-                                                                                                                                                    color: white;
-                                                                                                                                                    }
-                                                                                                                                                    
+.locked-tag {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #7a00ff;
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  color: white;
+}

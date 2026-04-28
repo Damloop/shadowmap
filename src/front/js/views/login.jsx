@@ -1,3 +1,4 @@
+// src/front/js/views/login.jsx
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";

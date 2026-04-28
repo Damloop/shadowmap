@@ -73,20 +73,35 @@ const Profile = () => {
 
                 <h2>Actividad</h2>
                 <ul>
-                    <li><span>Rutas visitadas</span><span>{routesVisited || 0}</span></li>
-                    <li><span>Rutas creadas</span><span>{routesCreated || 0}</span></li>
-                    <li><span>Compartidas conmigo</span><span>{routesShared || 0}</span></li>
+                    <li data-tooltip="Número total de rutas que has visitado">
+                        <span>Rutas visitadas</span><span>{routesVisited || 0}</span>
+                    </li>
+
+                    <li data-tooltip="Rutas que tú mismo has creado">
+                        <span>Rutas creadas</span><span>{routesCreated || 0}</span>
+                    </li>
+
+                    <li data-tooltip="Rutas que otros usuarios han compartido contigo">
+                        <span>Compartidas conmigo</span><span>{routesShared || 0}</span>
+                    </li>
                 </ul>
 
                 <h2>Puntuación</h2>
                 <ul>
-                    <li><span>Explorador</span><span>{explorerScore || 0}</span></li>
-                    <li><span>Creador</span><span>{creatorScore || 0}</span></li>
+                    <li data-tooltip="Tu nivel como explorador basado en misiones completadas">
+                        <span>Explorador</span><span>{explorerScore || 0}</span>
+                    </li>
+
+                    <li data-tooltip="Tu nivel como creador de rutas y contenido">
+                        <span>Creador</span><span>{creatorScore || 0}</span>
+                    </li>
                 </ul>
 
                 <h2>Estado</h2>
                 <ul>
-                    <li>{is_premium ? "Cuenta Premium" : "Cuenta Estándar"}</li>
+                    <li data-tooltip="Tipo de cuenta que posees actualmente">
+                        {is_premium ? "Cuenta Premium" : "Cuenta Estándar"}
+                    </li>
                 </ul>
 
                 {!is_premium && (

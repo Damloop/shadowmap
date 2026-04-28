@@ -3,13 +3,13 @@
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
-  margin-top: -40px; /* SUBE TODO EL BLOQUE */
-  transform: translateY(-20px); /* SUBE AÚN MÁS */
+  margin-top: -40px;
+  transform: translateY(-20px);
 }
 
 /* LISTA ALTA Y SIN SCROLL VISIBLE */
 .carousel-list {
-  height: 600px; /* AHORA CABEN TODAS LAS TARJETAS */
+  height: 600px;
   overflow-y: auto;
   padding-right: 10px;
   scrollbar-width: none;
@@ -27,6 +27,7 @@
   font-size: 17px;
   transition: 0.25s;
   border: 1px solid rgba(255, 255, 255, 0.15);
+  position: relative;
 }
 
 /* EFECTO HOVER */
@@ -57,7 +58,6 @@
 .carousel-card.locked {
   filter: grayscale(1) brightness(0.5);
   cursor: not-allowed;
-  position: relative;
 }
 
 .locked-tag {
@@ -70,3 +70,5 @@
   border-radius: 4px;
   color: white;
 }
+
+

@@ -451,3 +451,23 @@
     width: 100% !important;
     max-width: 100% !important;
 }
+/* TOOLTIP PARA ACTIVIDAD / PUNTUACIÓN / ESTADO */
+.sidebar ul li {
+    position: relative;
+}
+
+.sidebar ul li:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 60%;          /* MÁS A LA DERECHA */
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(80, 0, 120, 0.95);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    color: #fff;
+    box-shadow: 0 0 10px #a855ff;
+    z-index: 30;
+}

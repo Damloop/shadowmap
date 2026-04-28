@@ -92,6 +92,34 @@ const PremiumLevel = () => {
         }, 1200);
     };
 
+    if (level === 10) {
+        return (
+            <div className="premium-max-container">
+                <div className="premium-max-title">NIVEL MÁXIMO</div>
+                <div className="premium-max-glow">10</div>
+                <div className="premium-max-msg">
+                    Has alcanzado el dominio absoluto del Velo.
+                </div>
+
+                <div className="premium-max-upgrades">
+                    {upgrades[10].map((u, i) => (
+                        <div key={i} className="premium-max-item">
+                            <strong>{u.name}</strong>
+                            <p>{u.desc}</p>
+                        </div>
+                    ))}
+                </div>
+
+                <button
+                    className="premium-max-btn"
+                    onClick={() => window.history.back()}
+                >
+                    Volver
+                </button>
+            </div>
+        );
+    }
+
     return (
         <div className="premium-level-box">
 

@@ -1,3 +1,5 @@
+// src/front/js/component/MissionCarousel.jsx
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../../styles/missionCarousel.css";

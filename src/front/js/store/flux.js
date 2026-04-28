@@ -106,11 +106,14 @@ const getState = ({ getStore, getActions, setStore }) => {
                         body: JSON.stringify({ email, password })
                     });
 
-                    if (!resp.ok) {
-                        return { success: false, message: "Credenciales incorrectas" };
-                    }
-
                     const data = await resp.json();
+
+                    if (!resp.ok) {
+                        return {
+                            success: false,
+                            message: data?.msg || "Credenciales incorrectas"
+                        };
+                    }
 
                     localStorage.setItem("token", data.token);
                     localStorage.setItem("user", JSON.stringify(data.user));
@@ -135,10 +138,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                 localStorage.removeItem("user");
                 setStore({ token: null, user: null });
             },
-
-            // ============================================================
-            // ELIMINADO getCurrentUser (NO EXISTE EN TU BACKEND)
-            // ============================================================
 
             publishRoute: async (routeData) => {
                 const store = getStore();

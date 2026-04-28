@@ -1,12 +1,12 @@
 // src/front/js/views/map.jsx
 
 import React, { useEffect, useContext, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 
 import MapView from "../component/MapView.jsx";
-import SavedRoutes from "../component/SavedRoutes.jsx";
-import SharedRoutes from "../component/SharedRoutes.jsx";
+// import SavedRoutes from "../component/SavedRoutes.jsx";
+// import SharedRoutes from "../component/SharedRoutes.jsx";
 
 import { missions } from "../../data/missions.js";
 
@@ -15,21 +15,16 @@ import "../../styles/map.css";
 const Map = () => {
     const { store, actions } = useContext(Context);
     const location = useLocation();
+    const navigate = useNavigate();
 
     const [activeMission, setActiveMission] = useState(null);
 
-    // ============================================================
-    // 1. Cargar POIs + rutas + pedir ubicación al entrar
-    // ============================================================
     useEffect(() => {
         actions.loadPois();
         actions.loadSharedRoutes();
         actions.getUserLocation();
     }, []);
 
-    // ============================================================
-    // 2. Cargar misión activa desde navegación o sessionStorage
-    // ============================================================
     useEffect(() => {
         const missionId = location.state?.missionId;
 
@@ -46,30 +41,22 @@ const Map = () => {
 
     return (
         <div className="map-page-container">
-
-            {/* ============================================================
-                PANEL IZQUIERDO — ESTÉTICA SHADOWMAP
-            ============================================================ */}
             <div className="map-left-panel">
 
-                <h2 className="panel-title">Exploración Paranormal</h2>
+                <h2 className="panel-title">SHADOWMAP - Mapa de Exploración Paranormal</h2>
 
                 <div className="panel-buttons">
-                    <button className="shadow-btn">➕ Crear nueva ruta</button>
-                    <button className="shadow-btn">📁 Mis rutas guardadas</button>
-                    <button className="shadow-btn">🧿 Compartidas conmigo</button>
+                    <button className="shadow-btn shadow-btn-main">Crear nueva ruta</button>
+                    <button className="shadow-btn shadow-btn-secondary">Mis rutas guardadas</button>
+                    <button className="shadow-btn shadow-btn-secondary">Compartidas conmigo</button>
                 </div>
 
-                {/* ============================================================
-                    MISIÓN ACTIVA — MISTERIOSA Y ESPECTRAL
-                ============================================================ */}
                 {activeMission ? (
                     <div className="mission-box">
                         <h3>Misión activa</h3>
                         <p className="mission-name">{activeMission.name}</p>
                         <p className="mission-desc">{activeMission.description}</p>
                         <p className="mission-diff">Dificultad: {activeMission.difficulty}</p>
-
                         <div className="mission-aura"></div>
                     </div>
                 ) : (
@@ -78,16 +65,17 @@ const Map = () => {
                     </div>
                 )}
 
-                {/* ============================================================
-                    RUTAS GUARDADAS Y COMPARTIDAS
-                ============================================================ */}
-                <SavedRoutes />
-                <SharedRoutes />
+                <button
+                    className="shadow-btn shadow-btn-secondary"
+                    onClick={() => navigate("/profile")}
+                >
+                    Volver
+                </button>
+
+                {/* <SavedRoutes /> */}
+                {/* <SharedRoutes /> */}
             </div>
 
-            {/* ============================================================
-                MAPA — OCUPA TODO EL RESTO
-            ============================================================ */}
             <div className="map-right-panel">
                 <MapView activeMission={activeMission} />
             </div>

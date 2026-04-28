@@ -1,3 +1,5 @@
+// src/front/js/store/appContext.jsx
+
 import React, { useState, useEffect } from "react";
 import getState from "./flux.js";
 

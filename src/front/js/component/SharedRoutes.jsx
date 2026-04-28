@@ -1,9 +1,10 @@
+// src/front/js/component/SharedRoutes.jsx
 import React, { useContext } from "react";
 import { Context } from "../store/appContext";
 
 const SharedRoutes = () => {
   const { store } = useContext(Context);
-  const routes = store.sharedRoutes || [];
+  const routes = store?.sharedRoutes || [];
 
   return (
     <div className="routes-block">
@@ -14,7 +15,7 @@ const SharedRoutes = () => {
       )}
 
       {routes.slice(-3).map(r => (
-        <div key={r.id} className="route-card route-card--shared">
+        <div key={r.id} className="route-card">
           <div className="route-card-header">
             <span className="route-card-name">{r.name}</span>
             <span className="route-card-rating">{"★".repeat(r.rating)}</span>

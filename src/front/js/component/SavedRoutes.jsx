@@ -3,7 +3,7 @@ import { Context } from "../store/appContext";
 
 const SavedRoutes = () => {
   const { store } = useContext(Context);
-  const routes = store.savedRoutes || [];
+  const routes = store?.savedRoutes || [];
 
   return (
     <div className="routes-block">

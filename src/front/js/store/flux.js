@@ -182,7 +182,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 if (!store.token) return;
 
                 try {
-                    const resp = await fetch(`${API_URL}/api/shared-routes`, {
+                    const resp = await fetch(`${API_URL}/api/routes/shared`, {
                         headers: {
                             Authorization: "Bearer " + store.token
                         }

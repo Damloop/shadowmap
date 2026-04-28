@@ -5,9 +5,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 
 import MapView from "../component/MapView.jsx";
-// import SavedRoutes from "../component/SavedRoutes.jsx";
-// import SharedRoutes from "../component/SharedRoutes.jsx";
-
 import { missions } from "../../data/missions.js";
 
 import "../../styles/map.css";
@@ -41,6 +38,7 @@ const Map = () => {
 
     return (
         <div className="map-page-container">
+
             <div className="map-left-panel">
 
                 <h2 className="panel-title">SHADOWMAP - Mapa de Exploración Paranormal</h2>
@@ -72,13 +70,12 @@ const Map = () => {
                     Volver
                 </button>
 
-                {/* <SavedRoutes /> */}
-                {/* <SharedRoutes /> */}
             </div>
 
             <div className="map-right-panel">
                 <MapView activeMission={activeMission} />
             </div>
+
         </div>
     );
 };

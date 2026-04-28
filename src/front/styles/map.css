@@ -64,38 +64,44 @@
 ============================================================ */
 .mission-box {
   background: rgba(20, 10, 40, 0.85);
-  padding: 20px;
+  padding: 26px;
   border-radius: 12px;
-  border: 1px solid rgba(180, 120, 255, 0.4);
-  box-shadow: 0 0 25px #6a00ff55, inset 0 0 20px #6a00ff33;
+  border: 2px solid rgba(180, 120, 255, 0.4);
+  box-shadow: 0 0 35px #b57bff88, inset 0 0 25px #6a00ff55;
   position: relative;
   overflow: hidden;
+  transform: scale(1.05);
 }
 
 .mission-box h3 {
   font-family: "Orbitron", sans-serif;
   color: #d8c4ff;
-  text-shadow: 0 0 8px #b57bff;
+  text-shadow: 0 0 12px #d8b4ff;
   margin-bottom: 10px;
+  font-size: 1.4rem;
 }
 
 .mission-name {
   color: #fff;
-  font-size: 1.2rem;
+  font-size: 1.45rem;
   font-weight: bold;
-  text-shadow: 0 0 10px #a66bff;
+  text-shadow: 0 0 14px #c28aff;
 }
 
 .mission-desc {
   color: #c8b8ff;
   margin-top: 10px;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  line-height: 1.45;
+  opacity: 0.95;
 }
 
 .mission-diff {
-  margin-top: 10px;
+  margin-top: 14px;
   color: #ff9dfc;
   font-weight: bold;
+  font-size: 1rem;
+  text-shadow: 0 0 10px #ff9dfc;
 }
 
 .mission-aura {
@@ -104,14 +110,14 @@
   left: -20%;
   width: 140%;
   height: 140%;
-  background: radial-gradient(circle, rgba(120,0,255,0.25), transparent 70%);
-  animation: pulse 4s infinite alternate;
+  background: radial-gradient(circle, rgba(150,0,255,0.35), transparent 75%);
+  animation: pulseStrong 3.5s infinite alternate;
   pointer-events: none;
 }
 
-@keyframes pulse {
-  from { opacity: 0.4; transform: scale(1); }
-  to   { opacity: 0.8; transform: scale(1.2); }
+@keyframes pulseStrong {
+  from { opacity: 0.5; transform: scale(1); }
+  to   { opacity: 0.9; transform: scale(1.25); }
 }
 
 /* ============================================================
@@ -120,6 +126,7 @@
 .map-right-panel {
   flex: 1;
   position: relative;
+  z-index: 1;
   height: 100vh;
   background: linear-gradient(135deg, #0a0514 0%, #000000 100%);
   border-left: 1px solid rgba(180, 120, 255, 0.3);
@@ -132,111 +139,12 @@
 #map {
   width: 100%;
   height: 100%;
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  left: 0;
   background: radial-gradient(circle at center, #0d0d0d 0%, #000000 100%);
   border-left: 2px solid #6a00ff;
   box-shadow: inset 0 0 25px #6a00ff33, 0 0 20px #6a00ff55;
   filter: drop-shadow(0 0 10px #6a00ff);
-}
-
-
-/* Ocultar los dos bloques de rutas (SavedRoutes y SharedRoutes) por posición */
-.map-left-panel > div:nth-of-type(3),
-.map-left-panel > div:nth-of-type(4) {
-  display: none !important;
-}
-
-/* ============================================================
-   MEJORAR VISIBILIDAD DE LA MISIÓN ACTIVA
-============================================================ */
-
-/* Aumentar tamaño y presencia */
-.mission-box {
-    transform: scale(1.05);
-    border-width: 2px;
-    padding: 26px;
-    box-shadow: 0 0 35px #b57bff88, inset 0 0 25px #6a00ff55;
-}
-
-/* Título más grande y dominante */
-.mission-box h3 {
-    font-size: 1.4rem;
-    letter-spacing: 1px;
-    text-shadow: 0 0 12px #d8b4ff;
-}
-
-/* Nombre de misión más protagonista */
-.mission-name {
-    font-size: 1.45rem;
-    margin-top: 6px;
-    text-shadow: 0 0 14px #c28aff;
-}
-
-/* Descripción más legible */
-.mission-desc {
-    font-size: 1rem;
-    line-height: 1.45;
-    opacity: 0.95;
-}
-
-/* Dificultad más marcada */
-.mission-diff {
-    font-size: 1rem;
-    margin-top: 14px;
-    text-shadow: 0 0 10px #ff9dfc;
-}
-
-/* Aura más intensa */
-.mission-aura {
-    background: radial-gradient(circle, rgba(150,0,255,0.35), transparent 75%);
-    animation: pulseStrong 3.5s infinite alternate;
-}
-
-@keyframes pulseStrong {
-    from { opacity: 0.5; transform: scale(1); }
-    to   { opacity: 0.9; transform: scale(1.25); }
-}
-
-/* Separación extra respecto a los botones */
-.panel-buttons {
-    margin-bottom: 10px;
-}
-
-/* Botón Volver */
-.shadow-btn-secondary {
-    font-family: "Orbitron", sans-serif;
-    background: rgba(20, 0, 40, 0.7);
-    border: 1px solid #9b4dff;
-    color: #d7b7ff;
-    padding: 10px 14px;
-    border-radius: 6px;
-    width: 100%;
-    text-align: left;
-    transition: 0.25s ease;
-    box-shadow: 0 0 8px #6a2bff55;
-}
-
-.shadow-btn-secondary:hover {
-    background: rgba(40, 0, 80, 0.9);
-    box-shadow: 0 0 14px #b57dffcc;
-    transform: translateX(4px);
-}
-
-.map-right-panel {
-  flex: 1;
-  position: relative;
-  height: 100vh;
-  background: linear-gradient(135deg, #0a0514 0%, #000000 100%);
-  border-left: 1px solid rgba(180, 120, 255, 0.3);
-  box-shadow: inset 0 0 40px #6a00ff33;
-}
-
-
-.map-view {
-    height: 100%;
-    width: 100%;
-}
-
-#map {
-    height: 100%;
-    width: 100%;
 }

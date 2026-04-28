@@ -1,6 +1,6 @@
-const getState = ({ getStore, getActions, setStore }) => {
-  const API_URL = import.meta.env.VITE_BACKEND_URL;
+// src/front/js/store/places.js
 
+const getState = ({ getStore, getActions, setStore, API_URL }) => {
   return {
     store: {
       pois: [],
@@ -19,11 +19,12 @@ const getState = ({ getStore, getActions, setStore }) => {
             pois: data
           });
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.error("Error loading POIs:", error);
         }
       },
 
-      loadPlaceById: async id => {
+      loadPlaceById: async (id) => {
         try {
           setStore({
             ...getStore(),
@@ -39,6 +40,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             currentPlace: data
           });
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.error("Error loading place:", error);
         }
       }

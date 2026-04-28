@@ -1,3 +1,5 @@
+// src/front/layout.jsx
+
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -13,7 +15,6 @@ import EditPlace from "./js/views/editPlace.jsx";
 import PlaceDetails from "./js/views/placeDetails.jsx";
 
 import ProtectedRoute from "./js/component/ProtectedRoute.jsx";
-import injectContext from "./js/store/appContext.jsx";
 
 const Layout = () => {
     return (
@@ -86,6 +87,6 @@ const Layout = () => {
             </Routes>
         </BrowserRouter>
     );
-};  
+};
 
 export default Layout;

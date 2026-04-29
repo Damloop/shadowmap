@@ -137,7 +137,7 @@ const PremiumLevel = () => {
                 {level < 10 ? (
                     <>
                         Sellar Ascenso  
-                        <span className="price-tag">4,95€</span>
+                        <span className="price-tag"> - 4,95€</span>
                     </>
                 ) : (
                     "Nivel Máximo"

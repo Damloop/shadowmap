@@ -1,5 +1,4 @@
 // src/front/js/views/profile.jsx
-
 import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../store/appContext.jsx";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +7,9 @@ import { avatarData } from "../../data/avatarData";
 import { missions } from "../../data/missions";
 import { MissionCarousel } from "../component/MissionCarousel.jsx";
 import "../../styles/profile.css";
+import "../../styles/map.css"; // asegura que .mission-completed esté disponible
+
+const COMPLETED_KEY = "shadowmap_completed_missions";
 
 const Profile = () => {
     const { store, actions } = useContext(Context);
@@ -30,6 +32,29 @@ const Profile = () => {
             if (saved) actions.syncTokenFromSessionStore();
         }
     }, [store.user]);
+
+    // Cargar misiones completadas desde localStorage al montar
+    useEffect(() => {
+        try {
+            const raw = localStorage.getItem(COMPLETED_KEY);
+            setCompletedMissions(raw ? JSON.parse(raw) : []);
+        } catch {
+            setCompletedMissions([]);
+        }
+
+        // Escuchar cambios en localStorage (otra pestaña o acción en Map)
+        const onStorage = (e) => {
+            if (e.key === COMPLETED_KEY) {
+                try {
+                    setCompletedMissions(e.newValue ? JSON.parse(e.newValue) : []);
+                } catch {
+                    setCompletedMissions([]);
+                }
+            }
+        };
+        window.addEventListener("storage", onStorage);
+        return () => window.removeEventListener("storage", onStorage);
+    }, []);
 
     if (!store.user) {
         return <div className="profile-loading">Cargando identidad...</div>;
@@ -54,16 +79,30 @@ const Profile = () => {
         if (mission.locked) return;
         sessionStorage.setItem("selectedMission", JSON.stringify(mission));
         setSelectedMission(mission);
-        navigate("/map");
+        navigate("/map", { state: { missionId: mission.id } });
     };
 
+    // Marca misión como completada y la persiste en localStorage
     const handleCompleteMission = (mission) => {
-        if (!completedMissions.includes(mission.id)) {
-            setCompletedMissions([...completedMissions, mission.id]);
-            setLevel(level + 5);
+        try {
+            const raw = localStorage.getItem(COMPLETED_KEY);
+            const completed = raw ? JSON.parse(raw) : [];
+            if (!completed.includes(mission.id)) {
+                const next = [...completed, mission.id];
+                localStorage.setItem(COMPLETED_KEY, JSON.stringify(next));
+                setCompletedMissions(next);
+                setLevel(prev => prev + 5);
+            }
+        } catch {
+            localStorage.setItem(COMPLETED_KEY, JSON.stringify([mission.id]));
+            setCompletedMissions([mission.id]);
+            setLevel(prev => prev + 5);
         }
         setSelectedMission(null);
     };
+
+    // Comprueba si una misión está completada
+    const isCompleted = (missionId) => completedMissions.includes(missionId);
 
     return (
         <div className="profile-container">
@@ -127,7 +166,7 @@ const Profile = () => {
 
                     <div className="profile-avatar-wrapper">
                         <img
-                            src={avatarInfo.src}
+                            src={avatarInfo?.src}
                             alt="avatar"
                             className="profile-avatar"
                         />
@@ -143,7 +182,7 @@ const Profile = () => {
                         )}
 
                         <p className="lore-text">
-                            <strong>{lore.title}:</strong> {lore.origin}
+                            <strong>{lore?.title}:</strong> {lore?.origin}
                         </p>
                     </div>
                 </div>
@@ -155,6 +194,8 @@ const Profile = () => {
                             ...missions.filter(m => m.locked).slice(0, 1)
                         ]}
                         onSelect={(m) => handleSelectMission(m)}
+                        // opcional: pasar completed para que el carousel muestre estado
+                        completedIds={completedMissions}
                     />
                 </div>
 
@@ -180,6 +221,30 @@ const Profile = () => {
                         </div>
                     </div>
                 )}
+
+                <section className="profile-missions" style={{ marginTop: 18 }}>
+                    <h3>Todas las misiones</h3>
+                    <div className="saved-routes-list">
+                        {missions.map(m => {
+                            const done = isCompleted(m.id);
+                            return (
+                                <div key={m.id} className={`saved-route-card ${done ? "mission-completed" : ""}`}>
+                                    <div className="route-header">
+                                        <strong className="route-name">{m.name}</strong>
+                                        <div>
+                                            {!done && (
+                                                <button className="small-btn" onClick={() => handleSelectMission(m)}>Ir a misión</button>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="route-meta">
+                                        <span className="route-info">{m.description}</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </section>
 
             </main>
 

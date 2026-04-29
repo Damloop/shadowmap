@@ -11,7 +11,7 @@ import redMarker from "../../img/markers/red-marker.png";
 
 const PROXIMITY_METERS = 60;
 
-const MapView = ({ activeMission: propMission }) => {
+const MapView = ({ activeMission: propMission, isCreatingRoute, setIsCreatingRoute }) => {
   const { store, actions } = useContext(Context);
   const mapRef = useRef(null);
   const containerRef = useRef(null);
@@ -54,88 +54,47 @@ const MapView = ({ activeMission: propMission }) => {
     []
   );
 
-  // Solicitar ubicación de forma robusta y detectar estado denied
+  // Solicitar ubicación
   useEffect(() => {
     const requestLocation = async () => {
       if (!navigator.geolocation) return;
 
-      // Preferir acción del store si existe
-      if (actions?.getUserLocation) {
-        try {
-          actions.getUserLocation();
-        } catch (err) {}
-      }
-
-      // Usar Permissions API si está disponible para detectar denied/prompt/granted
       try {
         if (navigator.permissions && navigator.permissions.query) {
           const status = await navigator.permissions.query({ name: "geolocation" });
+
           if (status.state === "denied") {
             setShowLocationDeniedToast(true);
             return;
           }
-          // Si prompt o granted, llamar para forzar prompt si corresponde
+
           navigator.geolocation.getCurrentPosition(
             pos => {
-              // si la acción existe, la usamos para sincronizar store
-              if (actions?.getUserLocation) {
-                try {
-                  actions.getUserLocation();
-                } catch (err) {}
-              } else {
-                try {
-                  sessionStorage.setItem("userLocationTemp", JSON.stringify({ lat: pos.coords.latitude, lng: pos.coords.longitude }));
-                } catch (err) {}
-              }
+              if (actions?.getUserLocation) actions.getUserLocation();
             },
             err => {
-              if (err && err.code === 1) {
-                // PERMISSION_DENIED
-                setShowLocationDeniedToast(true);
-              }
+              if (err.code === 1) setShowLocationDeniedToast(true);
             }
           );
-          // escuchar cambios de permiso para actualizar toast dinámicamente
+
           status.onchange = () => {
             if (status.state === "denied") setShowLocationDeniedToast(true);
             else setShowLocationDeniedToast(false);
           };
         } else {
-          // Sin Permissions API: llamar directamente (esto debería disparar prompt)
-          navigator.geolocation.getCurrentPosition(
-            pos => {
-              if (actions?.getUserLocation) {
-                try {
-                  actions.getUserLocation();
-                } catch (err) {}
-              } else {
-                try {
-                  sessionStorage.setItem("userLocationTemp", JSON.stringify({ lat: pos.coords.latitude, lng: pos.coords.longitude }));
-                } catch (err) {}
-              }
-            },
-            err => {
-              if (err && err.code === 1) setShowLocationDeniedToast(true);
-            }
-          );
-        }
-      } catch (err) {
-        // fallback directo
-        try {
           navigator.geolocation.getCurrentPosition(
             pos => {
               if (actions?.getUserLocation) actions.getUserLocation();
             },
-            e => {
-              if (e && e.code === 1) setShowLocationDeniedToast(true);
+            err => {
+              if (err.code === 1) setShowLocationDeniedToast(true);
             }
           );
-        } catch (e) {}
-      }
+        }
+      } catch (err) {}
     };
 
     requestLocation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Inicializar mapa
@@ -154,27 +113,24 @@ const MapView = ({ activeMission: propMission }) => {
       { maxZoom: 19 }
     ).addTo(map);
 
+    // SOLO añadir puntos si estamos creando una ruta
     map.on("click", (e) => {
+      if (!isCreatingRoute) return;
       if (actions?.addPointToRoute) {
-        try {
-          actions.addPointToRoute(e.latlng.lat, e.latlng.lng);
-        } catch (err) {}
+        actions.addPointToRoute(e.latlng.lat, e.latlng.lng);
       }
     });
 
     mapRef.current = map;
 
-    setTimeout(() => {
-      try {
-        map.invalidateSize();
-      } catch (err) {}
-    }, 120);
+    setTimeout(() => map.invalidateSize(), 120);
 
     const onResize = () => {
       try {
         map.invalidateSize();
       } catch (err) {}
     };
+
     window.addEventListener("resize", onResize);
 
     return () => {
@@ -184,63 +140,48 @@ const MapView = ({ activeMission: propMission }) => {
       } catch (err) {}
       mapRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actions]);
+  }, [actions, isCreatingRoute]);
 
-  // Generador de misión cerca de ubicación base
+  // Generador de misión
   const generateMissionNear = (template, baseLat, baseLng) => {
     if (!template) return null;
 
     if (template.type === "reach_point" && template.target) {
-      if (typeof template.target.lat === "number" && typeof template.target.lng === "number") {
+      if (typeof template.target.lat === "number") {
         return {
           ...template,
           preparedCheckpoints: [{ lat: template.target.lat, lng: template.target.lng }]
         };
-      } else {
-        const tLat = baseLat + (template.target.latOffset || 0);
-        const tLng = baseLng + (template.target.lngOffset || 0);
-        return {
-          ...template,
-          preparedCheckpoints: [{ lat: tLat, lng: tLng }]
-        };
       }
+      return {
+        ...template,
+        preparedCheckpoints: [{
+          lat: baseLat + (template.target.latOffset || 0),
+          lng: baseLng + (template.target.lngOffset || 0)
+        }]
+      };
     }
 
-    if (template.type === "multi_checkpoint" && Array.isArray(template.checkpoints)) {
-      const prepared = template.checkpoints.map(cp => {
-        if (typeof cp.lat === "number" && typeof cp.lng === "number") {
-          return { lat: cp.lat, lng: cp.lng };
-        }
-        return {
-          lat: baseLat + (cp.latOffset || (Math.random() - 0.5) * 0.002),
-          lng: baseLng + (cp.lngOffset || (Math.random() - 0.5) * 0.002)
-        };
-      });
+    if (template.type === "multi_checkpoint") {
+      const prepared = template.checkpoints.map(cp => ({
+        lat: cp.lat ?? baseLat + (Math.random() - 0.5) * 0.002,
+        lng: cp.lng ?? baseLng + (Math.random() - 0.5) * 0.002
+      }));
       return { ...template, preparedCheckpoints: prepared };
     }
 
     const count = template?.checkpoints?.length || 3;
-    const prepared = Array.from({ length: count }).map(() => {
-      const lat = baseLat + (Math.random() - 0.5) * 0.002;
-      const lng = baseLng + (Math.random() - 0.5) * 0.002;
-      return { lat, lng };
-    });
+    const prepared = Array.from({ length: count }).map(() => ({
+      lat: baseLat + (Math.random() - 0.5) * 0.002,
+      lng: baseLng + (Math.random() - 0.5) * 0.002
+    }));
 
     return { ...template, preparedCheckpoints: prepared };
   };
 
-  // Preparar misión cuando tengamos ubicación o propMission
+  // Preparar misión
   useEffect(() => {
-    const loc = store?.userLocation || (() => {
-      try {
-        const s = sessionStorage.getItem("userLocationTemp");
-        return s ? JSON.parse(s) : null;
-      } catch (err) {
-        return null;
-      }
-    })();
-
+    const loc = store?.userLocation;
     if (!loc) return;
 
     let mission = propMission;
@@ -248,9 +189,7 @@ const MapView = ({ activeMission: propMission }) => {
       try {
         const stored = sessionStorage.getItem("selectedMission");
         if (stored) mission = JSON.parse(stored);
-      } catch (err) {
-        mission = null;
-      }
+      } catch (err) {}
     }
 
     if (!mission) {
@@ -261,7 +200,6 @@ const MapView = ({ activeMission: propMission }) => {
     const prepared = generateMissionNear(mission, loc.lat, loc.lng);
     setPreparedMission(prepared);
     setCompletedCount(0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [propMission, store?.userLocation]);
 
   // Renderizar marcadores de misión
@@ -271,7 +209,7 @@ const MapView = ({ activeMission: propMission }) => {
 
     missionMarkers.current.forEach(m => {
       try {
-        if (m && map.hasLayer && map.hasLayer(m)) map.removeLayer(m);
+        if (map.hasLayer(m)) map.removeLayer(m);
       } catch (err) {}
     });
     missionMarkers.current = [];
@@ -285,19 +223,14 @@ const MapView = ({ activeMission: propMission }) => {
       } catch (err) {}
     });
 
-    const focus = checkpoints[0] || (store?.userLocation && { lat: store.userLocation.lat, lng: store.userLocation.lng });
+    const focus = checkpoints[0] || store?.userLocation;
     if (focus) {
       try {
         map.setView([focus.lat, focus.lng], 15);
       } catch (err) {}
     }
 
-    setTimeout(() => {
-      try {
-        map.invalidateSize();
-      } catch (err) {}
-    }, 120);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setTimeout(() => map.invalidateSize(), 120);
   }, [preparedMission, redIcon, store?.userLocation]);
 
   // Cargar POIs
@@ -316,7 +249,7 @@ const MapView = ({ activeMission: propMission }) => {
 
         poiMarkers.current.forEach(m => {
           try {
-            if (m && map.hasLayer && map.hasLayer(m)) map.removeLayer(m);
+            if (map.hasLayer(m)) map.removeLayer(m);
           } catch (err) {}
         });
         poiMarkers.current = [];
@@ -336,12 +269,11 @@ const MapView = ({ activeMission: propMission }) => {
       cancelled = true;
       poiMarkers.current.forEach(m => {
         try {
-          if (m && map.hasLayer && map.hasLayer(m)) map.removeLayer(m);
+          if (map.hasLayer(m)) map.removeLayer(m);
         } catch (err) {}
       });
       poiMarkers.current = [];
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [greenIcon]);
 
   // Actualizar marcador de usuario
@@ -353,7 +285,7 @@ const MapView = ({ activeMission: propMission }) => {
 
     if (userMarker.current) {
       try {
-        if (map.hasLayer && map.hasLayer(userMarker.current)) map.removeLayer(userMarker.current);
+        if (map.hasLayer(userMarker.current)) map.removeLayer(userMarker.current);
       } catch (err) {}
       userMarker.current = null;
     }
@@ -368,21 +300,17 @@ const MapView = ({ activeMission: propMission }) => {
       userMarker.current = L.marker([lat, lng], { icon }).addTo(map);
     } catch (err) {}
 
-    setTimeout(() => {
-      try {
-        map.invalidateSize();
-      } catch (err) {}
-    }, 80);
+    setTimeout(() => map.invalidateSize(), 80);
   }, [store?.userLocation]);
 
-  // Renderizar marcadores de ruta en curso (selectedPoints)
+  // Renderizar puntos de ruta temporal
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
     tempRouteMarkers.current.forEach(m => {
       try {
-        if (m && map.hasLayer && map.hasLayer(m)) map.removeLayer(m);
+        if (map.hasLayer(m)) map.removeLayer(m);
       } catch (err) {}
     });
     tempRouteMarkers.current = [];
@@ -403,95 +331,26 @@ const MapView = ({ activeMission: propMission }) => {
     return () => {
       tempRouteMarkers.current.forEach(m => {
         try {
-          if (m && map.hasLayer && map.hasLayer(m)) map.removeLayer(m);
+          if (map.hasLayer(m)) map.removeLayer(m);
         } catch (err) {}
       });
       tempRouteMarkers.current = [];
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store?.selectedPoints, store?.markerColor]);
-
-  // Lógica para comprobar misión
-  const handleCheckMission = () => {
-    const map = mapRef.current;
-    if (!map || !preparedMission || !store?.userLocation) {
-      try {
-        L.popup()
-          .setLatLng(map ? map.getCenter() : [40.4168, -3.7038])
-          .setContent("Necesitamos tu ubicación para comprobar la misión. Permite la ubicación y vuelve a intentarlo.")
-          .openOn(map || null);
-      } catch (err) {}
-      return;
-    }
-
-    const userLatLng = L.latLng(store.userLocation.lat, store.userLocation.lng);
-    let newlyCompleted = 0;
-
-    missionMarkers.current.forEach((marker, idx) => {
-      if (!marker || !marker.getLatLng) return;
-      const dist = userLatLng.distanceTo(marker.getLatLng());
-      if (dist <= PROXIMITY_METERS) {
-        try {
-          if (map.hasLayer && map.hasLayer(marker)) map.removeLayer(marker);
-        } catch (err) {}
-        missionMarkers.current[idx] = null;
-        newlyCompleted++;
-      } else {
-        try {
-          marker.bindPopup(`A ${Math.round(dist)} m. Acércate para completar.`).openPopup();
-          setTimeout(() => {
-            try {
-              marker.closePopup();
-            } catch (err) {}
-          }, 1200);
-        } catch (err) {}
-      }
-    });
-
-    if (newlyCompleted > 0) {
-      setCompletedCount(prev => prev + newlyCompleted);
-    }
-
-    missionMarkers.current = missionMarkers.current.filter(Boolean);
-
-    if (missionMarkers.current.length === 0) {
-      try {
-        L.popup()
-          .setLatLng(userLatLng)
-          .setContent(`<strong>Misión completada</strong><br/>Has completado la misión.`)
-          .openOn(map);
-      } catch (err) {}
-
-      try {
-        sessionStorage.removeItem("selectedMission");
-      } catch (err) {}
-
-      if (actions?.onMissionComplete) {
-        try {
-          actions.onMissionComplete(preparedMission);
-        } catch (err) {}
-      }
-
-      setTimeout(() => {
-        setPreparedMission(null);
-        setCompletedCount(0);
-      }, 1200);
-    }
-  };
 
   // Modal submit handlers
   const openModalForSave = () => {
-    setFormName((store.currentRouteMeta && store.currentRouteMeta.name) || "Ruta sin nombre");
-    setFormDescription((store.currentRouteMeta && store.currentRouteMeta.description) || "");
-    setFormCharacteristics((store.currentRouteMeta && store.currentRouteMeta.characteristics) || "");
+    setFormName(store.currentRouteMeta?.name || "Ruta sin nombre");
+    setFormDescription(store.currentRouteMeta?.description || "");
+    setFormCharacteristics(store.currentRouteMeta?.characteristics || "");
     setPublishAfterSave(false);
     setIsModalOpen(true);
   };
 
   const openModalForPublish = () => {
-    setFormName((store.currentRouteMeta && store.currentRouteMeta.name) || "Ruta sin nombre");
-    setFormDescription((store.currentRouteMeta && store.currentRouteMeta.description) || "");
-    setFormCharacteristics((store.currentRouteMeta && store.currentRouteMeta.characteristics) || "");
+    setFormName(store.currentRouteMeta?.name || "Ruta sin nombre");
+    setFormDescription(store.currentRouteMeta?.description || "");
+    setFormCharacteristics(store.currentRouteMeta?.characteristics || "");
     setPublishAfterSave(true);
     setIsModalOpen(true);
   };
@@ -500,7 +359,6 @@ const MapView = ({ activeMission: propMission }) => {
     e.preventDefault();
     setIsModalOpen(false);
 
-    // Guardar local primero
     if (actions?.saveRouteLocalFromSelected) {
       await actions.saveRouteLocalFromSelected({
         name: formName,
@@ -509,122 +367,21 @@ const MapView = ({ activeMission: propMission }) => {
       });
     }
 
-    // Si el usuario pidió publicar, intentar publicar
     if (publishAfterSave && actions?.publishRouteFromSelected) {
       const res = await actions.publishRouteFromSelected({
         name: formName,
         description: formDescription,
         characteristics: formCharacteristics
       });
-      if (res && res.success) {
-        try { alert("Ruta publicada correctamente"); } catch (err) {}
-      } else {
-        try { alert("Ruta guardada localmente (no se pudo publicar)"); } catch (err) {}
-      }
+      if (res?.success) alert("Ruta publicada correctamente");
+      else alert("Ruta guardada localmente (no se pudo publicar)");
     } else {
-      try { alert("Ruta guardada localmente"); } catch (err) {}
+      alert("Ruta guardada localmente");
     }
   };
 
-  const handleSaveLocal = () => openModalForSave();
-  const handlePublish = () => openModalForPublish();
-
   return (
     <div style={{ position: "relative", height: "100%", width: "100%" }}>
-      {/* PANEL LATERAL IZQUIERDO */}
-      <aside style={{
-        position: "absolute",
-        top: 12,
-        left: 12,
-        zIndex: 9999,
-        width: 260,
-        background: "linear-gradient(180deg, rgba(18,18,30,0.96), rgba(12,12,22,0.96))",
-        color: "#fff",
-        padding: "14px",
-        borderRadius: 10,
-        boxShadow: "0 8px 28px rgba(0,0,0,0.45)",
-        display: "flex",
-        flexDirection: "column",
-        gap: "10px",
-        fontFamily: "Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial"
-      }}>
-        <div style={{ fontWeight: 800, fontSize: 15, letterSpacing: 1 }}>SHADOWMAP</div>
-
-        <button
-          onClick={() => {
-            if (actions?.startNewRoute) actions.startNewRoute();
-          }}
-          style={{
-            padding: "10px 12px",
-            background: "#1976d2",
-            color: "#fff",
-            border: "none",
-            borderRadius: 8,
-            cursor: "pointer",
-            fontWeight: 600
-          }}
-        >
-          Crear nueva ruta
-        </button>
-
-        <button
-          onClick={handleSaveLocal}
-          style={{
-            padding: "10px 12px",
-            background: "#4caf50",
-            color: "#fff",
-            border: "none",
-            borderRadius: 8,
-            cursor: "pointer",
-            fontWeight: 600
-          }}
-        >
-          Guardar local
-        </button>
-
-        <button
-          onClick={handlePublish}
-          style={{
-            padding: "10px 12px",
-            background: "#ff9800",
-            color: "#fff",
-            border: "none",
-            borderRadius: 8,
-            cursor: "pointer",
-            fontWeight: 600
-          }}
-        >
-          Publicar
-        </button>
-
-        <button
-          onClick={() => {
-            if (actions?.clearSelectedPoints) actions.clearSelectedPoints();
-          }}
-          style={{
-            padding: "10px 12px",
-            background: "#e53935",
-            color: "#fff",
-            border: "none",
-            borderRadius: 8,
-            cursor: "pointer",
-            fontWeight: 600
-          }}
-        >
-          Cancelar
-        </button>
-
-        <div style={{ marginTop: 6, fontSize: 13, opacity: 0.9 }}>
-          <div>Haz clic en el mapa para añadir puntos.</div>
-          <div style={{ marginTop: 8 }}>
-            {store?.userLocation ? (
-              <span style={{ color: "#b2ffb4" }}>Ubicación disponible</span>
-            ) : (
-              <span style={{ color: "#ffb4b4" }}>Permite la ubicación para misiones</span>
-            )}
-          </div>
-        </div>
-      </aside>
 
       {/* MAPA */}
       <div

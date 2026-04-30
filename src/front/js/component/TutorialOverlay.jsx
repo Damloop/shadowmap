@@ -1,7 +1,10 @@
+// src/front/js/component/TutorialOverlay.jsx
+
 import React from "react";
 import "../../styles/tutorial.css";
 
-export const TutorialOverlay = ({ step, onNext, onClose }) => {
+export const TutorialOverlay = ({ step = 0, onNext, onClose }) => {
+    
     const steps = [
         {
             title: "Aceptar la misión",
@@ -17,13 +20,13 @@ export const TutorialOverlay = ({ step, onNext, onClose }) => {
         }
     ];
 
-    const current = steps[step];
+    const safeStep = Math.min(Math.max(step, 0), steps.length - 1);
+    const current = steps[safeStep];
 
     return (
         <div className="tutorial-overlay">
             <div className="tutorial-box">
 
-                {/* X discreta arriba a la derecha */}
                 <button className="tutorial-close" onClick={onClose}>×</button>
 
                 <h2 className="tutorial-title">SHADOWMAP</h2>
@@ -32,7 +35,7 @@ export const TutorialOverlay = ({ step, onNext, onClose }) => {
                 <p className="tutorial-text">{current.text}</p>
 
                 <button className="tutorial-next" onClick={onNext}>
-                    {step === steps.length - 1 ? "Empezar" : "Siguiente"}
+                    {safeStep === steps.length - 1 ? "Empezar" : "Siguiente"}
                 </button>
             </div>
         </div>

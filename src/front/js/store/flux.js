@@ -22,11 +22,7 @@ const getState = ({ getStore, getActions, setStore }) => {
       userLocation: null,
 
       selectedPoints: [],
-      markerColor: "blue",
-
-      routes: [],
       savedRoutes: [],
-      sharedRoutes: [],
 
       activeMission: null,
       missionPoint: null
@@ -35,172 +31,71 @@ const getState = ({ getStore, getActions, setStore }) => {
     actions: {
       ...placesState.actions,
 
-      /* ---------------------------
-         LOGIN — RESETEA TODO
-      ---------------------------*/
-      login: async (email, password) => {
-        try {
-          const resp = await fetch(`${API_URL}/api/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
-          });
-
-          const data = await resp.json();
-
-          if (!resp.ok) {
-            return { success: false, message: data.msg || "Credenciales incorrectas" };
-          }
-
-          // Guardar sesión
-          localStorage.setItem("token", data.token);
-          localStorage.setItem("user", JSON.stringify(data.user));
-
-          // Guardar en store
-          setStore({
-            token: data.token,
-            user: data.user
-          });
-
-          // 🔥 RESETEAR MISIONES Y RUTAS AL CAMBIAR DE USUARIO
-          localStorage.removeItem("shadowmap_completed_missions");
-          localStorage.removeItem("savedRoutes_local");
-
-          setStore({
-            activeMission: null,
-            missionPoint: null,
-            selectedPoints: [],
-            savedRoutes: []
-          });
-
-          return { success: true };
-        } catch {
-          return { success: false, message: "Error de conexión con el servidor" };
-        }
-      },
-
-      /* ---------------------------
-         LOGOUT — LIMPIA TODO
-      ---------------------------*/
-      logout: () => {
-        try {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-          localStorage.removeItem("shadowmap_completed_missions");
-          localStorage.removeItem("savedRoutes_local");
-        } catch {}
-
-        setStore({
-          token: null,
-          user: null,
-          activeMission: null,
-          missionPoint: null,
-          selectedPoints: [],
-          savedRoutes: []
-        });
-      },
-
-      syncTokenFromSessionStore: () => {
-        try {
-          const token = localStorage.getItem("token");
-          const userRaw = localStorage.getItem("user");
-
-          if (token) setStore({ token });
-          if (userRaw) {
-            try {
-              setStore({ user: JSON.parse(userRaw) });
-            } catch {
-              localStorage.removeItem("user");
-              setStore({ user: null });
-            }
-          }
-        } catch {}
-      },
-
-      /* ---------------------------
-         UBICACIÓN
-      ---------------------------*/
-      getUserLocation: () => {
-        if (!navigator.geolocation) return;
-
-        navigator.geolocation.getCurrentPosition(
-          pos => {
-            setStore({
-              userLocation: {
-                lat: pos.coords.latitude,
-                lng: pos.coords.longitude
-              }
-            });
-          },
-          () => {}
-        );
-      },
-
-      /* ---------------------------
-         RUTAS LOCALES
-      ---------------------------*/
       saveRouteLocal: (route) => {
         try {
           const raw = localStorage.getItem("savedRoutes_local");
           const arr = raw ? JSON.parse(raw) : [];
 
-          const toSave = {
-            id: Date.now().toString(),
-            name: route.name || "Ruta sin nombre",
-            description: route.description || "",
-            rating: Number(route.rating) || 1,
-            points: route.points || [],
-            createdAt: new Date().toISOString()
-          };
+          if (arr.length >= 3) {
+            alert("Máximo 3 rutas guardadas.");
+            return;
+          }
 
-          arr.push(toSave);
+          const colors = ["#ff4444", "#44ff44", "#4488ff"];
+          const index = arr.length % colors.length;
 
-          localStorage.setItem("savedRoutes_local", JSON.stringify(arr));
-          setStore({ savedRoutes: arr });
+          const newRoute = { ...route, color: colors[index] };
+
+          const updated = [...arr, newRoute];
+
+          localStorage.setItem("savedRoutes_local", JSON.stringify(updated));
+          setStore({ savedRoutes: updated });
         } catch {}
       },
 
       loadSavedRoutesLocal: () => {
         try {
           const raw = localStorage.getItem("savedRoutes_local");
-          let arr = raw ? JSON.parse(raw) : [];
-
-          arr = arr.map(r => ({
-            ...r,
-            rating: Number(r.rating) || 1,
-            createdAt: r.createdAt || new Date().toISOString()
-          }));
-
+          const arr = raw ? JSON.parse(raw) : [];
           setStore({ savedRoutes: arr });
         } catch {
           setStore({ savedRoutes: [] });
         }
       },
 
-      deleteSavedRouteLocal: (id) => {
-        try {
-          const raw = localStorage.getItem("savedRoutes_local");
-          const arr = raw ? JSON.parse(raw) : [];
-          const filtered = arr.filter(r => r.id !== id);
-          localStorage.setItem("savedRoutes_local", JSON.stringify(filtered));
-          setStore({ savedRoutes: filtered });
-        } catch {}
+      deleteRoute: (id) => {
+        const store = getStore();
+        const updated = store.savedRoutes.filter(r => r.id !== id);
+
+        localStorage.setItem("savedRoutes_local", JSON.stringify(updated));
+        setStore({ savedRoutes: updated });
+      },
+
+      editRoute: (id, newData) => {
+        const store = getStore();
+        const updated = store.savedRoutes.map(r =>
+          r.id === id ? { ...r, ...newData } : r
+        );
+
+        localStorage.setItem("savedRoutes_local", JSON.stringify(updated));
+        setStore({ savedRoutes: updated });
+      },
+
+      shareRoute: (id) => {
+        alert("Compartir ruta estará disponible próximamente.");
       },
 
       addPointToRoute: (lat, lng) => {
         const store = getStore();
-        const points = Array.isArray(store.selectedPoints) ? [...store.selectedPoints] : [];
+        const points = [...store.selectedPoints];
         points.push({ lat, lng, createdAt: new Date().toISOString() });
         setStore({ selectedPoints: points });
       },
 
       clearSelectedPoints: () => {
-        setStore({ selectedPoints: [], currentRouteMeta: null });
+        setStore({ selectedPoints: [] });
       },
 
-      /* ---------------------------
-         MISIONES
-      ---------------------------*/
       setActiveMission: (mission) => {
         setStore({ activeMission: mission });
       },
@@ -243,6 +138,12 @@ const getState = ({ getStore, getActions, setStore }) => {
           activeMission: null,
           missionPoint: null
         });
+
+        return {
+          success: true,
+          message:
+            "Has completado la misión. Ya no podrás volver a acceder a ella y aparecerá en gris en tu perfil."
+        };
       }
     }
   };

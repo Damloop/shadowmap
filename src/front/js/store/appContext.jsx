@@ -38,18 +38,8 @@ const injectContext = PassedComponent => {
       const actions = stateRef.current?.actions;
       if (!actions) return;
 
-      if (typeof actions.syncTokenFromSessionStore === "function") {
-        try {
-          actions.syncTokenFromSessionStore();
-        } catch (err) {}
-      }
-
-      if (typeof actions.loadSavedRoutesLocal === "function") {
-        try {
-          actions.loadSavedRoutesLocal();
-        } catch (err) {}
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+      try { actions.syncTokenFromSessionStore?.(); } catch {}
+      try { actions.loadSavedRoutesLocal?.(); } catch {}
     }, []);
 
     return (

@@ -280,3 +280,138 @@
 .saved-route-card {
     width: 100%;
 }
+/* ============================================================
+   POPUP PREMIUM — SHADOWMAP
+============================================================ */
+.premium-popup-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.premium-popup-box {
+  background: rgba(20, 0, 40, 0.95);
+  border: 2px solid #b57dff;
+  padding: 28px;
+  width: 340px;
+  border-radius: 14px;
+  text-align: center;
+  box-shadow: 0 0 35px #b57dff88, inset 0 0 25px #6a00ff55;
+  animation: popupScale 0.35s ease-out;
+}
+
+.premium-title {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.4rem;
+  color: #e8d4ff;
+  text-shadow: 0 0 12px #d8b4ff;
+  margin-bottom: 12px;
+}
+
+.premium-text {
+  color: #d8c4ff;
+  font-size: 1rem;
+  line-height: 1.45;
+  margin-bottom: 20px;
+  opacity: 0.9;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popupScale {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+/* ============================================================
+   POPUP PREMIUM — VERSIÓN CINEMÁTICA SHADOWMAP
+============================================================ */
+.premium-popup-bg {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(40,0,80,0.85) 0%, rgba(0,0,0,0.9) 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+  animation: fadeIn 0.6s ease-out;
+  backdrop-filter: blur(6px);
+}
+
+.premium-popup-box {
+  background: rgba(15, 5, 30, 0.95);
+  border: 2px solid #c28aff;
+  padding: 40px 30px;
+  width: 420px;
+  border-radius: 18px;
+  text-align: center;
+  box-shadow: 
+      0 0 40px #b57dffcc,
+      inset 0 0 35px #6a00ff55,
+      0 0 120px rgba(180, 120, 255, 0.4);
+  animation: popupAscend 0.55s ease-out;
+  transform-origin: center;
+}
+
+.premium-title {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.8rem;
+  color: #f3e4ff;
+  text-shadow: 0 0 18px #d8b4ff, 0 0 30px #b57dff;
+  margin-bottom: 14px;
+  letter-spacing: 1px;
+}
+
+.premium-text {
+  color: #e6d6ff;
+  font-size: 1.1rem;
+  line-height: 1.55;
+  margin-bottom: 28px;
+  opacity: 0.95;
+  text-shadow: 0 0 10px #8a4dff88;
+}
+
+/* Botones del popup */
+.premium-popup-box .shadow-btn-main {
+  font-size: 1.05rem;
+  padding: 12px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #9b4dff, #d8b4ff);
+  color: #fff;
+  text-shadow: 0 0 6px #000;
+  box-shadow: 0 0 20px #b57dffcc;
+}
+
+.premium-popup-box .shadow-btn-main:hover {
+  background: linear-gradient(135deg, #b57dff, #e8d4ff);
+  transform: scale(1.05);
+}
+
+.premium-popup-box .shadow-btn {
+  margin-top: 10px;
+  opacity: 0.8;
+}
+
+.premium-popup-box .shadow-btn:hover {
+  opacity: 1;
+  transform: scale(1.03);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popupAscend {
+  0% { transform: scale(0.6) translateY(40px); opacity: 0; }
+  60% { transform: scale(1.05) translateY(-6px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); }
+}

@@ -20,17 +20,102 @@ const getState = ({ getStore, getActions, setStore }) => {
       })(),
 
       userLocation: null,
-
       selectedPoints: [],
       savedRoutes: [],
 
       activeMission: null,
-      missionPoint: null
+      missionPoint: null,
+
+      allMissionsCompleted: false
     },
 
     actions: {
       ...placesState.actions,
 
+      /* ============================================================
+         RESET TOTAL AL CAMBIAR DE USUARIO
+      ============================================================ */
+      resetAllForNewUser: () => {
+        localStorage.removeItem("shadowmap_completed_missions");
+        localStorage.removeItem("savedRoutes_local");
+
+        setStore({
+          selectedPoints: [],
+          savedRoutes: [],
+          activeMission: null,
+          missionPoint: null,
+          userLocation: null,
+          allMissionsCompleted: false
+        });
+      },
+
+      /* ============================================================
+         LOGIN COMPLETO Y CORREGIDO
+      ============================================================ */
+      login: async (email, password) => {
+        try {
+          const resp = await fetch(`${API_URL}/api/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+          });
+
+          if (!resp.ok)
+            return { success: false, message: "Credenciales incorrectas." };
+
+          const data = await resp.json();
+          if (!data.token)
+            return { success: false, message: "Token no recibido." };
+
+          // Guardar token y usuario
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify(data.user));
+
+          // Detectar si es un usuario nuevo
+          const lastUser = localStorage.getItem("last_user_email");
+
+          if (lastUser !== data.user.email) {
+            getActions().resetAllForNewUser();
+          }
+
+          // Guardar referencia del usuario actual
+          localStorage.setItem("last_user_email", data.user.email);
+
+          setStore({
+            token: data.token,
+            user: data.user
+          });
+
+          return { success: true };
+        } catch {
+          return {
+            success: false,
+            message: "Error de conexión con el servidor."
+          };
+        }
+      },
+
+      logout: () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setStore({ token: null, user: null });
+      },
+
+      syncToken: () => {
+        const token = localStorage.getItem("token");
+        const user = localStorage.getItem("user");
+
+        if (token && user) {
+          setStore({
+            token: token,
+            user: JSON.parse(user)
+          });
+        }
+      },
+
+      /* ============================================================
+         RUTAS LOCALES
+      ============================================================ */
       saveRouteLocal: (route) => {
         try {
           const raw = localStorage.getItem("savedRoutes_local");
@@ -65,7 +150,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
       deleteRoute: (id) => {
         const store = getStore();
-        const updated = store.savedRoutes.filter(r => r.id !== id);
+        const updated = store.savedRoutes.filter((r) => r.id !== id);
 
         localStorage.setItem("savedRoutes_local", JSON.stringify(updated));
         setStore({ savedRoutes: updated });
@@ -73,7 +158,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
       editRoute: (id, newData) => {
         const store = getStore();
-        const updated = store.savedRoutes.map(r =>
+        const updated = store.savedRoutes.map((r) =>
           r.id === id ? { ...r, ...newData } : r
         );
 
@@ -81,7 +166,17 @@ const getState = ({ getStore, getActions, setStore }) => {
         setStore({ savedRoutes: updated });
       },
 
-      shareRoute: (id) => {
+      loadRouteToEditor: (id) => {
+        const store = getStore();
+        const route = store.savedRoutes.find((r) => r.id === id);
+        if (!route) return;
+
+        setStore({
+          selectedPoints: route.points
+        });
+      },
+
+      shareRoute: () => {
         alert("Compartir ruta estará disponible próximamente.");
       },
 
@@ -96,24 +191,14 @@ const getState = ({ getStore, getActions, setStore }) => {
         setStore({ selectedPoints: [] });
       },
 
+      /* ============================================================
+         MISIONES
+      ============================================================ */
       setActiveMission: (mission) => {
         setStore({ activeMission: mission });
       },
 
-      generateMissionPoint: (coords) => {
-        const store = getStore();
-
-        let lat, lng;
-
-        if (Array.isArray(coords) && coords.length === 2) {
-          [lat, lng] = coords;
-        } else if (store.userLocation) {
-          lat = store.userLocation.lat;
-          lng = store.userLocation.lng;
-        } else {
-          return;
-        }
-
+      generateMissionPoint: ([lat, lng]) => {
         const point = {
           lat: lat + (Math.random() - 0.5) * 0.002,
           lng: lng + (Math.random() - 0.5) * 0.002
@@ -121,6 +206,18 @@ const getState = ({ getStore, getActions, setStore }) => {
 
         setStore({ missionPoint: point });
         return point;
+      },
+
+      checkAllMissionsCompleted: () => {
+        const KEY = "shadowmap_completed_missions";
+        const raw = localStorage.getItem(KEY);
+        const completed = raw ? JSON.parse(raw) : [];
+
+        const TOTAL = 5;
+
+        if (completed.length >= TOTAL) {
+          setStore({ allMissionsCompleted: true });
+        }
       },
 
       completeMission: (missionId) => {
@@ -138,6 +235,8 @@ const getState = ({ getStore, getActions, setStore }) => {
           activeMission: null,
           missionPoint: null
         });
+
+        getActions().checkAllMissionsCompleted();
 
         return {
           success: true,

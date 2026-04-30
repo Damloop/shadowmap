@@ -24,13 +24,13 @@ const Profile = () => {
     const premiumNick = sessionStorage.getItem("premiumNick");
 
     useEffect(() => {
-        actions.syncTokenFromSessionStore();
+        actions.syncToken();
     }, []);
 
     useEffect(() => {
         if (!store.user) {
             const saved = localStorage.getItem("user");
-            if (saved) actions.syncTokenFromSessionStore();
+            if (saved) actions.syncToken();
         }
     }, [store.user]);
 

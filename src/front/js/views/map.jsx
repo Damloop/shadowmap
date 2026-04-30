@@ -1,343 +1,403 @@
 // src/front/js/views/map.jsx
-import React, { useEffect, useContext, useState, useCallback } from "react";
+
+import React, { useContext, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Context } from "../store/appContext";
-
+import { Context } from "../store/appContext.jsx";
 import MapView from "../component/MapView.jsx";
-import RoutesManager from "../component/RoutesManager.jsx";
-import { missions } from "../../data/missions.js";
-
+import { TutorialOverlay } from "../component/TutorialOverlay.jsx";
 import "../../styles/map.css";
 
-const DRAFT_KEY = "shadowmap_route_draft";
-const TUTORIAL_SEEN_KEY = "shadowmap_tutorial_seen";
-const COMPLETED_KEY = "shadowmap_completed_missions";
-
-const Map = () => {
+const MapPage = () => {
   const { store, actions } = useContext(Context);
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [activeMission, setActiveMission] = useState(null);
-  const [missionPoints, setMissionPoints] = useState([]);
-  const [isPlacingPoints, setIsPlacingPoints] = useState(false);
-  const [isEditingMeta, setIsEditingMeta] = useState(false);
-
-  // tutorialStep: 0 oculto, 1..4 pasos
-  const [tutorialStep, setTutorialStep] = useState(() => {
+  const missionFromState = location.state?.mission || null;
+  const missionFromSession = (() => {
     try {
-      // si no existe la clave, mostramos tutorial; si existe, lo ocultamos
-      return sessionStorage.getItem(TUTORIAL_SEEN_KEY) ? 0 : 1;
+      const raw = sessionStorage.getItem("selectedMission");
+      return raw ? JSON.parse(raw) : null;
     } catch {
-      return 1;
+      return null;
     }
+  })();
+  const mission = missionFromState || missionFromSession || store.activeMission;
+
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [showTutorial, setShowTutorial] = useState(() => {
+    return !localStorage.getItem("tutorialDone_map");
   });
 
-  const [draft, setDraft] = useState(() => {
-    try {
-      const raw = sessionStorage.getItem(DRAFT_KEY);
-      return raw ? JSON.parse(raw) : { id: null, name: "", rating: 0, info: "", points: [] };
-    } catch {
-      return { id: null, name: "", rating: 0, info: "", points: [] };
+  const handleNextTutorial = () => {
+    if (tutorialStep < 2) {
+      setTutorialStep(tutorialStep + 1);
+    } else {
+      localStorage.setItem("tutorialDone_map", "true");
+      setShowTutorial(false);
     }
-  });
+  };
 
-  useEffect(() => {
-    actions.loadPois?.();
-    actions.loadSharedRoutes?.();
-    navigator.geolocation.getCurrentPosition(
-      () => actions.getUserLocation?.(),
-      () => actions.getUserLocation?.(),
-      { enableHighAccuracy: true }
-    );
-  }, []);
+  const [isCreatingRoute, setIsCreatingRoute] = useState(false);
+  const [selectedRoute, setSelectedRoute] = useState(null);
 
-  useEffect(() => {
-    const missionId = location.state?.missionId;
-    if (missionId) {
-      const m = missions.find((x) => x.id === missionId);
-      if (m) {
-        setActiveMission(m);
-        sessionStorage.setItem("selectedMission", JSON.stringify(m));
-        const pts = generateMissionPointsNearUser(3);
-        setMissionPoints(pts);
-        sessionStorage.setItem("activeMissionPoints", JSON.stringify(pts));
-      }
+  const handleMissionMode = () => {
+    setIsCreatingRoute(false);
+
+    if (!mission) return;
+
+    actions.setActiveMission(mission);
+
+    if (store.userLocation) {
+      const { lat, lng } = store.userLocation;
+      actions.generateMissionPoint([lat, lng]);
       return;
     }
-    const stored = sessionStorage.getItem("selectedMission");
-    if (stored) setActiveMission(JSON.parse(stored));
-    const storedPts = sessionStorage.getItem("activeMissionPoints");
-    if (storedPts) setMissionPoints(JSON.parse(storedPts));
-  }, [location.state]);
 
-  // persist draft
-  useEffect(() => {
-    if (draft && (draft.name || draft.info || (draft.points && draft.points.length) || draft.rating)) {
-      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-    } else {
-      sessionStorage.removeItem(DRAFT_KEY);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const coords = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude
+          };
+
+          actions.getUserLocation();
+          actions.generateMissionPoint([coords.lat, coords.lng]);
+        },
+        () => {}
+      );
     }
-  }, [draft]);
-
-  // generar puntos aleatorios cerca del usuario
-  const generateMissionPointsNearUser = (count = 3) => {
-    const center = store?.userLocation || { lat: 40.4168, lng: -3.7038 };
-    return generateRandomPoints(center, count, 300);
   };
 
-  const generateRandomPoints = (center, count, radiusMeters) => {
-    const points = [];
-    const metersToDeg = (m) => m / 111000;
-    for (let i = 0; i < count; i++) {
-      const r = Math.random() * radiusMeters;
-      const theta = Math.random() * 2 * Math.PI;
-      const dx = r * Math.cos(theta);
-      const dy = r * Math.sin(theta);
-      const lat = center.lat + metersToDeg(dy);
-      const lng = center.lng + metersToDeg(dx) / Math.cos((center.lat * Math.PI) / 180);
-      points.push({ id: `mpt-${Date.now()}-${i}`, lat, lng });
-    }
-    return points;
+  const handleRouteMode = () => {
+    setIsCreatingRoute(true);
+    if (!store.userLocation) actions.getUserLocation();
+    if (actions?.clearMissionPoint) actions.clearMissionPoint();
   };
 
-  // al pulsar la misión: regenerar puntos y mostrarlos
-  const handleMissionClick = (e) => {
-    e?.stopPropagation();
-    if (!activeMission) return;
-    const pts = generateMissionPointsNearUser(3);
-    setMissionPoints(pts);
-    sessionStorage.setItem("activeMissionPoints", JSON.stringify(pts));
-    // guardar selección actual para que Profile pueda leerla si hace falta
-    sessionStorage.setItem("selectedMission", JSON.stringify(activeMission));
-  };
+  const [showConfirm, setShowConfirm] = useState(false);
 
-  // marcar misión como completada manualmente
-  const completeMission = (e) => {
-    e?.stopPropagation();
-    if (!activeMission) return;
-    try {
-      const raw = localStorage.getItem(COMPLETED_KEY);
-      const completed = raw ? JSON.parse(raw) : [];
-      if (!completed.includes(activeMission.id)) {
-        completed.push(activeMission.id);
-        localStorage.setItem(COMPLETED_KEY, JSON.stringify(completed));
-      }
-    } catch {
-      localStorage.setItem(COMPLETED_KEY, JSON.stringify([activeMission.id]));
-    }
-    // marcar en sessionStorage para reflejar inmediatamente en esta vista
-    sessionStorage.setItem(COMPLETED_KEY, localStorage.getItem(COMPLETED_KEY));
-    // navegar a perfil
+  const handleCompleteMission = () => {
+    if (!mission) return;
+    actions.completeMission(mission.id);
     navigate("/profile");
   };
 
-  const isMissionCompleted = (id) => {
-    try {
-      const raw = localStorage.getItem(COMPLETED_KEY);
-      const completed = raw ? JSON.parse(raw) : [];
-      return completed.includes(id);
-    } catch {
-      return false;
-    }
-  };
+  const [showRouteModal, setShowRouteModal] = useState(false);
+  const [routeName, setRouteName] = useState("");
+  const [routeInfo, setRouteInfo] = useState("");
+  const [routeRating, setRouteRating] = useState(3);
 
-  // callbacks MapView / RoutesManager (igual que antes)
-  const addPointToDraft = useCallback((point) => {
-    setDraft((prev) => ({ ...prev, points: [...(prev.points || []), point] }));
-  }, []);
-  const removePointFromDraft = useCallback((predicate) => {
-    setDraft((prev) => ({ ...prev, points: (prev.points || []).filter((p) => !predicate(p)) }));
-  }, []);
-  const finishPlacingPoints = useCallback(() => {
-    if (!draft.points || draft.points.length === 0) {
-      alert("Añade al menos un punto en el mapa antes de continuar.");
+  const openRouteModal = () => {
+    if (!store.selectedPoints || store.selectedPoints.length < 1) {
+      alert("Añade al menos un punto en el mapa.");
       return;
     }
-    setIsEditingMeta(true);
-  }, [draft.points]);
-
-  const onRouteSaved = useCallback((savedRoutes) => {
-    setDraft({ id: null, name: "", rating: 0, info: "", points: [] });
-    sessionStorage.removeItem(DRAFT_KEY);
-    setIsPlacingPoints(false);
-    setIsEditingMeta(false);
-  }, []);
-  const onEditSavedRoute = useCallback((route) => {
-    setDraft({ ...route });
-    setIsPlacingPoints(true);
-    setIsEditingMeta(true);
-  }, []);
-  const onRouteDeleted = useCallback((savedRoutes) => {
-    const raw = sessionStorage.getItem(DRAFT_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      const exists = savedRoutes.some((r) => r.id === parsed.id);
-      if (!exists) {
-        sessionStorage.removeItem(DRAFT_KEY);
-        setDraft({ id: null, name: "", rating: 0, info: "", points: [] });
-      }
-    }
-  }, []);
-
-  // tutorial controls
-  const nextTutorial = () => {
-    if (tutorialStep >= 1 && tutorialStep < 4) setTutorialStep(tutorialStep + 1);
-    else {
-      setTutorialStep(0);
-      sessionStorage.setItem(TUTORIAL_SEEN_KEY, "1");
-    }
+    setRouteName("");
+    setRouteInfo("");
+    setRouteRating(3);
+    setShowRouteModal(true);
   };
-  const openTutorial = () => setTutorialStep(1);
+
+  const saveRoute = () => {
+    if (!routeName.trim()) {
+      alert("Pon un nombre a la ruta.");
+      return;
+    }
+
+    const newRoute = {
+      id: Date.now().toString(),
+      name: routeName,
+      description: routeInfo,
+      rating: Number(routeRating),
+      points: store.selectedPoints,
+      createdAt: new Date().toISOString()
+    };
+
+    actions.saveRouteLocal(newRoute);
+
+    setShowRouteModal(false);
+    setIsCreatingRoute(false);
+    actions.clearSelectedPoints();
+  };
+
+  useEffect(() => {
+    actions.loadSavedRoutesLocal();
+  }, []);
 
   return (
     <div className="map-page-container">
-      {/* Tutorial (suspense) */}
-      {tutorialStep > 0 && (
-        <div className="tutorial-overlay" onClick={nextTutorial} role="dialog" aria-modal="true">
-          <div className="tutorial-box horror" onClick={(e) => e.stopPropagation()}>
-            <div className="tutorial-header">
-              <div className="neon-badge">SHADOWMAP</div>
-              <button className="tutorial-close" onClick={() => { setTutorialStep(0); sessionStorage.setItem(TUTORIAL_SEEN_KEY, "1"); }}>✕</button>
+
+      {showTutorial && (
+        <TutorialOverlay
+          step={tutorialStep}
+          onNext={handleNextTutorial}
+          onClose={() => {
+            localStorage.setItem("tutorialDone_map", "true");
+            setShowTutorial(false);
+          }}
+        />
+      )}
+
+      <div className="map-left-panel">
+        <h2 className="panel-title">SHADOWMAP - Mapa de Exloración Paranormal</h2>
+
+        {!isCreatingRoute && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <button
+              className="shadow-btn shadow-btn-main pulse-btn"
+              onClick={handleRouteMode}
+            >
+              Mis rutas
+            </button>
+
+            <button
+              className="shadow-btn pulse-btn"
+              onClick={handleMissionMode}
+            >
+              Misión activa
+            </button>
+
+            <button
+              className="shadow-btn"
+              onClick={() => navigate("/profile")}
+            >
+              Volver
+            </button>
+          </div>
+        )}
+
+        {isCreatingRoute && (
+          <div className="route-buttons">
+            <button className="shadow-btn shadow-btn-main" onClick={openRouteModal}>
+              Crear
+            </button>
+            <button className="shadow-btn" onClick={openRouteModal}>
+              Guardar
+            </button>
+            <button className="shadow-btn">Compartir</button>
+            <button className="shadow-btn">Compartidas conmigo</button>
+
+            <button
+              className="shadow-btn"
+              onClick={() => {
+                actions.clearSelectedPoints();
+                setIsCreatingRoute(false);
+              }}
+            >
+              Volver
+            </button>
+          </div>
+        )}
+
+        {isCreatingRoute && store.savedRoutes.length > 0 && (
+          <div style={{ marginTop: 20 }}>
+            <h3 style={{ color: "#b38bff", marginBottom: 10 }}>Tus rutas guardadas</h3>
+
+            {store.savedRoutes.slice(0, 3).map((r) => {
+              const rating = Number(r.rating) || 1;
+              const fecha = new Date(r.createdAt);
+
+              return (
+                <div key={r.id} style={{ marginBottom: 10 }}>
+
+                  <div
+                    onClick={() => setSelectedRoute(r.id)}
+                    style={{
+                      background: "#1b1f2a",
+                      padding: 8,
+                      borderRadius: 6,
+                      border: "1px solid #333",
+                      fontSize: 12,
+                      cursor: "pointer"
+                    }}
+                  >
+                    <div style={{ fontWeight: "bold", color: "white", fontSize: 13 }}>
+                      {r.name}
+                    </div>
+
+                    <div style={{ opacity: 0.7 }}>{r.description}</div>
+
+                    <div style={{ marginTop: 4 }}>
+                      {"⭐".repeat(rating)}
+                    </div>
+
+                    <div style={{ opacity: 0.5, fontSize: 11, marginTop: 4 }}>
+                      {fecha.toLocaleDateString("es-ES", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric"
+                      })}{" "}
+                      -{" "}
+                      {fecha.toLocaleTimeString("es-ES", {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                      })}
+                    </div>
+
+                    <div style={{ opacity: 0.5 }}>{r.points.length} puntos</div>
+                  </div>
+
+                  {selectedRoute === r.id && (
+                    <div
+                      style={{
+                        background: "#2a2340",
+                        border: "1px solid #444",
+                        borderRadius: 6,
+                        padding: 8,
+                        marginTop: 6,
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 6
+                      }}
+                    >
+                      <button
+                        className="shadow-btn"
+                        style={{ padding: "4px 6px", fontSize: 12 }}
+                        onClick={() => {
+                          setRouteName(r.name);
+                          setRouteInfo(r.description);
+                          setRouteRating(r.rating);
+                          setShowRouteModal(true);
+                        }}
+                      >
+                        Editar
+                      </button>
+
+                      <button
+                        className="shadow-btn"
+                        style={{ padding: "4px 6px", fontSize: 12 }}
+                        onClick={() => alert("Compartir próximamente")}
+                      >
+                        Compartir
+                      </button>
+
+                      <button
+                        className="shadow-btn"
+                        style={{
+                          padding: "4px 6px",
+                          fontSize: 12,
+                          background: "#a30000"
+                        }}
+                        onClick={() => {
+                          actions.deleteSavedRouteLocal(r.id);
+                          setSelectedRoute(null);
+                        }}
+                      >
+                        Eliminar
+                      </button>
+
+                      <button
+                        className="shadow-btn"
+                        style={{ padding: "4px 6px", fontSize: 12 }}
+                        onClick={() => setSelectedRoute(null)}
+                      >
+                        Cerrar
+                      </button>
+                    </div>
+                  )}
+
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {!isCreatingRoute && mission && (
+          <div className="mission-box">
+            <div className="mission-aura"></div>
+
+            <h3>Misión activa</h3>
+            <div className="mission-name">{mission.name}</div>
+            <div className="mission-desc">{mission.description}</div>
+            <div className="mission-diff">
+              Dificultad: {mission.difficulty}
             </div>
 
-            {tutorialStep === 1 && (
-              <>
-                <h3 className="horror-title">No estás solo</h3>
-                <p className="horror-big">Sigue la misión o traza tu propio camino. Cada decisión deja una huella.</p>
-                <p className="horror-line typewriter">Elige con cuidado. Algunas rutas susurran cuando cae la noche.</p>
-                <div className="tutorial-actions">
-                  <button className="shadow-btn shadow-btn-main" onClick={nextTutorial}>Seguir</button>
-                  <button className="shadow-btn shadow-btn-secondary" onClick={() => { setTutorialStep(0); sessionStorage.setItem(TUTORIAL_SEEN_KEY, "1"); }}>Cerrar</button>
-                </div>
-              </>
-            )}
+            <button
+              className="shadow-btn shadow-btn-main pulse-btn"
+              onClick={() => setShowConfirm(true)}
+            >
+              Confirmar completada
+            </button>
 
-            {tutorialStep === 2 && (
-              <>
-                <h3 className="horror-title">Aceptar la misión</h3>
-                <p className="horror-big">Pulsa el recuadro de la misión para recibir puntos cercanos a tu ubicación.</p>
-                <div className="tutorial-actions">
-                  <button className="shadow-btn shadow-btn-main" onClick={nextTutorial}>Siguiente</button>
-                </div>
-              </>
-            )}
+           
+          </div>
+        )}
+      </div>
 
-            {tutorialStep === 3 && (
-              <>
-                <h3 className="horror-title">Explora por tu cuenta</h3>
-                <p className="horror-big">Crea hasta 3 rutas, nómbralas y compártelas con quien confíes.</p>
-                <div className="tutorial-actions">
-                  <button className="shadow-btn shadow-btn-main" onClick={nextTutorial}>Siguiente</button>
-                </div>
-              </>
-            )}
+      <div className="map-right-panel">
+        <MapView isCreatingRoute={isCreatingRoute} />
+      </div>
 
-            {tutorialStep === 4 && (
-              <>
-                <h3 className="horror-title">Confirmar misión</h3>
-                <p className="horror-big">Marca la misión como completada manualmente cuando lo hayas hecho; te llevará a tu perfil.</p>
-                <div className="tutorial-actions">
-                  <button className="shadow-btn shadow-btn-main" onClick={nextTutorial}>Empezar</button>
-                </div>
-              </>
-            )}
+      {showConfirm && (
+        <div className="confirm-overlay">
+          <div className="confirm-box">
+            <button className="confirm-close" onClick={() => setShowConfirm(false)}>
+              ×
+            </button>
 
-            <div className="tutorial-footer">
-              <span className="sparkle">•</span>
-              <span className="tip">Pulsa <strong>?</strong> para ver esto otra vez.</span>
+            <h3 className="confirm-title">¿Estás seguro?</h3>
+            <p className="confirm-text">
+              Vas a marcar la misión como completada.  
+              Esta acción actualizará tu perfil y bloqueará esta misión.
+            </p>
+
+            <div className="confirm-buttons">
+              <button className="confirm-yes" onClick={handleCompleteMission}>
+                Sí, completar
+              </button>
+              <button className="confirm-no" onClick={() => setShowConfirm(false)}>
+                Cancelar
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      <button className="tutorial-quick-btn" onClick={openTutorial} aria-label="Mostrar tutorial">?</button>
+      {showRouteModal && (
+        <div className="modal-bg">
+          <div className="modal-box">
+            <h3>Ruta tenebrosa</h3>
 
-      <div className="map-left-panel">
-        <h2 className="panel-title">SHADOWMAP</h2>
+            <label>Nombre</label>
+            <input value={routeName} onChange={e => setRouteName(e.target.value)} />
 
-        {/* Misión arriba */}
-        {activeMission ? (
-          <div
-            className={`mission-box ${isMissionCompleted(activeMission.id) ? "mission-completed" : ""}`}
-            role="region"
-            aria-label="Misión activa"
-            onClick={handleMissionClick}
-            style={{ cursor: "pointer" }}
-          >
-            <h3>Misión activa</h3>
-            <p className="mission-name">{activeMission.name}</p>
-            <p className="mission-desc">{activeMission.description}</p>
-            <p className="mission-diff">Dificultad: {activeMission.difficulty}</p>
+            <label>Descripción</label>
+            <textarea value={routeInfo} onChange={e => setRouteInfo(e.target.value)} rows={3} />
 
-            <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+            <label>Valoración</label>
+            <select value={routeRating} onChange={e => setRouteRating(Number(e.target.value))}>
+              <option value={1}>⭐</option>
+              <option value={2}>⭐⭐</option>
+              <option value={3}>⭐⭐⭐</option>
+              <option value={4}>⭐⭐⭐⭐</option>
+              <option value={5}>⭐⭐⭐⭐⭐</option>
+            </select>
+
+            <div style={{ display: "flex", gap: 8, marginTop: 12, justifyContent: "space-between" }}>
               <button
-                className="shadow-btn shadow-btn-secondary"
-                onClick={(e) => { e.stopPropagation(); completeMission(); }}
-                title="Marcar misión como completada y ver en perfil"
+                className="shadow-btn shadow-btn-main"
+                onClick={saveRoute}
+                style={{ flex: 1 }}
               >
-                ✔ Confirmar completada
+                Guardar
+              </button>
+
+              <button
+                className="shadow-btn"
+                onClick={() => setShowRouteModal(false)}
+                style={{ flex: 1 }}
+              >
+                Cancelar
               </button>
             </div>
-
-            <div className="mission-aura" />
           </div>
-        ) : (
-          <div className="mission-box empty">
-            <p>No hay misión activa</p>
-          </div>
-        )}
-
-        {/* Crear ruta debajo */}
-        <div className="panel-buttons">
-          <button className="shadow-btn shadow-btn-main pulse-btn" onClick={() => { setIsPlacingPoints(true); setIsEditingMeta(false); }}>
-            Crear nueva ruta
-          </button>
         </div>
+      )}
 
-        {/* Quick actions */}
-        {isPlacingPoints && !isEditingMeta && (
-          <div className="panel-buttons">
-            <button className="shadow-btn shadow-btn-secondary" onClick={finishPlacingPoints}>
-              Terminar y editar detalles
-            </button>
-            <button className="shadow-btn shadow-btn-secondary" onClick={() => { setIsPlacingPoints(false); setDraft({ id: null, name: "", rating: 0, info: "", points: [] }); }}>
-              Cancelar
-            </button>
-          </div>
-        )}
-
-        <RoutesManager
-          isCreatingRoute={isPlacingPoints}
-          draft={draft}
-          setDraft={setDraft}
-          isEditingMeta={isEditingMeta}
-          setIsEditingMeta={setIsEditingMeta}
-          onRouteSaved={onRouteSaved}
-          onEditSavedRoute={onEditSavedRoute}
-          onRouteDeleted={onRouteDeleted}
-          maxRoutes={3}
-        />
-
-        <div style={{ marginTop: 8 }}>
-          <button className="shadow-btn shadow-btn-secondary" onClick={() => navigate("/profile")}>Volver</button>
-        </div>
-      </div>
-
-      <div className="map-right-panel">
-        <MapView
-          activeMission={activeMission}
-          missionPoints={missionPoints}
-          isCreatingRoute={isPlacingPoints}
-          setIsCreatingRoute={setIsPlacingPoints}
-          draftPoints={draft.points}
-          addPointToDraft={addPointToDraft}
-          removePointFromDraft={removePointFromDraft}
-          onFinishPlacing={finishPlacingPoints}
-        />
-      </div>
     </div>
   );
 };
 
-export default Map;
+export default MapPage;

@@ -1,10 +1,9 @@
 // src/front/js/component/MissionCarousel.jsx
 
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import "../../styles/missionCarousel.css";
 
-export const MissionCarousel = ({ missions, onSelect }) => {
+export const MissionCarousel = ({ missions, onSelect, completedIds = [] }) => {
 
     if (!missions || missions.length === 0) return null;
 
@@ -22,43 +21,55 @@ export const MissionCarousel = ({ missions, onSelect }) => {
         return "";
     };
 
+    const isCompleted = (id) => completedIds.includes(id);
+
     return (
         <div className="carousel-container">
             <div className="carousel-list">
-                {missions.map((m) => (
-                    <div
-                        key={m.id}
-                        className={`carousel-card ${getDifficultyClass(m.difficulty)} ${
-                            m.locked ? "locked" : ""
-                        }`}
-                        onClick={() => !m.locked && onSelect(m)}
-                        style={{
-                            cursor: m.locked ? "not-allowed" : "pointer",
-                        }}
-                    >
-                        {m.locked && <span className="locked-tag">BLOQUEADA</span>}
+                {missions.map((m) => {
+                    const completed = isCompleted(m.id);
 
+                    return (
                         <div
+                            key={m.id}
+                            className={`carousel-card 
+                                ${getDifficultyClass(m.difficulty)} 
+                                ${m.locked ? "locked" : ""} 
+                                ${completed ? "completed" : ""}
+                            `}
+                            onClick={() => {
+                                if (!m.locked && !completed) onSelect(m);
+                            }}
                             style={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                                width: "100%",
-                                marginBottom: "6px"
+                                cursor: m.locked || completed ? "not-allowed" : "pointer",
+                                opacity: m.locked || completed ? 0.5 : 1
                             }}
                         >
-                            <h4 style={{ margin: 0 }}>
-                                <strong>Misión:</strong> {m.name}
-                            </h4>
+                            {m.locked && <span className="locked-tag">BLOQUEADA</span>}
+                            {completed && <span className="completed-tag">COMPLETADA</span>}
 
-                            <span style={{ fontSize: "14px", opacity: 0.9 }}>
-                                <strong>Nivel:</strong> {m.difficulty} {getStars(m.difficulty)}
-                            </span>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    width: "100%",
+                                    marginBottom: "6px"
+                                }}
+                            >
+                                <h4 style={{ margin: 0 }}>
+                                    <strong>Misión:</strong> {m.name}
+                                </h4>
+
+                                <span style={{ fontSize: "14px", opacity: 0.9 }}>
+                                    <strong>Nivel:</strong> {m.difficulty} {getStars(m.difficulty)}
+                                </span>
+                            </div>
+
+                            <p className="mission-description">{m.description}</p>
                         </div>
-
-                        <p className="mission-description">{m.description}</p>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );

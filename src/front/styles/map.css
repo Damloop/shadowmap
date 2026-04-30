@@ -45,6 +45,7 @@
   text-align: left;
   transition: 0.25s ease;
   box-shadow: 0 0 8px #6a2bff55;
+  cursor: pointer;
 }
 
 .shadow-btn:hover {
@@ -57,6 +58,11 @@
   border-color: #b57dff;
   color: #e8d4ff;
   font-weight: bold;
+}
+
+.shadow-btn-active {
+  background: rgba(60, 0, 110, 0.95);
+  box-shadow: 0 0 16px #b57dffdd;
 }
 
 /* ============================================================
@@ -148,176 +154,253 @@
   box-shadow: inset 0 0 25px #6a00ff33, 0 0 20px #6a00ff55;
   filter: drop-shadow(0 0 10px #6a00ff);
 }
+
 /* ============================================================
-   BOTÓN PALPITANTE (PUNTO 2)
+   BOTÓN PALPITANTE
 ============================================================ */
 .pulse-btn {
-    animation: pulse 1.0s infinite;
-    box-shadow: 0 0 0 rgba(255, 0, 150, 0.6);
+  animation: pulse 1.0s infinite;
+  box-shadow: 0 0 0 rgba(255, 0, 150, 0.6);
 }
 
 @keyframes pulse {
-    0% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(255, 0, 150, 0.6);
-    }
-    70% {
-        transform: scale(1.05);
-        box-shadow: 0 0 12px 8px rgba(255, 0, 150, 0);
-    }
-    100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(255, 0, 150, 0);
-    }
-}
-
-/* ============================================================
-   OVERLAY TUTORIAL CENTRAL
-============================================================ */
-.tutorial-overlay {
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(10, 10, 10, 0.65);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 999999 !important; /* 🔥 por encima de Leaflet */
-    pointer-events: auto !important;
-}
-
-.tutorial-box {
-    background: rgba(255, 255, 255, 0.12);
-    padding: 25px;
-    border-radius: 12px;
-    text-align: center;
-    color: #fff;
-    width: 300px;
-    border: 2px solid #ff0099;
-    backdrop-filter: blur(6px);
-}
-
-.tutorial-tap {
-    margin-top: 15px;
-    font-size: 13px;
-    opacity: 0.7;
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 0, 150, 0.6);
+  }
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 12px 8px rgba(255, 0, 150, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 0, 150, 0);
+  }
 }
 
 /* ============================================================
    OVERLAY TUTORIAL SHADOWMAP
 ============================================================ */
 .tutorial-overlay {
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(5, 0, 15, 0.75);
-    backdrop-filter: blur(4px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 999999 !important;
-    pointer-events: auto !important;
-    animation: fadeIn 0.4s ease-out;
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(5, 0, 15, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999999 !important;
+  pointer-events: auto !important;
+  animation: fadeIn 0.4s ease-out;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .tutorial-box {
-    background: rgba(20, 5, 40, 0.85);
-    padding: 30px;
-    border-radius: 14px;
-    text-align: center;
-    color: #e8d7ff;
-    width: 330px;
-    border: 2px solid #a020f0;
-    box-shadow:
-        0 0 15px #a020f0,
-        0 0 35px #6a00ff inset;
-    backdrop-filter: blur(8px);
-    animation: popIn 0.35s ease-out;
+  background: rgba(20, 5, 40, 0.85);
+  padding: 30px;
+  border-radius: 14px;
+  text-align: center;
+  color: #e8d7ff;
+  width: 330px;
+  border: 2px solid #a020f0;
+  box-shadow:
+    0 0 15px #a020f0,
+    0 0 35px #6a00ff inset;
+  backdrop-filter: blur(8px);
+  animation: popIn 0.35s ease-out;
 }
 
 @keyframes popIn {
-    0% { transform: scale(0.7); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.tutorial-box h3 {
-    font-family: "Orbitron", sans-serif;
-    font-size: 1.4rem;
-    margin-bottom: 12px;
-    color: #d7b7ff;
-    text-shadow: 0 0 10px #b57bff;
-}
-
-.tutorial-box p {
-    font-size: 1rem;
-    margin: 8px 0;
-    color: #c9b6ff;
-    text-shadow: 0 0 6px #6a00ff;
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 .tutorial-tap {
-    margin-top: 18px;
-    font-size: 0.85rem;
-    opacity: 0.8;
-    color: #ff9cff;
-    text-shadow: 0 0 8px #ff00ff;
-    animation: pulseText 1.4s infinite;
+  margin-top: 18px;
+  font-size: 0.85rem;
+  opacity: 0.8;
+  color: #ff9cff;
+  text-shadow: 0 0 8px #ff00ff;
+  animation: pulseText 1.4s infinite;
 }
 
 @keyframes pulseText {
-    0% { opacity: 0.5; }
-    50% { opacity: 1; }
-    100% { opacity: 0.5; }
-}
-/* Add to src/front/styles/map.css */
-
-/* mission completed greyed style */
-.mission-completed {
-  opacity: 0.45;
-  filter: grayscale(0.6);
-  pointer-events: none;
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
 }
 
-/* ensure mission box still readable when completed */
-.mission-completed .mission-name,
-.mission-completed .mission-desc,
-.mission-completed .mission-diff {
-  color: rgba(220,220,220,0.8);
+/* ============================================================
+   CONFIRMACIÓN
+============================================================ */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
 }
 
-/* map-overlay-card already exists; ensure mission points list looks neat */
-.map-overlay-card ul { margin: 0; padding-left: 12px; }
-.map-overlay-card li { color: #f0e6ff; opacity: 0.95; }
-
-/* ensure overlays and modals are above map */
-#map { z-index: 10; }
-.map-overlay-card, .meta-modal-overlay, .tutorial-overlay { z-index: 1000000 !important; }
-/* ya tienes .mission-completed; refuerzo para Profile */
-.mission-completed {
-  opacity: 0.45 !important;
-  filter: grayscale(0.8) contrast(0.9);
-  pointer-events: none;
+.confirm-box {
+  position: relative;
+  width: 360px;
+  padding: 22px;
+  background: rgba(20, 0, 35, 0.88);
+  border: 1px solid rgba(150, 80, 255, 0.4);
+  border-radius: 12px;
+  box-shadow: 0 0 25px rgba(150, 80, 255, 0.4);
+  color: #fff;
+  text-align: center;
+  animation: fadeIn 0.25s ease-out;
 }
 
-/* Profile cards */
-.profile-page { padding: 18px; }
-.profile-missions .saved-route-card {
-  margin-bottom: 10px;
-  background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(20,6,40,0.06));
-  border: 1px solid rgba(160,80,255,0.04);
+.confirm-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: #c9aaff;
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.confirm-close:hover {
+  opacity: 1;
+}
+
+.confirm-title {
+  margin: 0;
+  font-size: 20px;
+  color: #e3d1ff;
+}
+
+.confirm-text {
+  margin-top: 12px;
+  font-size: 15px;
+  opacity: 0.9;
+}
+
+.confirm-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 18px;
+}
+
+.confirm-yes {
+  flex: 1;
+  margin-right: 8px;
   padding: 10px;
+  background: #7d2cff;
+  border: none;
   border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+}
+.confirm-yes:hover {
+  background: #9b4dff;
 }
 
-/* Tutorial overlay z-index y visibilidad (asegurar que se vea) */
-.tutorial-overlay { z-index: 1000002 !important; pointer-events: auto !important; }
-.tutorial-box { z-index: 1000003 !important; }
+.confirm-no {
+  flex: 1;
+  margin-left: 8px;
+  padding: 10px;
+  background: #444;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+}
+.confirm-no:hover {
+  background: #666;
+}
+
+
+
+
+
+.bouncing-marker .bounce-dot {
+  width: 22px;
+  height: 22px;
+  background: cyan;
+  border-radius: 50%;
+  animation: bounce 0.8s infinite;
+  box-shadow: 0 0 10px rgba(0,255,255,0.8);
+}
+
+@keyframes bounce {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+  100% { transform: translateY(0); }
+}
+
+.route-tools {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 9999;
+}
+
+.tool-btn {
+  background: #1b1f2a;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #333;
+  cursor: pointer;
+}
+
+.modal-bg {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.modal-box {
+  background: #1b1f2a;
+  padding: 20px;
+  border-radius: 10px;
+  width: 320px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-box input,
+.modal-box textarea,
+.modal-box select {
+  background: #111522;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 6px 8px;
+  color: white;
+}
+
+.save-btn {
+  background: #7b2ff7;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  margin-top: 6px;
+}
+

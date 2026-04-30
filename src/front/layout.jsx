@@ -14,6 +14,8 @@ import AddPlace from "./js/views/addPlace.jsx";
 import EditPlace from "./js/views/editPlace.jsx";
 import PlaceDetails from "./js/views/placeDetails.jsx";
 
+import RoutesPage from "./js/views/routes.jsx";   
+
 import ProtectedRoute from "./js/component/ProtectedRoute.jsx";
 
 const Layout = () => {
@@ -78,6 +80,16 @@ const Layout = () => {
                     element={
                         <ProtectedRoute>
                             <PlaceDetails />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* 👇 NUEVA RUTA PARA VER RUTAS GUARDADAS */}
+                <Route
+                    path="/routes"
+                    element={
+                        <ProtectedRoute>
+                            <RoutesPage />
                         </ProtectedRoute>
                     }
                 />

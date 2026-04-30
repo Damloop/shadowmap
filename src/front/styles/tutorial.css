@@ -1,0 +1,78 @@
+.tutorial-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+}
+
+.tutorial-box {
+    position: relative;
+    width: 380px;
+    padding: 24px;
+    background: rgba(20, 0, 35, 0.85);
+    border: 1px solid rgba(150, 80, 255, 0.4);
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(150, 80, 255, 0.4);
+    color: #fff;
+    text-align: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.tutorial-close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    color: #c9aaff;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0.7;
+}
+.tutorial-close:hover {
+    opacity: 1;
+}
+
+.tutorial-title {
+    margin: 0;
+    font-size: 18px;
+    letter-spacing: 1px;
+    color: #b78aff;
+}
+
+.tutorial-step-title {
+    margin-top: 10px;
+    font-size: 20px;
+    color: #e3d1ff;
+}
+
+.tutorial-text {
+    margin-top: 12px;
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+.tutorial-next {
+    margin-top: 18px;
+    width: 100%;
+    padding: 10px;
+    background: #7d2cff;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.tutorial-next:hover {
+    background: #9b4dff;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}

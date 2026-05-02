@@ -34,7 +34,6 @@ const MapPage = () => {
     else closeTutorial();
   };
 
-  // ⭐⭐⭐ Misión activa → obtener ubicación REAL y generar punto ⭐⭐⭐
   const triggerMission = () => {
     setTutorialMode("mission");
     setTutorialStep(0);
@@ -250,19 +249,29 @@ const MapPage = () => {
         )}
 
         {!isCreatingRoute && mission && (
-          <div className="mission-box pulse-btn" onClick={triggerMission}>
+          <div
+            className="mission-box pulse-btn"
+            onClick={(e) => {
+              if (e.target.tagName !== "BUTTON") triggerMission();
+            }}
+          >
             <h3>Misión activa</h3>
             <div className="mission-name">{mission.name}</div>
             <div className="mission-desc">{mission.description}</div>
             <div className="mission-diff">Dificultad: {mission.difficulty}</div>
 
-            <button className="shadow-btn shadow-btn-main" onClick={completeMission}>
+            <button
+              className="shadow-btn shadow-btn-main"
+              onClick={(e) => {
+                e.stopPropagation();
+                completeMission();
+              }}
+            >
               Completar misión
             </button>
           </div>
         )}
 
-        {/* ⭐⭐⭐ Botón Volver fijo ⭐⭐⭐ */}
         <button
           className="shadow-btn"
           onClick={goBack}
@@ -282,7 +291,6 @@ const MapPage = () => {
         <MapView isCreatingRoute={isCreatingRoute} />
       </div>
 
-      {/* ⭐⭐⭐ POPUP PREMIUM ⭐⭐⭐ */}
       {store.allMissionsCompleted && (
         <div className="premium-popup-bg">
           <div className="premium-popup-box">

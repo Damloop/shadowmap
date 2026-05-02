@@ -1,5 +1,3 @@
-// src/front/js/store/flux.js
-
 import places from "./places.js";
 import { API_URL } from "../../api/config.js";
 
@@ -51,8 +49,7 @@ const getState = ({ getStore, getActions, setStore }) => {
           const resp = await fetch(`${API_URL}/api/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password }),
-            mode: "cors"
+            body: JSON.stringify({ email, password })
           });
 
           if (!resp.ok)
@@ -93,14 +90,38 @@ const getState = ({ getStore, getActions, setStore }) => {
         setStore({ token: null, user: null });
       },
 
-      syncToken: () => {
+      syncToken: async () => {
         const token = localStorage.getItem("token");
-        const user = localStorage.getItem("user");
+        if (!token) {
+          setStore({ token: null, user: null });
+          return;
+        }
 
-        if (token && user) {
+        try {
+          const resp = await fetch(`${API_URL}/api/me`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          if (!resp.ok) {
+            setStore({
+              token,
+              user: JSON.parse(localStorage.getItem("user")) || {}
+            });
+            return;
+          }
+
+          const data = await resp.json();
+
+          localStorage.setItem("user", JSON.stringify(data.user));
+
           setStore({
-            token: token,
-            user: JSON.parse(user)
+            token,
+            user: data.user
+          });
+        } catch {
+          setStore({
+            token,
+            user: JSON.parse(localStorage.getItem("user")) || {}
           });
         }
       },

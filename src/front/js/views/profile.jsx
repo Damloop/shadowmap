@@ -23,15 +23,9 @@ const Profile = () => {
     const premiumLevel = sessionStorage.getItem("premiumLevel");
     const premiumNick = sessionStorage.getItem("premiumNick");
 
+    // 🔥 FIX: evitar doble syncToken que congelaba Profile
     useEffect(() => {
-        actions.syncToken();
-    }, []);
-
-    useEffect(() => {
-        if (!store.user) {
-            const saved = localStorage.getItem("user");
-            if (saved) actions.syncToken();
-        }
+        if (!store.user) actions.syncToken();
     }, [store.user]);
 
     useEffect(() => {

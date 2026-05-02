@@ -4,7 +4,8 @@ echo "=== ShadowMap: Arrancando Frontend y Backend ==="
 
 # Arrancar backend en segundo plano
 echo "→ Iniciando backend en puerto 3001..."
-python3 run.py &
+export FLASK_APP=src/api/app.py
+flask run --host=0.0.0.0 --port=3001 &
 BACKEND_PID=$!
 
 # Esperar a que el backend levante

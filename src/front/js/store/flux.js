@@ -32,9 +32,6 @@ const getState = ({ getStore, getActions, setStore }) => {
     actions: {
       ...placesState.actions,
 
-      /* ============================================================
-         RESET TOTAL AL CAMBIAR DE USUARIO
-      ============================================================ */
       resetAllForNewUser: () => {
         localStorage.removeItem("shadowmap_completed_missions");
         localStorage.removeItem("savedRoutes_local");
@@ -49,15 +46,13 @@ const getState = ({ getStore, getActions, setStore }) => {
         });
       },
 
-      /* ============================================================
-         LOGIN COMPLETO Y CORREGIDO
-      ============================================================ */
       login: async (email, password) => {
         try {
           const resp = await fetch(`${API_URL}/api/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email, password }),
+            mode: "cors"
           });
 
           if (!resp.ok)
@@ -67,18 +62,15 @@ const getState = ({ getStore, getActions, setStore }) => {
           if (!data.token)
             return { success: false, message: "Token no recibido." };
 
-          // Guardar token y usuario
           localStorage.setItem("token", data.token);
           localStorage.setItem("user", JSON.stringify(data.user));
 
-          // Detectar si es un usuario nuevo
           const lastUser = localStorage.getItem("last_user_email");
 
           if (lastUser !== data.user.email) {
             getActions().resetAllForNewUser();
           }
 
-          // Guardar referencia del usuario actual
           localStorage.setItem("last_user_email", data.user.email);
 
           setStore({
@@ -113,9 +105,6 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
-      /* ============================================================
-         RUTAS LOCALES
-      ============================================================ */
       saveRouteLocal: (route) => {
         try {
           const raw = localStorage.getItem("savedRoutes_local");
@@ -191,9 +180,6 @@ const getState = ({ getStore, getActions, setStore }) => {
         setStore({ selectedPoints: [] });
       },
 
-      /* ============================================================
-         MISIONES
-      ============================================================ */
       setActiveMission: (mission) => {
         setStore({ activeMission: mission });
       },

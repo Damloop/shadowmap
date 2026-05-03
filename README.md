@@ -81,3 +81,22 @@ src/
    Código
    pipenv install
    pipenv run start
+
+## ⚠️ Advertencia al Explorador
+
+ShadowMap no es un juego.  
+No es una app.  
+No es un mapa.
+
+Es un **registro**.
+
+Cada misión que completas deja una marca.  
+Cada punto que visitas altera algo más que tu ubicación.  
+Cada ruta que creas… alguien la sigue.
+
+Si notas que el mapa cambia cuando no debería,  
+si aparece una misión que no recuerdas haber aceptado,  
+o si ves un punto demasiado cerca de tu casa…
+
+**cierra la aplicación.  
+Es ShadowMap quien te está explorando a ti.**

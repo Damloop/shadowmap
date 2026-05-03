@@ -19,6 +19,9 @@ jwt = JWTManager()
 def create_app():
     app = Flask(__name__)
 
+    # ============================================================
+    # BASE DE DATOS — RUTA ABSOLUTA CORRECTA (SOLO UNA DB REAL)
+    # ============================================================
     BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
     DB_PATH = os.path.join(BASE_DIR, "instance", "database.db")
 
@@ -26,19 +29,25 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["JWT_SECRET_KEY"] = "super-secret-key"
 
+    # ============================================================
+    # CORS — CONFIGURACIÓN COMPLETA PARA CODESPACES + LEAFLET
+    # ============================================================
     CORS(
         app,
-        resources={r"/api/*": {"origins": "*"}},
+        resources={r"/*": {"origins": "*"}},
+        supports_credentials=True,
         allow_headers=["Content-Type", "Authorization"],
         expose_headers=["Content-Type", "Authorization"],
         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     )
 
+    # Extensiones
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
     mail.init_app(app)
 
+    # Blueprints
     from src.api.routes_auth import auth_api
     from src.api.routes_routes import routes_api
     from src.api.routes_recover import recover_bp

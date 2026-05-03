@@ -1,3 +1,5 @@
+// src/front/js/store/flux.js
+
 import places from "./places.js";
 import { API_URL } from "../../api/config.js";
 
@@ -18,32 +20,24 @@ const getState = ({ getStore, getActions, setStore }) => {
       })(),
 
       userLocation: null,
+
       selectedPoints: [],
+      markerColor: "blue",
+
+      routes: [],
       savedRoutes: [],
+      sharedRoutes: [],
 
       activeMission: null,
-      missionPoint: null,
-
-      allMissionsCompleted: false
+      missionPoint: null
     },
 
     actions: {
       ...placesState.actions,
 
-      resetAllForNewUser: () => {
-        localStorage.removeItem("shadowmap_completed_missions");
-        localStorage.removeItem("savedRoutes_local");
-
-        setStore({
-          selectedPoints: [],
-          savedRoutes: [],
-          activeMission: null,
-          missionPoint: null,
-          userLocation: null,
-          allMissionsCompleted: false
-        });
-      },
-
+      /* ---------------------------
+         LOGIN — RESETEA TODO
+      ---------------------------*/
       login: async (email, password) => {
         try {
           const resp = await fetch(`${API_URL}/api/login`, {
@@ -52,160 +46,179 @@ const getState = ({ getStore, getActions, setStore }) => {
             body: JSON.stringify({ email, password })
           });
 
-          if (!resp.ok)
-            return { success: false, message: "Credenciales incorrectas." };
-
           const data = await resp.json();
-          if (!data.token)
-            return { success: false, message: "Token no recibido." };
 
+          if (!resp.ok) {
+            return { success: false, message: data.msg || "Credenciales incorrectas" };
+          }
+
+          // Guardar sesión
           localStorage.setItem("token", data.token);
           localStorage.setItem("user", JSON.stringify(data.user));
 
-          const lastUser = localStorage.getItem("last_user_email");
-
-          if (lastUser !== data.user.email) {
-            getActions().resetAllForNewUser();
-          }
-
-          localStorage.setItem("last_user_email", data.user.email);
-
+          // Guardar en store
           setStore({
             token: data.token,
             user: data.user
           });
 
+          // 🔥 RESETEAR MISIONES Y RUTAS AL CAMBIAR DE USUARIO
+          localStorage.removeItem("shadowmap_completed_missions");
+          localStorage.removeItem("savedRoutes_local");
+
+          setStore({
+            activeMission: null,
+            missionPoint: null,
+            selectedPoints: [],
+            savedRoutes: []
+          });
+
           return { success: true };
         } catch {
-          return {
-            success: false,
-            message: "Error de conexión con el servidor."
-          };
+          return { success: false, message: "Error de conexión con el servidor" };
         }
       },
 
+      /* ---------------------------
+         LOGOUT — LIMPIA TODO
+      ---------------------------*/
       logout: () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        setStore({ token: null, user: null });
-      },
-
-      syncToken: async () => {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          setStore({ token: null, user: null });
-          return;
-        }
-
         try {
-          const resp = await fetch(`${API_URL}/api/me`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          localStorage.removeItem("shadowmap_completed_missions");
+          localStorage.removeItem("savedRoutes_local");
+        } catch {}
 
-          if (!resp.ok) {
-            setStore({
-              token,
-              user: JSON.parse(localStorage.getItem("user")) || {}
-            });
-            return;
-          }
-
-          const data = await resp.json();
-
-          localStorage.setItem("user", JSON.stringify(data.user));
-
-          setStore({
-            token,
-            user: data.user
-          });
-        } catch {
-          setStore({
-            token,
-            user: JSON.parse(localStorage.getItem("user")) || {}
-          });
-        }
+        setStore({
+          token: null,
+          user: null,
+          activeMission: null,
+          missionPoint: null,
+          selectedPoints: [],
+          savedRoutes: []
+        });
       },
 
+      syncTokenFromSessionStore: () => {
+        try {
+          const token = localStorage.getItem("token");
+          const userRaw = localStorage.getItem("user");
+
+          if (token) setStore({ token });
+          if (userRaw) {
+            try {
+              setStore({ user: JSON.parse(userRaw) });
+            } catch {
+              localStorage.removeItem("user");
+              setStore({ user: null });
+            }
+          }
+        } catch {}
+      },
+
+      /* ---------------------------
+         UBICACIÓN
+      ---------------------------*/
+      getUserLocation: () => {
+        if (!navigator.geolocation) return;
+
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            setStore({
+              userLocation: {
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude
+              }
+            });
+          },
+          () => {}
+        );
+      },
+
+      /* ---------------------------
+         RUTAS LOCALES
+      ---------------------------*/
       saveRouteLocal: (route) => {
         try {
           const raw = localStorage.getItem("savedRoutes_local");
           const arr = raw ? JSON.parse(raw) : [];
 
-          if (arr.length >= 3) {
-            alert("Máximo 3 rutas guardadas.");
-            return;
-          }
+          const toSave = {
+            id: Date.now().toString(),
+            name: route.name || "Ruta sin nombre",
+            description: route.description || "",
+            rating: Number(route.rating) || 1,
+            points: route.points || [],
+            createdAt: new Date().toISOString()
+          };
 
-          const colors = ["#ff4444", "#44ff44", "#4488ff"];
-          const index = arr.length % colors.length;
+          arr.push(toSave);
 
-          const newRoute = { ...route, color: colors[index] };
-
-          const updated = [...arr, newRoute];
-
-          localStorage.setItem("savedRoutes_local", JSON.stringify(updated));
-          setStore({ savedRoutes: updated });
+          localStorage.setItem("savedRoutes_local", JSON.stringify(arr));
+          setStore({ savedRoutes: arr });
         } catch {}
       },
 
       loadSavedRoutesLocal: () => {
         try {
           const raw = localStorage.getItem("savedRoutes_local");
-          const arr = raw ? JSON.parse(raw) : [];
+          let arr = raw ? JSON.parse(raw) : [];
+
+          arr = arr.map(r => ({
+            ...r,
+            rating: Number(r.rating) || 1,
+            createdAt: r.createdAt || new Date().toISOString()
+          }));
+
           setStore({ savedRoutes: arr });
         } catch {
           setStore({ savedRoutes: [] });
         }
       },
 
-      deleteRoute: (id) => {
-        const store = getStore();
-        const updated = store.savedRoutes.filter((r) => r.id !== id);
-
-        localStorage.setItem("savedRoutes_local", JSON.stringify(updated));
-        setStore({ savedRoutes: updated });
-      },
-
-      editRoute: (id, newData) => {
-        const store = getStore();
-        const updated = store.savedRoutes.map((r) =>
-          r.id === id ? { ...r, ...newData } : r
-        );
-
-        localStorage.setItem("savedRoutes_local", JSON.stringify(updated));
-        setStore({ savedRoutes: updated });
-      },
-
-      loadRouteToEditor: (id) => {
-        const store = getStore();
-        const route = store.savedRoutes.find((r) => r.id === id);
-        if (!route) return;
-
-        setStore({
-          selectedPoints: route.points
-        });
-      },
-
-      shareRoute: () => {
-        alert("Compartir ruta estará disponible próximamente.");
+      deleteSavedRouteLocal: (id) => {
+        try {
+          const raw = localStorage.getItem("savedRoutes_local");
+          const arr = raw ? JSON.parse(raw) : [];
+          const filtered = arr.filter(r => r.id !== id);
+          localStorage.setItem("savedRoutes_local", JSON.stringify(filtered));
+          setStore({ savedRoutes: filtered });
+        } catch {}
       },
 
       addPointToRoute: (lat, lng) => {
         const store = getStore();
-        const points = [...store.selectedPoints];
+        const points = Array.isArray(store.selectedPoints) ? [...store.selectedPoints] : [];
         points.push({ lat, lng, createdAt: new Date().toISOString() });
         setStore({ selectedPoints: points });
       },
 
       clearSelectedPoints: () => {
-        setStore({ selectedPoints: [] });
+        setStore({ selectedPoints: [], currentRouteMeta: null });
       },
 
+      /* ---------------------------
+         MISIONES
+      ---------------------------*/
       setActiveMission: (mission) => {
         setStore({ activeMission: mission });
       },
 
-      generateMissionPoint: ([lat, lng]) => {
+      generateMissionPoint: (coords) => {
+        const store = getStore();
+
+        let lat, lng;
+
+        if (Array.isArray(coords) && coords.length === 2) {
+          [lat, lng] = coords;
+        } else if (store.userLocation) {
+          lat = store.userLocation.lat;
+          lng = store.userLocation.lng;
+        } else {
+          return;
+        }
+
         const point = {
           lat: lat + (Math.random() - 0.5) * 0.002,
           lng: lng + (Math.random() - 0.5) * 0.002
@@ -213,18 +226,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 
         setStore({ missionPoint: point });
         return point;
-      },
-
-      checkAllMissionsCompleted: () => {
-        const KEY = "shadowmap_completed_missions";
-        const raw = localStorage.getItem(KEY);
-        const completed = raw ? JSON.parse(raw) : [];
-
-        const TOTAL = 5;
-
-        if (completed.length >= TOTAL) {
-          setStore({ allMissionsCompleted: true });
-        }
       },
 
       completeMission: (missionId) => {
@@ -242,14 +243,6 @@ const getState = ({ getStore, getActions, setStore }) => {
           activeMission: null,
           missionPoint: null
         });
-
-        getActions().checkAllMissionsCompleted();
-
-        return {
-          success: true,
-          message:
-            "Has completado la misión. Ya no podrás volver a acceder a ella y aparecerá en gris en tu perfil."
-        };
       }
     }
   };

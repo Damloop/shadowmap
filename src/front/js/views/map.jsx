@@ -18,24 +18,51 @@ const MapPage = () => {
 
   const [tutorialStep, setTutorialStep] = useState(0);
   const [showTutorial, setShowTutorial] = useState(false);
-  const [tutorialMode, setTutorialMode] = useState("mission");
+
+  const closeTutorial = () => setShowTutorial(false);
+
+  const nextTutorial = () => {
+    if (tutorialStep < 2) setTutorialStep(tutorialStep + 1);
+    else closeTutorial();
+  };
 
   const [showRouteModal, setShowRouteModal] = useState(false);
   const [routeName, setRouteName] = useState("");
   const [routeInfo, setRouteInfo] = useState("");
   const [routeRating, setRouteRating] = useState(3);
-  const [editingRouteId, setEditingRouteId] = useState(null);
 
-  const closeTutorial = () => setShowTutorial(false);
-
-  const nextTutorial = () => {
-    const maxSteps = tutorialMode === "routes" ? 1 : 1;
-    if (tutorialStep < maxSteps) setTutorialStep(tutorialStep + 1);
-    else closeTutorial();
+  const openRouteModal = () => {
+    if (!store.selectedPoints || store.selectedPoints.length < 1) {
+      alert("Añade al menos un punto en el mapa.");
+      return;
+    }
+    setRouteName("");
+    setRouteInfo("");
+    setRouteRating(3);
+    setShowRouteModal(true);
   };
 
+  const saveRoute = () => {
+    if (!routeName.trim()) {
+      alert("Pon un nombre a la ruta.");
+      return;
+    }
+
+    const newRoute = {
+      id: Date.now().toString(),
+      name: routeName,
+      description: routeInfo,
+      rating: Number(routeRating),
+      points: store.selectedPoints,
+      createdAt: new Date().toISOString()
+    };
+
+    actions.saveRouteLocal(newRoute);
+    setShowRouteModal(false);
+  };
+
+  // 🔥 MISIÓN ACTIVA → TUTORIAL + GENERAR PUNTO
   const triggerMission = () => {
-    setTutorialMode("mission");
     setTutorialStep(0);
     setShowTutorial(true);
 
@@ -43,19 +70,22 @@ const MapPage = () => {
 
     actions.setActiveMission(mission);
 
+    if (store.userLocation) {
+      const { lat, lng } = store.userLocation;
+      actions.generateMissionPoint([lat, lng]);
+      return;
+    }
+
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const coords = {
           lat: pos.coords.latitude,
           lng: pos.coords.longitude
         };
-
-        actions.setUserLocation(coords);
+        actions.getUserLocation();
         actions.generateMissionPoint([coords.lat, coords.lng]);
       },
-      () => {
-        alert("No se pudo obtener tu ubicación.");
-      }
+      () => {}
     );
   };
 
@@ -92,64 +122,15 @@ const MapPage = () => {
 
   const handleCreateRoute = () => {
     actions.clearSelectedPoints();
-    setEditingRouteId(null);
     setIsCreatingRoute(true);
-    setShowTutorial(false);
-    alert("Haz clic en el mapa para añadir puntos a tu ruta (máx 5).");
+    setTutorialStep(2);
+    setShowTutorial(true);
   };
 
   const handleMisRutasTutorial = () => {
-    setTutorialMode("routes");
-    setTutorialStep(0);
+    setTutorialStep(1);
     setShowTutorial(true);
     setIsCreatingRoute(true);
-  };
-
-  const openRouteModal = () => {
-    if (!store.selectedPoints || store.selectedPoints.length < 1) {
-      alert("Añade al menos un punto en el mapa.");
-      return;
-    }
-    setShowRouteModal(true);
-  };
-
-  const saveRoute = () => {
-    if (!routeName.trim()) {
-      alert("Pon un nombre a la ruta.");
-      return;
-    }
-
-    if (editingRouteId) {
-      actions.editRoute(editingRouteId, {
-        name: routeName,
-        description: routeInfo,
-        rating: routeRating,
-        points: store.selectedPoints
-      });
-    } else {
-      const newRoute = {
-        id: Date.now().toString(),
-        name: routeName,
-        description: routeInfo,
-        rating: Number(routeRating),
-        points: store.selectedPoints,
-        createdAt: new Date().toISOString()
-      };
-      actions.saveRouteLocal(newRoute);
-    }
-
-    setEditingRouteId(null);
-    setShowRouteModal(false);
-  };
-
-  const startEditingRoute = (route) => {
-    actions.loadRouteToEditor(route.id);
-    setRouteName(route.name);
-    setRouteInfo(route.description);
-    setRouteRating(route.rating);
-    setEditingRouteId(route.id);
-    setIsCreatingRoute(true);
-    setShowRouteModal(true);
   };
 
   return (
@@ -160,11 +141,10 @@ const MapPage = () => {
           step={tutorialStep}
           onNext={nextTutorial}
           onClose={closeTutorial}
-          mode={tutorialMode}
         />
       )}
 
-      <div className="map-left-panel" style={{ position: "relative" }}>
+      <div className="map-left-panel">
         <h2 className="panel-title">SHADOWMAP - Mapa de Exploración Paranormal</h2>
 
         <button
@@ -190,13 +170,6 @@ const MapPage = () => {
 
             <button className="shadow-btn">Compartir ruta</button>
 
-            <button
-              className="shadow-btn"
-              onClick={() => actions.clearSelectedPoints()}
-            >
-              Borrar ruta
-            </button>
-
             <h3 style={{ marginTop: 15 }}>Rutas guardadas</h3>
 
             <div className="saved-routes-list">
@@ -220,26 +193,9 @@ const MapPage = () => {
                   </div>
 
                   <div className="route-actions">
-                    <button
-                      className="route-action-btn"
-                      onClick={() => startEditingRoute(r)}
-                    >
-                      Editar
-                    </button>
-
-                    <button
-                      className="route-action-btn"
-                      onClick={() => actions.deleteRoute(r.id)}
-                    >
-                      Eliminar
-                    </button>
-
-                    <button
-                      className="route-action-btn"
-                      onClick={() => actions.shareRoute(r.id)}
-                    >
-                      Compartir
-                    </button>
+                    <button className="route-action-btn" onClick={() => actions.editRoute(r.id)}>Editar</button>
+                    <button className="route-action-btn" onClick={() => actions.deleteRoute(r.id)}>Eliminar</button>
+                    <button className="route-action-btn" onClick={() => actions.shareRoute(r.id)}>Compartir</button>
                   </div>
 
                 </div>
@@ -249,39 +205,19 @@ const MapPage = () => {
         )}
 
         {!isCreatingRoute && mission && (
-          <div
-            className="mission-box pulse-btn"
-            onClick={(e) => {
-              if (e.target.tagName !== "BUTTON") triggerMission();
-            }}
-          >
+          <div className="mission-box pulse-btn" onClick={triggerMission}>
             <h3>Misión activa</h3>
             <div className="mission-name">{mission.name}</div>
             <div className="mission-desc">{mission.description}</div>
             <div className="mission-diff">Dificultad: {mission.difficulty}</div>
 
-            <button
-              className="shadow-btn shadow-btn-main"
-              onClick={(e) => {
-                e.stopPropagation();
-                completeMission();
-              }}
-            >
+            <button className="shadow-btn shadow-btn-main" onClick={completeMission}>
               Completar misión
             </button>
           </div>
         )}
 
-        <button
-          className="shadow-btn"
-          onClick={goBack}
-          style={{
-            position: "absolute",
-            bottom: "20px",
-            left: "20px",
-            width: "calc(100% - 40px)"
-          }}
-        >
+        <button className="shadow-btn" style={{ marginTop: 20 }} onClick={goBack}>
           Volver
         </button>
 
@@ -291,35 +227,10 @@ const MapPage = () => {
         <MapView isCreatingRoute={isCreatingRoute} />
       </div>
 
-      {store.allMissionsCompleted && (
-        <div className="premium-popup-bg">
-          <div className="premium-popup-box">
-            <h2 className="premium-title">¡Has completado todas las misiones!</h2>
-            <p className="premium-text">
-              Tu potencial es increíble. Desbloquea el <strong>Plan Premium</strong> y continúa tu ascenso en ShadowMap.
-            </p>
-
-            <button
-              className="shadow-btn shadow-btn-main"
-              onClick={() => navigate("/premium")}
-            >
-              Ver Plan Premium
-            </button>
-
-            <button
-              className="shadow-btn"
-              onClick={() => actions.setStore({ allMissionsCompleted: false })}
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
-      )}
-
       {showRouteModal && (
         <div className="modal-bg">
           <div className="modal-box">
-            <h3>{editingRouteId ? "Editar ruta" : "Guardar ruta"}</h3>
+            <h3>Guardar ruta</h3>
 
             <label>Nombre</label>
             <input value={routeName} onChange={e => setRouteName(e.target.value)} />
@@ -337,9 +248,7 @@ const MapPage = () => {
             </select>
 
             <div className="modal-buttons">
-              <button className="shadow-btn shadow-btn-main" onClick={saveRoute}>
-                {editingRouteId ? "Guardar cambios" : "Guardar"}
-              </button>
+              <button className="shadow-btn shadow-btn-main" onClick={saveRoute}>Guardar</button>
               <button className="shadow-btn" onClick={() => setShowRouteModal(false)}>Cancelar</button>
             </div>
           </div>

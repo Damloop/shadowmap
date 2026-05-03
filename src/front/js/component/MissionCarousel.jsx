@@ -32,12 +32,11 @@ export const MissionCarousel = ({ missions, onSelect, completedIds = [] }) => {
                     return (
                         <div
                             key={m.id}
-                            className={
-                                "carousel-card " +
-                                getDifficultyClass(m.difficulty) +
-                                (m.locked ? " locked" : "") +
-                                (completed ? " completed" : "")
-                            }
+                            className={`carousel-card 
+                                ${getDifficultyClass(m.difficulty)} 
+                                ${m.locked ? "locked" : ""} 
+                                ${completed ? "completed" : ""}
+                            `}
                             onClick={() => {
                                 if (!m.locked && !completed) onSelect(m);
                             }}

@@ -1,3 +1,5 @@
+// src/front/js/component/MapView.jsx
+
 import React, { useEffect, useContext, useRef } from "react";
 import { Context } from "../store/appContext.jsx";
 import L from "leaflet";
@@ -40,16 +42,19 @@ const MapView = ({ isCreatingRoute }) => {
     const map = mapRef.current;
     if (!map) return;
 
+    // Eliminar marcador anterior
     if (missionMarker.current) {
       try { map.removeLayer(missionMarker.current); } catch {}
     }
 
+    // SI HAY PUNTO → LO PINTA
     if (store.missionPoint) {
       missionMarker.current = L.marker(
         [store.missionPoint.lat, store.missionPoint.lng],
         { icon: missionIcon }
       ).addTo(map);
 
+      // Zoom al punto
       map.setView([store.missionPoint.lat, store.missionPoint.lng], 16);
     }
   }, [store.missionPoint]);

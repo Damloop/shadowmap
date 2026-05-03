@@ -40,6 +40,9 @@ const MapPage = () => {
   const [isCreatingRoute, setIsCreatingRoute] = useState(false);
   const [selectedRoute, setSelectedRoute] = useState(null);
 
+  /* ---------------------------------------------------
+     🔥 MISIÓN ACTIVA → UBICACIÓN REAL + PUNTO CERCANO
+  ---------------------------------------------------*/
   const handleMissionMode = () => {
     setIsCreatingRoute(false);
 
@@ -47,26 +50,22 @@ const MapPage = () => {
 
     actions.setActiveMission(mission);
 
-    if (store.userLocation) {
-      const { lat, lng } = store.userLocation;
-      actions.generateMissionPoint([lat, lng]);
-      return;
-    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const coords = {
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude
-          };
+        actions.getUserLocation();
 
-          actions.getUserLocation();
-          actions.generateMissionPoint([coords.lat, coords.lng]);
-        },
-        () => {}
-      );
-    }
+        const randomLat = lat + (Math.random() - 0.5) * 0.002;
+        const randomLng = lng + (Math.random() - 0.5) * 0.002;
+
+        actions.generateMissionPoint([randomLat, randomLng]);
+      },
+      (err) => {
+        console.error("No se pudo obtener ubicación:", err);
+      }
+    );
   };
 
   const handleRouteMode = () => {
@@ -80,7 +79,7 @@ const MapPage = () => {
   const handleCompleteMission = () => {
     if (!mission) return;
     actions.completeMission(mission.id);
-    navigate("/profile");
+    setShowConfirm(false);
   };
 
   const [showRouteModal, setShowRouteModal] = useState(false);
@@ -176,8 +175,6 @@ const MapPage = () => {
               Guardar
             </button>
             <button className="shadow-btn">Compartir</button>
-            <button className="shadow-btn">Compartidas conmigo</button>
-
             <button
               className="shadow-btn"
               onClick={() => {
@@ -321,7 +318,7 @@ const MapPage = () => {
               Confirmar completada
             </button>
 
-           
+          
           </div>
         )}
       </div>
@@ -332,25 +329,30 @@ const MapPage = () => {
 
       {showConfirm && (
         <div className="confirm-overlay">
-          <div className="confirm-box">
-            <button className="confirm-close" onClick={() => setShowConfirm(false)}>
-              ×
-            </button>
+          <div className="confirm-box shadowmap-modal">
 
-            <h3 className="confirm-title">¿Estás seguro?</h3>
-            <p className="confirm-text">
-              Vas a marcar la misión como completada.  
-              Esta acción actualizará tu perfil y bloqueará esta misión.
-            </p>
+            <div className="modal-header">
+              <h2 className="modal-title">Confirmar misión</h2>
+              <button className="modal-close" onClick={() => setShowConfirm(false)}>×</button>
+            </div>
 
-            <div className="confirm-buttons">
-              <button className="confirm-yes" onClick={handleCompleteMission}>
-                Sí, completar
+            <div className="modal-body">
+              <p className="modal-text">
+                Estás a punto de marcar esta misión como completada.<br />
+                Esta acción actualizará tu perfil y bloqueará esta misión.
+              </p>
+            </div>
+
+            <div className="modal-actions">
+              <button className="modal-btn modal-btn-confirm" onClick={handleCompleteMission}>
+                ✔ Completar misión
               </button>
-              <button className="confirm-no" onClick={() => setShowConfirm(false)}>
-                Cancelar
+
+              <button className="modal-btn modal-btn-cancel" onClick={() => setShowConfirm(false)}>
+                ✖ Cancelar
               </button>
             </div>
+
           </div>
         </div>
       )}

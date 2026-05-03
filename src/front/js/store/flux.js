@@ -29,15 +29,14 @@ const getState = ({ getStore, getActions, setStore }) => {
       sharedRoutes: [],
 
       activeMission: null,
-      missionPoint: null
+      missionPoint: null,
+
+      showPremiumPopup: false
     },
 
     actions: {
       ...placesState.actions,
 
-      /* ---------------------------
-         LOGIN — RESETEA TODO
-      ---------------------------*/
       login: async (email, password) => {
         try {
           const resp = await fetch(`${API_URL}/api/login`, {
@@ -52,17 +51,14 @@ const getState = ({ getStore, getActions, setStore }) => {
             return { success: false, message: data.msg || "Credenciales incorrectas" };
           }
 
-          // Guardar sesión
           localStorage.setItem("token", data.token);
           localStorage.setItem("user", JSON.stringify(data.user));
 
-          // Guardar en store
           setStore({
             token: data.token,
             user: data.user
           });
 
-          // 🔥 RESETEAR MISIONES Y RUTAS AL CAMBIAR DE USUARIO
           localStorage.removeItem("shadowmap_completed_missions");
           localStorage.removeItem("savedRoutes_local");
 
@@ -70,7 +66,8 @@ const getState = ({ getStore, getActions, setStore }) => {
             activeMission: null,
             missionPoint: null,
             selectedPoints: [],
-            savedRoutes: []
+            savedRoutes: [],
+            showPremiumPopup: false
           });
 
           return { success: true };
@@ -79,9 +76,6 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
-      /* ---------------------------
-         LOGOUT — LIMPIA TODO
-      ---------------------------*/
       logout: () => {
         try {
           localStorage.removeItem("token");
@@ -96,7 +90,8 @@ const getState = ({ getStore, getActions, setStore }) => {
           activeMission: null,
           missionPoint: null,
           selectedPoints: [],
-          savedRoutes: []
+          savedRoutes: [],
+          showPremiumPopup: false
         });
       },
 
@@ -117,9 +112,6 @@ const getState = ({ getStore, getActions, setStore }) => {
         } catch {}
       },
 
-      /* ---------------------------
-         UBICACIÓN
-      ---------------------------*/
       getUserLocation: () => {
         if (!navigator.geolocation) return;
 
@@ -136,9 +128,6 @@ const getState = ({ getStore, getActions, setStore }) => {
         );
       },
 
-      /* ---------------------------
-         RUTAS LOCALES
-      ---------------------------*/
       saveRouteLocal: (route) => {
         try {
           const raw = localStorage.getItem("savedRoutes_local");
@@ -198,13 +187,13 @@ const getState = ({ getStore, getActions, setStore }) => {
         setStore({ selectedPoints: [], currentRouteMeta: null });
       },
 
-      /* ---------------------------
-         MISIONES
-      ---------------------------*/
       setActiveMission: (mission) => {
         setStore({ activeMission: mission });
       },
 
+      /* ---------------------------------------------------
+         🔥 GENERAR PUNTO CERCANO PARA LA MISIÓN
+      ---------------------------------------------------*/
       generateMissionPoint: (coords) => {
         const store = getStore();
 
@@ -234,9 +223,23 @@ const getState = ({ getStore, getActions, setStore }) => {
           const raw = localStorage.getItem(KEY);
           const completed = raw ? JSON.parse(raw) : [];
 
+          let updatedCompleted = completed;
+
           if (!completed.includes(missionId)) {
-            localStorage.setItem(KEY, JSON.stringify([...completed, missionId]));
+            updatedCompleted = [...completed, missionId];
+            localStorage.setItem(KEY, JSON.stringify(updatedCompleted));
           }
+
+          alert("Misión completada");
+
+          const store = getStore();
+          const totalMissions = store.missions?.length || 0;
+          const completedNow = updatedCompleted.length;
+
+          if (totalMissions > 0 && completedNow >= totalMissions) {
+            setStore({ showPremiumPopup: true });
+          }
+
         } catch {}
 
         setStore({

@@ -415,3 +415,82 @@
   60% { transform: scale(1.05) translateY(-6px); opacity: 1; }
   100% { transform: scale(1) translateY(0); }
 }
+.shadowmap-modal {
+  background: #1b1f2a;
+  border: 2px solid #6a4fbf;
+  border-radius: 12px;
+  padding: 20px;
+  width: 360px;
+  animation: popIn 0.25s ease-out;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  color: #c7b3ff;
+  font-size: 20px;
+  margin: 0;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  color: #c7b3ff;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.modal-body {
+  margin-top: 10px;
+}
+
+.modal-text {
+  color: #ddd;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.modal-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.modal-btn-confirm {
+  background: #6a4fbf;
+  color: white;
+}
+
+.modal-btn-cancel {
+  background: #333;
+  color: #bbb;
+}
+.mission-magic-marker {
+  font-size: 28px;
+  text-shadow: 0 0 12px #d8b4ff, 0 0 20px #b57dff;
+  animation: magicPulse 2s infinite ease-in-out;
+}
+
+@keyframes magicPulse {
+  0% { transform: scale(0.8); opacity: 0.6; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.8); opacity: 0.6; }
+}

@@ -29,8 +29,9 @@ const MapPage = () => {
   });
 
   const handleNextTutorial = () => {
-    if (tutorialStep < 2) setTutorialStep(tutorialStep + 1);
-    else {
+    if (tutorialStep < 2) {
+      setTutorialStep(tutorialStep + 1);
+    } else {
       localStorage.setItem("tutorialDone_map", "true");
       setShowTutorial(false);
     }
@@ -38,11 +39,9 @@ const MapPage = () => {
 
   const [isCreatingRoute, setIsCreatingRoute] = useState(false);
   const [selectedRoute, setSelectedRoute] = useState(null);
-  const [editingRouteId, setEditingRouteId] = useState(null);
 
   const handleMissionMode = () => {
     setIsCreatingRoute(false);
-    actions.clearSelectedPoints();
 
     if (!mission) return;
 
@@ -61,6 +60,7 @@ const MapPage = () => {
             lat: pos.coords.latitude,
             lng: pos.coords.longitude
           };
+
           actions.getUserLocation();
           actions.generateMissionPoint([coords.lat, coords.lng]);
         },
@@ -71,9 +71,6 @@ const MapPage = () => {
 
   const handleRouteMode = () => {
     setIsCreatingRoute(true);
-    setSelectedRoute(null);
-    setEditingRouteId(null);
-    actions.clearSelectedPoints();
     if (!store.userLocation) actions.getUserLocation();
     if (actions?.clearMissionPoint) actions.clearMissionPoint();
   };
@@ -99,7 +96,6 @@ const MapPage = () => {
     setRouteName("");
     setRouteInfo("");
     setRouteRating(3);
-    setEditingRouteId(null);
     setShowRouteModal(true);
   };
 
@@ -109,27 +105,19 @@ const MapPage = () => {
       return;
     }
 
-    if (editingRouteId) {
-      actions.editRoute(editingRouteId, {
-        name: routeName,
-        description: routeInfo,
-        rating: Number(routeRating)
-      });
-    } else {
-      const newRoute = {
-        id: Date.now().toString(),
-        name: routeName,
-        description: routeInfo,
-        rating: Number(routeRating),
-        points: store.selectedPoints,
-        createdAt: new Date().toISOString()
-      };
-      actions.saveRouteLocal(newRoute);
-    }
+    const newRoute = {
+      id: Date.now().toString(),
+      name: routeName,
+      description: routeInfo,
+      rating: Number(routeRating),
+      points: store.selectedPoints,
+      createdAt: new Date().toISOString()
+    };
+
+    actions.saveRouteLocal(newRoute);
 
     setShowRouteModal(false);
     setIsCreatingRoute(false);
-    setEditingRouteId(null);
     actions.clearSelectedPoints();
   };
 
@@ -164,7 +152,7 @@ const MapPage = () => {
             </button>
 
             <button
-              className="shadow-btn shadow-btn-main pulse-btn"
+              className="shadow-btn pulse-btn"
               onClick={handleMissionMode}
             >
               Misión activa
@@ -179,45 +167,163 @@ const MapPage = () => {
           </div>
         )}
 
-        {/* MODO CREAR RUTA */}
         {isCreatingRoute && (
           <div className="route-buttons">
-
             <button className="shadow-btn shadow-btn-main" onClick={openRouteModal}>
               Crear
             </button>
-
             <button className="shadow-btn" onClick={openRouteModal}>
               Guardar
             </button>
-
-            {/* ✔ BOTÓN BORRAR */}
-            <button
-              className="shadow-btn"
-             
-              onClick={() => {
-                actions.clearSelectedPoints();
-                setSelectedRoute(null);
-              }}
-            >
-              Borrar
-            </button>
+            <button className="shadow-btn">Compartir</button>
+            <button className="shadow-btn">Compartidas conmigo</button>
 
             <button
               className="shadow-btn"
               onClick={() => {
                 actions.clearSelectedPoints();
                 setIsCreatingRoute(false);
-                setSelectedRoute(null);
-                setEditingRouteId(null);
               }}
             >
               Volver
             </button>
-
           </div>
         )}
 
+        {isCreatingRoute && store.savedRoutes.length > 0 && (
+          <div style={{ marginTop: 20 }}>
+            <h3 style={{ color: "#b38bff", marginBottom: 10 }}>Tus rutas guardadas</h3>
+
+            {store.savedRoutes.slice(0, 3).map((r) => {
+              const rating = Number(r.rating) || 1;
+              const fecha = new Date(r.createdAt);
+
+              return (
+                <div key={r.id} style={{ marginBottom: 10 }}>
+
+                  <div
+                    onClick={() => setSelectedRoute(r.id)}
+                    style={{
+                      background: "#1b1f2a",
+                      padding: 8,
+                      borderRadius: 6,
+                      border: "1px solid #333",
+                      fontSize: 12,
+                      cursor: "pointer"
+                    }}
+                  >
+                    <div style={{ fontWeight: "bold", color: "white", fontSize: 13 }}>
+                      {r.name}
+                    </div>
+
+                    <div style={{ opacity: 0.7 }}>{r.description}</div>
+
+                    <div style={{ marginTop: 4 }}>
+                      {"⭐".repeat(rating)}
+                    </div>
+
+                    <div style={{ opacity: 0.5, fontSize: 11, marginTop: 4 }}>
+                      {fecha.toLocaleDateString("es-ES", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric"
+                      })}{" "}
+                      -{" "}
+                      {fecha.toLocaleTimeString("es-ES", {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                      })}
+                    </div>
+
+                    <div style={{ opacity: 0.5 }}>{r.points.length} puntos</div>
+                  </div>
+
+                  {selectedRoute === r.id && (
+                    <div
+                      style={{
+                        background: "#2a2340",
+                        border: "1px solid #444",
+                        borderRadius: 6,
+                        padding: 8,
+                        marginTop: 6,
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 6
+                      }}
+                    >
+                      <button
+                        className="shadow-btn"
+                        style={{ padding: "4px 6px", fontSize: 12 }}
+                        onClick={() => {
+                          setRouteName(r.name);
+                          setRouteInfo(r.description);
+                          setRouteRating(r.rating);
+                          setShowRouteModal(true);
+                        }}
+                      >
+                        Editar
+                      </button>
+
+                      <button
+                        className="shadow-btn"
+                        style={{ padding: "4px 6px", fontSize: 12 }}
+                        onClick={() => alert("Compartir próximamente")}
+                      >
+                        Compartir
+                      </button>
+
+                      <button
+                        className="shadow-btn"
+                        style={{
+                          padding: "4px 6px",
+                          fontSize: 12,
+                          background: "#a30000"
+                        }}
+                        onClick={() => {
+                          actions.deleteSavedRouteLocal(r.id);
+                          setSelectedRoute(null);
+                        }}
+                      >
+                        Eliminar
+                      </button>
+
+                      <button
+                        className="shadow-btn"
+                        style={{ padding: "4px 6px", fontSize: 12 }}
+                        onClick={() => setSelectedRoute(null)}
+                      >
+                        Cerrar
+                      </button>
+                    </div>
+                  )}
+
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {!isCreatingRoute && mission && (
+          <div className="mission-box">
+            <div className="mission-aura"></div>
+
+            <h3>Misión activa</h3>
+            <div className="mission-name">{mission.name}</div>
+            <div className="mission-desc">{mission.description}</div>
+            <div className="mission-diff">
+              Dificultad: {mission.difficulty}
+            </div>
+
+            <button
+              className="shadow-btn shadow-btn-main pulse-btn"
+              onClick={() => setShowConfirm(true)}
+            >
+              Confirmar completada
+            </button>
+
+           
+          </div>
+        )}
       </div>
 
       <div className="map-right-panel">
@@ -232,7 +338,10 @@ const MapPage = () => {
             </button>
 
             <h3 className="confirm-title">¿Estás seguro?</h3>
-            <p className="confirm-text">Vas a marcar la misión como completada.</p>
+            <p className="confirm-text">
+              Vas a marcar la misión como completada.  
+              Esta acción actualizará tu perfil y bloqueará esta misión.
+            </p>
 
             <div className="confirm-buttons">
               <button className="confirm-yes" onClick={handleCompleteMission}>
@@ -266,17 +375,18 @@ const MapPage = () => {
               <option value={5}>⭐⭐⭐⭐⭐</option>
             </select>
 
-            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-              <button className="shadow-btn shadow-btn-main" onClick={saveRoute} style={{ flex: 1 }}>
+            <div style={{ display: "flex", gap: 8, marginTop: 12, justifyContent: "space-between" }}>
+              <button
+                className="shadow-btn shadow-btn-main"
+                onClick={saveRoute}
+                style={{ flex: 1 }}
+              >
                 Guardar
               </button>
 
               <button
                 className="shadow-btn"
-                onClick={() => {
-                  setShowRouteModal(false);
-                  setEditingRouteId(null);
-                }}
+                onClick={() => setShowRouteModal(false)}
                 style={{ flex: 1 }}
               >
                 Cancelar

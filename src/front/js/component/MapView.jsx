@@ -1,5 +1,3 @@
-// src/front/js/component/MapView.jsx
-
 import React, { useEffect, useContext, useRef } from "react";
 import { Context } from "../store/appContext.jsx";
 import L from "leaflet";
@@ -56,35 +54,27 @@ const MapView = ({ isCreatingRoute }) => {
     }
   }, [store.missionPoint]);
 
-  /* CLICK PARA CREAR RUTA O MISIÓN */
+  /* CLICK PARA CREAR RUTA */
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
     const handleClick = (e) => {
-      // 👉 SI ESTÁS CREANDO RUTA → AÑADE PUNTOS
-      if (isCreatingRoute) {
-        const points = store.selectedPoints || [];
+      if (!isCreatingRoute) return;
 
-        if (points.length >= 5) {
-          alert("Máximo 5 puntos.");
-          return;
-        }
+      const points = store.selectedPoints || [];
 
-        actions.addPointToRoute(e.latlng.lat, e.latlng.lng);
+      if (points.length >= 5) {
+        alert("Máximo 5 puntos.");
         return;
       }
 
-      // 👉 SI HAY MISIÓN ACTIVA → GENERA PUNTO DE MISIÓN
-      if (store.activeMission) {
-        actions.generateMissionPoint([e.latlng.lat, e.latlng.lng]);
-        return;
-      }
+      actions.addPointToRoute(e.latlng.lat, e.latlng.lng);
     };
 
     map.on("click", handleClick);
     return () => map.off("click", handleClick);
-  }, [isCreatingRoute, store.selectedPoints, store.activeMission]);
+  }, [isCreatingRoute, store.selectedPoints]);
 
   /* DIBUJAR PUNTOS TEMPORALES */
   useEffect(() => {

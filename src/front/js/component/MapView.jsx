@@ -6,18 +6,15 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 const MapView = ({ isCreatingRoute }) => {
-  const { store } = useContext(Context);
+  const { store, actions } = useContext(Context);
 
   const mapRef = useRef(null);
   const containerRef = useRef(null);
 
-  const userMarker = useRef(null);
-  const tempMarkers = useRef([]);
   const missionMarker = useRef(null);
+  const tempMarkers = useRef([]);
 
-  /* ---------------------------
-     ICONO ESPECIAL MISIÓN
-  ---------------------------*/
+  /* ICONO MISIÓN */
   const missionIcon = L.divIcon({
     className: "mission-icon",
     html: `<div class="mission-pulse"></div>`,
@@ -25,9 +22,7 @@ const MapView = ({ isCreatingRoute }) => {
     iconAnchor: [20, 40]
   });
 
-  /* ---------------------------
-     INICIALIZAR MAPA
-  ---------------------------*/
+  /* INICIALIZAR MAPA */
   useEffect(() => {
     if (mapRef.current) return;
 
@@ -42,9 +37,7 @@ const MapView = ({ isCreatingRoute }) => {
     setTimeout(() => map.invalidateSize(), 200);
   }, []);
 
-  /* ---------------------------
-     MOSTRAR PUNTO DE MISIÓN
-  ---------------------------*/
+  /* MOSTRAR PUNTO DE MISIÓN */
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -63,35 +56,37 @@ const MapView = ({ isCreatingRoute }) => {
     }
   }, [store.missionPoint]);
 
-  /* ---------------------------
-     MARCADOR DE USUARIO
-  ---------------------------*/
+  /* CLICK PARA CREAR RUTA O MISIÓN */
   useEffect(() => {
-    if (!isCreatingRoute) return;
-    if (!store.userLocation) return;
-
     const map = mapRef.current;
-    const { lat, lng } = store.userLocation;
+    if (!map) return;
 
-    if (userMarker.current) {
-      try { map.removeLayer(userMarker.current); } catch {}
-    }
+    const handleClick = (e) => {
+      // 👉 SI ESTÁS CREANDO RUTA → AÑADE PUNTOS
+      if (isCreatingRoute) {
+        const points = store.selectedPoints || [];
 
-    const bouncingIcon = L.divIcon({
-      className: "bouncing-marker",
-      html: `<div class="bounce-dot"></div>`,
-      iconSize: [30, 30],
-      iconAnchor: [15, 30]
-    });
+        if (points.length >= 5) {
+          alert("Máximo 5 puntos.");
+          return;
+        }
 
-    userMarker.current = L.marker([lat, lng], { icon: bouncingIcon }).addTo(map);
+        actions.addPointToRoute(e.latlng.lat, e.latlng.lng);
+        return;
+      }
 
-    map.setView([lat, lng], 16);
-  }, [isCreatingRoute, store.userLocation]);
+      // 👉 SI HAY MISIÓN ACTIVA → GENERA PUNTO DE MISIÓN
+      if (store.activeMission) {
+        actions.generateMissionPoint([e.latlng.lat, e.latlng.lng]);
+        return;
+      }
+    };
 
-  /* ---------------------------
-     DIBUJAR PUNTOS TEMPORALES
-  ---------------------------*/
+    map.on("click", handleClick);
+    return () => map.off("click", handleClick);
+  }, [isCreatingRoute, store.selectedPoints, store.activeMission]);
+
+  /* DIBUJAR PUNTOS TEMPORALES */
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -104,7 +99,7 @@ const MapView = ({ isCreatingRoute }) => {
     (store.selectedPoints || []).forEach(pt => {
       const marker = L.circleMarker([pt.lat, pt.lng], {
         radius: 7,
-        color: "#000000",
+        color: "#000",
         fillColor: "#eb1212",
         fillOpacity: 1
       }).addTo(map);

@@ -12,18 +12,78 @@ const MapPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const mission = location.state?.mission || store.activeMission;
-
-  const [isCreatingRoute, setIsCreatingRoute] = useState(false);
+  const missionFromState = location.state?.mission || null;
+  const missionFromSession = (() => {
+    try {
+      const raw = sessionStorage.getItem("selectedMission");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  })();
+  const mission = missionFromState || missionFromSession || store.activeMission;
 
   const [tutorialStep, setTutorialStep] = useState(0);
-  const [showTutorial, setShowTutorial] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(() => {
+    return !localStorage.getItem("tutorialDone_map");
+  });
 
-  const closeTutorial = () => setShowTutorial(false);
-
-  const nextTutorial = () => {
+  const handleNextTutorial = () => {
     if (tutorialStep < 2) setTutorialStep(tutorialStep + 1);
-    else closeTutorial();
+    else {
+      localStorage.setItem("tutorialDone_map", "true");
+      setShowTutorial(false);
+    }
+  };
+
+  const [isCreatingRoute, setIsCreatingRoute] = useState(false);
+  const [selectedRoute, setSelectedRoute] = useState(null);
+  const [editingRouteId, setEditingRouteId] = useState(null);
+
+  const handleMissionMode = () => {
+    setIsCreatingRoute(false);
+    actions.clearSelectedPoints();
+
+    if (!mission) return;
+
+    actions.setActiveMission(mission);
+
+    if (store.userLocation) {
+      const { lat, lng } = store.userLocation;
+      actions.generateMissionPoint([lat, lng]);
+      return;
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const coords = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude
+          };
+          actions.getUserLocation();
+          actions.generateMissionPoint([coords.lat, coords.lng]);
+        },
+        () => {}
+      );
+    }
+  };
+
+  const handleRouteMode = () => {
+    setIsCreatingRoute(true);
+    setSelectedRoute(null);
+    setEditingRouteId(null);
+    actions.clearSelectedPoints();
+    if (!store.userLocation) actions.getUserLocation();
+    if (actions?.clearMissionPoint) actions.clearMissionPoint();
+  };
+
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const handleCompleteMission = () => {
+    if (!mission) return;
+    actions.completeMission(mission.id);
+    navigate("/profile");
   };
 
   const [showRouteModal, setShowRouteModal] = useState(false);
@@ -39,6 +99,7 @@ const MapPage = () => {
     setRouteName("");
     setRouteInfo("");
     setRouteRating(3);
+    setEditingRouteId(null);
     setShowRouteModal(true);
   };
 
@@ -48,90 +109,33 @@ const MapPage = () => {
       return;
     }
 
-    const newRoute = {
-      id: Date.now().toString(),
-      name: routeName,
-      description: routeInfo,
-      rating: Number(routeRating),
-      points: store.selectedPoints,
-      createdAt: new Date().toISOString()
-    };
-
-    actions.saveRouteLocal(newRoute);
-    setShowRouteModal(false);
-  };
-
-  // 🔥 MISIÓN ACTIVA → TUTORIAL + GENERAR PUNTO
-  const triggerMission = () => {
-    setTutorialStep(0);
-    setShowTutorial(true);
-
-    if (!mission) return;
-
-    actions.setActiveMission(mission);
-
-    if (store.userLocation) {
-      const { lat, lng } = store.userLocation;
-      actions.generateMissionPoint([lat, lng]);
-      return;
+    if (editingRouteId) {
+      actions.editRoute(editingRouteId, {
+        name: routeName,
+        description: routeInfo,
+        rating: Number(routeRating)
+      });
+    } else {
+      const newRoute = {
+        id: Date.now().toString(),
+        name: routeName,
+        description: routeInfo,
+        rating: Number(routeRating),
+        points: store.selectedPoints,
+        createdAt: new Date().toISOString()
+      };
+      actions.saveRouteLocal(newRoute);
     }
 
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const coords = {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude
-        };
-        actions.getUserLocation();
-        actions.generateMissionPoint([coords.lat, coords.lng]);
-      },
-      () => {}
-    );
-  };
-
-  const completeMission = () => {
-    const confirm = window.confirm(
-      "Si completas la misión ya no podrás volver a ella.\n¿Quieres continuar?"
-    );
-    if (!confirm) return;
-
-    const resp = actions.completeMission(mission.id);
-    alert(resp.message);
+    setShowRouteModal(false);
+    setIsCreatingRoute(false);
+    setEditingRouteId(null);
+    actions.clearSelectedPoints();
   };
 
   useEffect(() => {
     actions.loadSavedRoutesLocal();
   }, []);
-
-  useEffect(() => {
-    if (store.selectedPoints.length === 5) {
-      const ok = window.confirm(
-        "Tienes los cinco puntos máximos.\n¿Deseas guardar la ruta ahora?"
-      );
-      if (ok) openRouteModal();
-    }
-  }, [store.selectedPoints.length]);
-
-  const goBack = () => {
-    if (isCreatingRoute) {
-      setIsCreatingRoute(false);
-      return;
-    }
-    navigate(-1);
-  };
-
-  const handleCreateRoute = () => {
-    actions.clearSelectedPoints();
-    setIsCreatingRoute(true);
-    setTutorialStep(2);
-    setShowTutorial(true);
-  };
-
-  const handleMisRutasTutorial = () => {
-    setTutorialStep(1);
-    setShowTutorial(true);
-    setIsCreatingRoute(true);
-  };
 
   return (
     <div className="map-page-container">
@@ -139,87 +143,80 @@ const MapPage = () => {
       {showTutorial && (
         <TutorialOverlay
           step={tutorialStep}
-          onNext={nextTutorial}
-          onClose={closeTutorial}
+          onNext={handleNextTutorial}
+          onClose={() => {
+            localStorage.setItem("tutorialDone_map", "true");
+            setShowTutorial(false);
+          }}
         />
       )}
 
       <div className="map-left-panel">
-        <h2 className="panel-title">SHADOWMAP - Mapa de Exploración Paranormal</h2>
+        <h2 className="panel-title">SHADOWMAP - Mapa de Exloración Paranormal</h2>
 
-        <button
-          className="shadow-btn shadow-btn-main pulse-btn"
-          onClick={handleMisRutasTutorial}
-        >
-          Mis rutas
-        </button>
+        {!isCreatingRoute && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <button
+              className="shadow-btn shadow-btn-main pulse-btn"
+              onClick={handleRouteMode}
+            >
+              Mis rutas
+            </button>
 
+            <button
+              className="shadow-btn shadow-btn-main pulse-btn"
+              onClick={handleMissionMode}
+            >
+              Misión activa
+            </button>
+
+            <button
+              className="shadow-btn"
+              onClick={() => navigate("/profile")}
+            >
+              Volver
+            </button>
+          </div>
+        )}
+
+        {/* MODO CREAR RUTA */}
         {isCreatingRoute && (
           <div className="route-buttons">
 
-            <button
-              className="shadow-btn shadow-btn-main"
-              onClick={handleCreateRoute}
-            >
-              Crear nueva ruta (máx 5 puntos)
+            <button className="shadow-btn shadow-btn-main" onClick={openRouteModal}>
+              Crear
             </button>
 
             <button className="shadow-btn" onClick={openRouteModal}>
-              Guardar ruta
+              Guardar
             </button>
 
-            <button className="shadow-btn">Compartir ruta</button>
-
-            <h3 style={{ marginTop: 15 }}>Rutas guardadas</h3>
-
-            <div className="saved-routes-list">
-              {store.savedRoutes.length === 0 && (
-                <p style={{ fontSize: "0.9rem", opacity: 0.7 }}>
-                  No tienes rutas guardadas.
-                </p>
-              )}
-
-              {store.savedRoutes.slice(0, 3).map(r => (
-                <div key={r.id} className="saved-route-card route-highlight">
-
-                  <div className="route-title">{r.name}</div>
-                  <div className="route-desc">{r.description}</div>
-
-                  <div className="route-meta">
-                    <span className="route-rating">⭐ {r.rating}</span>
-                    <span className="route-date">
-                      {new Date(r.createdAt).toLocaleString()}
-                    </span>
-                  </div>
-
-                  <div className="route-actions">
-                    <button className="route-action-btn" onClick={() => actions.editRoute(r.id)}>Editar</button>
-                    <button className="route-action-btn" onClick={() => actions.deleteRoute(r.id)}>Eliminar</button>
-                    <button className="route-action-btn" onClick={() => actions.shareRoute(r.id)}>Compartir</button>
-                  </div>
-
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {!isCreatingRoute && mission && (
-          <div className="mission-box pulse-btn" onClick={triggerMission}>
-            <h3>Misión activa</h3>
-            <div className="mission-name">{mission.name}</div>
-            <div className="mission-desc">{mission.description}</div>
-            <div className="mission-diff">Dificultad: {mission.difficulty}</div>
-
-            <button className="shadow-btn shadow-btn-main" onClick={completeMission}>
-              Completar misión
+            {/* ✔ BOTÓN BORRAR */}
+            <button
+              className="shadow-btn"
+             
+              onClick={() => {
+                actions.clearSelectedPoints();
+                setSelectedRoute(null);
+              }}
+            >
+              Borrar
             </button>
+
+            <button
+              className="shadow-btn"
+              onClick={() => {
+                actions.clearSelectedPoints();
+                setIsCreatingRoute(false);
+                setSelectedRoute(null);
+                setEditingRouteId(null);
+              }}
+            >
+              Volver
+            </button>
+
           </div>
         )}
-
-        <button className="shadow-btn" style={{ marginTop: 20 }} onClick={goBack}>
-          Volver
-        </button>
 
       </div>
 
@@ -227,10 +224,32 @@ const MapPage = () => {
         <MapView isCreatingRoute={isCreatingRoute} />
       </div>
 
+      {showConfirm && (
+        <div className="confirm-overlay">
+          <div className="confirm-box">
+            <button className="confirm-close" onClick={() => setShowConfirm(false)}>
+              ×
+            </button>
+
+            <h3 className="confirm-title">¿Estás seguro?</h3>
+            <p className="confirm-text">Vas a marcar la misión como completada.</p>
+
+            <div className="confirm-buttons">
+              <button className="confirm-yes" onClick={handleCompleteMission}>
+                Sí, completar
+              </button>
+              <button className="confirm-no" onClick={() => setShowConfirm(false)}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showRouteModal && (
         <div className="modal-bg">
           <div className="modal-box">
-            <h3>Guardar ruta</h3>
+            <h3>Ruta tenebrosa</h3>
 
             <label>Nombre</label>
             <input value={routeName} onChange={e => setRouteName(e.target.value)} />
@@ -247,9 +266,21 @@ const MapPage = () => {
               <option value={5}>⭐⭐⭐⭐⭐</option>
             </select>
 
-            <div className="modal-buttons">
-              <button className="shadow-btn shadow-btn-main" onClick={saveRoute}>Guardar</button>
-              <button className="shadow-btn" onClick={() => setShowRouteModal(false)}>Cancelar</button>
+            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+              <button className="shadow-btn shadow-btn-main" onClick={saveRoute} style={{ flex: 1 }}>
+                Guardar
+              </button>
+
+              <button
+                className="shadow-btn"
+                onClick={() => {
+                  setShowRouteModal(false);
+                  setEditingRouteId(null);
+                }}
+                style={{ flex: 1 }}
+              >
+                Cancelar
+              </button>
             </div>
           </div>
         </div>

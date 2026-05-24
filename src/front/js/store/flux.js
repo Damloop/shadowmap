@@ -37,6 +37,9 @@ const getState = ({ getStore, getActions, setStore }) => {
     actions: {
       ...placesState.actions,
 
+      // ============================================================
+      // LOGIN
+      // ============================================================
       login: async (email, password) => {
         try {
           const resp = await fetch(`${API_URL}/api/login`, {
@@ -76,6 +79,9 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
+      // ============================================================
+      // LOGOUT
+      // ============================================================
       logout: () => {
         try {
           localStorage.removeItem("token");
@@ -95,6 +101,9 @@ const getState = ({ getStore, getActions, setStore }) => {
         });
       },
 
+      // ============================================================
+      // SYNC TOKEN
+      // ============================================================
       syncTokenFromSessionStore: () => {
         try {
           const token = localStorage.getItem("token");
@@ -112,6 +121,9 @@ const getState = ({ getStore, getActions, setStore }) => {
         } catch {}
       },
 
+      // ============================================================
+      // USER LOCATION
+      // ============================================================
       getUserLocation: () => {
         if (!navigator.geolocation) return;
 
@@ -128,6 +140,163 @@ const getState = ({ getStore, getActions, setStore }) => {
         );
       },
 
+      // ============================================================
+      // PREMIUM: ACTIVAR PREMIUM
+      // ============================================================
+      activatePremium: async () => {
+        const store = getStore();
+        const token = store.token;
+
+        if (!token) {
+          return { success: false, message: "No hay token" };
+        }
+
+        try {
+          const resp = await fetch(`${API_URL}/api/premium`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + token
+            }
+          });
+
+          const data = await resp.json();
+
+          if (!resp.ok) {
+            return { success: false, message: data.msg || "No se pudo activar Premium" };
+          }
+
+          const updatedUser = {
+            ...store.user,
+            is_premium: true
+          };
+
+          setStore({ user: updatedUser });
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+
+          return { success: true };
+        } catch {
+          return { success: false, message: "Error de conexión" };
+        }
+      },
+
+      // ============================================================
+      // PLACES: CREATE
+      // ============================================================
+      createPlace: async (placeData) => {
+        const store = getStore();
+        const token = store.token;
+
+        try {
+          const resp = await fetch(`${API_URL}/api/places`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify(placeData)
+          });
+
+          const data = await resp.json();
+
+          if (!resp.ok) {
+            return { success: false, message: data.message || "Error creando el lugar" };
+          }
+
+          return { success: true, place: data.place };
+        } catch {
+          return { success: false, message: "Error de conexión" };
+        }
+      },
+
+      // ============================================================
+      // PLACES: UPDATE
+      // ============================================================
+      updatePlace: async (id, placeData) => {
+        const store = getStore();
+        const token = store.token;
+
+        try {
+          const resp = await fetch(`${API_URL}/api/places/${id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify(placeData)
+          });
+
+          const data = await resp.json();
+
+          if (!resp.ok) {
+            return { success: false, message: data.message || "Error actualizando el lugar" };
+          }
+
+          return { success: true, place: data.place };
+        } catch {
+          return { success: false, message: "Error de conexión" };
+        }
+      },
+
+      // ============================================================
+      // PLACES: DELETE
+      // ============================================================
+      deletePlace: async (id) => {
+        const store = getStore();
+        const token = store.token;
+
+        try {
+          const resp = await fetch(`${API_URL}/api/places/${id}`, {
+            method: "DELETE",
+            headers: {
+              "Authorization": "Bearer " + token
+            }
+          });
+
+          const data = await resp.json();
+
+          if (!resp.ok) {
+            return { success: false, message: data.message || "Error eliminando el lugar" };
+          }
+
+          return { success: true };
+        } catch {
+          return { success: false, message: "Error de conexión" };
+        }
+      },
+
+      // ============================================================
+      // ROUTES: PUBLISH PREMIUM ROUTE
+      // ============================================================
+      publishRoute: async (routeData) => {
+        const store = getStore();
+        const token = store.token;
+
+        try {
+          const resp = await fetch(`${API_URL}/api/premium-routes`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify(routeData)
+          });
+
+          const data = await resp.json();
+
+          if (!resp.ok) {
+            return { success: false, message: data.message || "Error publicando la ruta" };
+          }
+
+          return { success: true, route: data.route };
+        } catch {
+          return { success: false, message: "Error de conexión" };
+        }
+      },
+
+      // ============================================================
+      // LOCAL ROUTES
+      // ============================================================
       saveRouteLocal: (route) => {
         try {
           const raw = localStorage.getItem("savedRoutes_local");
@@ -176,6 +345,9 @@ const getState = ({ getStore, getActions, setStore }) => {
         } catch {}
       },
 
+      // ============================================================
+      // ROUTE CREATION
+      // ============================================================
       addPointToRoute: (lat, lng) => {
         const store = getStore();
         const points = Array.isArray(store.selectedPoints) ? [...store.selectedPoints] : [];
@@ -187,13 +359,13 @@ const getState = ({ getStore, getActions, setStore }) => {
         setStore({ selectedPoints: [], currentRouteMeta: null });
       },
 
+      // ============================================================
+      // MISSIONS
+      // ============================================================
       setActiveMission: (mission) => {
         setStore({ activeMission: mission });
       },
 
-      /* ---------------------------------------------------
-         🔥 GENERAR PUNTO CERCANO PARA LA MISIÓN
-      ---------------------------------------------------*/
       generateMissionPoint: (coords) => {
         const store = getStore();
 

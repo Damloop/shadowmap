@@ -55,7 +55,9 @@ const Layout = () => {
                 />
 
                 <Route path="/recover" element={<Recover />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
+
+                {/* ⭐ RUTA CORREGIDA */}
+                <Route path="/reset-password/:token" element={<ResetPassword />} />
 
                 <Route
                     path="/add-place"
@@ -84,7 +86,6 @@ const Layout = () => {
                     }
                 />
 
-                {/* 👇 NUEVA RUTA PARA VER RUTAS GUARDADAS */}
                 <Route
                     path="/routes"
                     element={

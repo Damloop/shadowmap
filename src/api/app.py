@@ -27,7 +27,8 @@ def create_app():
 
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_PATH}"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["JWT_SECRET_KEY"] = "super-secret-key"
+    app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+
 
     # ============================================================
     # CORS — CONFIGURACIÓN COMPLETA PARA CODESPACES + LEAFLET

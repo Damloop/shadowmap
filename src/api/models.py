@@ -7,7 +7,6 @@ db = SQLAlchemy()
 # USER
 # ============================
 
-
 class User(db.Model):
     __tablename__ = "users"
 
@@ -21,6 +20,12 @@ class User(db.Model):
 
     recovery_token = db.Column(db.String(200), nullable=True)
 
+    # ⭐ NUEVO CAMPO PREMIUM
+    is_premium = db.Column(db.Boolean, nullable=False, default=False)
+
+    
+
+
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def serialize(self):
@@ -29,13 +34,13 @@ class User(db.Model):
             "shortname": self.shortname,
             "email": self.email,
             "avatar": self.avatar,
+            "is_premium": self.is_premium,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
 
 # ============================
 # PLACE
 # ============================
-
 
 class Place(db.Model):
     __tablename__ = "places"
@@ -60,6 +65,9 @@ class Place(db.Model):
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
 
+# ============================
+# POI
+# ============================
 
 class POI(db.Model):
     __tablename__ = "pois"
@@ -86,15 +94,13 @@ class POI(db.Model):
 # FAVORITE
 # ============================
 
-
 class Favorite(db.Model):
     __tablename__ = "favorites"
 
     id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    place_id = db.Column(db.Integer, db.ForeignKey(
-        "places.id"), nullable=False)
+    place_id = db.Column(db.Integer, db.ForeignKey("places.id"), nullable=False)
 
     user = db.relationship("User", backref="favorites", lazy=True)
     place = db.relationship("Place", backref="favorited_by", lazy=True)
@@ -113,7 +119,6 @@ class Favorite(db.Model):
 # ============================
 # ROUTE
 # ============================
-
 
 class Route(db.Model):
     __tablename__ = "routes"
@@ -150,13 +155,11 @@ class Route(db.Model):
 # ROUTE POINT
 # ============================
 
-
 class RoutePoint(db.Model):
     __tablename__ = "route_points"
 
     id = db.Column(db.Integer, primary_key=True)
-    route_id = db.Column(db.Integer, db.ForeignKey(
-        "routes.id"), nullable=False)
+    route_id = db.Column(db.Integer, db.ForeignKey("routes.id"), nullable=False)
 
     order = db.Column(db.Integer, nullable=False)
     lat = db.Column(db.Float, nullable=False)
@@ -173,7 +176,6 @@ class RoutePoint(db.Model):
 # ============================
 # PREMIUM ROUTE
 # ============================
-
 
 class PremiumRoute(db.Model):
     __tablename__ = "premium_routes"

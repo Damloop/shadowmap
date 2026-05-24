@@ -175,6 +175,28 @@ const Profile = () => {
                     <div className="profile-info">
                         <h2>{shortname}</h2>
 
+                        {/* ⭐ BADGE PREMIUM */}
+                        {is_premium && (
+                            <span className="premium-badge">⭐ Cuenta Premium</span>
+                        )}
+
+                        {/* ⭐ BOTÓN ACTIVAR PREMIUM */}
+                        {!is_premium && (
+                            <button
+                                className="premium-btn"
+                                onClick={async () => {
+                                    const ok = await actions.activatePremium();
+                                    if (ok.success) {
+                                        alert("Premium activado");
+                                    } else {
+                                        alert(ok.message);
+                                    }
+                                }}
+                            >
+                                Activar Premium
+                            </button>
+                        )}
+
                         {premiumLevel && (
                             <p className="premium-level-display">
                                 Nivel {premiumLevel} — {premiumNick}

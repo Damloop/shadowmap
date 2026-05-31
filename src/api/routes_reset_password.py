@@ -1,32 +1,35 @@
-# src/api/routes_reset_password.py
-
 from flask import Blueprint, request, jsonify
-from src.api.models import db, User
 from werkzeug.security import generate_password_hash
+
+from src.api.models import db, User
 
 reset_bp = Blueprint("reset_bp", __name__)
 
-@reset_bp.route("/reset-password/<token>", methods=["POST"])
-def reset_password(token):
-    """
-    ShadowMap — Identity Re-Stabilization
-    Valida el token y actualiza la contraseña.
-    """
+
+# ============================================================
+# RESET PASSWORD
+# ============================================================
+@reset_bp.route("/reset-password", methods=["POST"])
+def reset_password():
     data = request.get_json() or {}
+
+    token = data.get("token")
     new_password = data.get("password")
 
-    if not new_password:
-        return jsonify({"msg": "Password required"}), 400
+    if not token or not new_password:
+        return jsonify({"msg": "Token y nueva contraseña son obligatorios"}), 400
 
-    # Buscar usuario por token
     user = User.query.filter_by(recovery_token=token).first()
 
     if not user:
-        return jsonify({"msg": "Invalid or expired token"}), 400
+        return jsonify({"msg": "Token inválido o expirado"}), 400
 
-    # Actualizar contraseña (HASH)
+    # Actualizar contraseña
     user.password = generate_password_hash(new_password)
-    user.recovery_token = None  # invalidar token
+
+    # Invalidar token
+    user.recovery_token = None
+
     db.session.commit()
 
-    return jsonify({"msg": "Password updated"}), 200
+    return jsonify({"msg": "Contraseña actualizada correctamente"}), 200

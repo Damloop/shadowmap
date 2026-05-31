@@ -1,5 +1,3 @@
-# src/api/utils.py
-
 import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
@@ -30,8 +28,7 @@ def send_email(to, subject, html):
         )
 
         response = sg.send(message)
-
-        print("📨 Email enviado:", response.status_code)
+        print(f"📨 Email enviado correctamente ({response.status_code})")
         return True
 
     except Exception as e:

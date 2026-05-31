@@ -1,5 +1,3 @@
-# src/api/extensions.py
-
 import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
@@ -7,7 +5,14 @@ from sendgrid.helpers.mail import Mail
 
 class Mailer:
     def init_app(self, app):
-        print("📨 SendGrid habilitado. Emails reales activos.")
+        # Solo mostramos un mensaje si las variables existen
+        api_key = os.getenv("SENDGRID_API_KEY")
+        sender = os.getenv("SENDGRID_FROM_EMAIL")
+
+        if api_key and sender:
+            print("📨 SendGrid habilitado. Emails reales activos.")
+        else:
+            print("⚠️ SendGrid no configurado. No se enviarán emails reales.")
 
     def send(self, message):
         """
@@ -35,7 +40,7 @@ class Mailer:
             )
 
             response = sg.send(email)
-            print("📨 Email enviado:", response.status_code)
+            print(f"📨 Email enviado correctamente ({response.status_code})")
             return True
 
         except Exception as e:

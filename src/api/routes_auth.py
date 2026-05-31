@@ -1,54 +1,59 @@
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import create_access_token
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
 from src.api.models import db, User
 
 auth_api = Blueprint("auth_api", __name__)
 
-@auth_api.route("/register", methods=["OPTIONS"])
-def register_options():
-    return jsonify({"ok": True}), 200
 
-@auth_api.route("/register", methods=["POST"])
-def register():
-    data = request.get_json()
+# ============================================================
+# SIGNUP
+# ============================================================
+@auth_api.route("/signup", methods=["POST"])
+def signup():
+    data = request.get_json() or {}
 
     email = data.get("email")
     password = data.get("password")
-    avatar = data.get("avatar")
-    shortname = data.get("shortname")
 
-    if not email or not password or not shortname:
-        return jsonify({"msg": "Faltan campos obligatorios"}), 400
+    if not email or not password:
+        return jsonify({"msg": "Email y password son obligatorios"}), 400
 
-    if User.query.filter_by(email=email).first():
-        return jsonify({"msg": "El usuario ya existe"}), 400
+    existing = User.query.filter_by(email=email).first()
+    if existing:
+        return jsonify({"msg": "El email ya está registrado"}), 409
 
-    hashed = generate_password_hash(password)
-
-    new_user = User(
+    user = User(
         email=email,
-        password=hashed,
-        avatar=avatar,
-        shortname=shortname
+        password=generate_password_hash(password),
+        is_premium=False
     )
 
-    db.session.add(new_user)
+    db.session.add(user)
     db.session.commit()
 
-    return jsonify({"msg": "Usuario creado"}), 201
+    token = create_access_token(identity=user.id)
 
-@auth_api.route("/login", methods=["OPTIONS"])
-def login_options():
-    return jsonify({"ok": True}), 200
+    return jsonify({
+        "msg": "Usuario creado correctamente",
+        "token": token,
+        "user": user.serialize()
+    }), 201
 
+
+# ============================================================
+# LOGIN
+# ============================================================
 @auth_api.route("/login", methods=["POST"])
 def login():
-    data = request.get_json()
+    data = request.get_json() or {}
 
     email = data.get("email")
     password = data.get("password")
+
+    if not email or not password:
+        return jsonify({"msg": "Email y password son obligatorios"}), 400
 
     user = User.query.filter_by(email=email).first()
 
@@ -58,27 +63,7 @@ def login():
     token = create_access_token(identity=user.id)
 
     return jsonify({
+        "msg": "Login correcto",
         "token": token,
-        "user": {
-            "id": user.id,
-            "email": user.email,
-            "avatar": user.avatar,
-            "shortname": user.shortname
-        }
-    }), 200
-
-@auth_api.route("/auth/me", methods=["GET"])
-@jwt_required()
-def get_me():
-    user_id = get_jwt_identity()
-    user = User.query.get(user_id)
-
-    if not user:
-        return jsonify({"msg": "Usuario no encontrado"}), 404
-
-    return jsonify({
-        "id": user.id,
-        "email": user.email,
-        "shortname": user.shortname,
-        "avatar": user.avatar
+        "user": user.serialize()   # incluye is_premium
     }), 200

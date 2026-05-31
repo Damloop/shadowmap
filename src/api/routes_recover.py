@@ -1,50 +1,44 @@
-# src/api/routes_recover.py
-
 from flask import Blueprint, request, jsonify
 from src.api.models import db, User
 from src.api.extensions import mail
-import secrets
-import os
+import uuid
 
 recover_bp = Blueprint("recover_bp", __name__)
 
+
+# ============================================================
+# REQUEST PASSWORD RECOVERY
+# ============================================================
 @recover_bp.route("/recover", methods=["POST"])
-def recover():
+def recover_password():
     data = request.get_json() or {}
     email = data.get("email")
 
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        return jsonify({"success": True}), 200
+    if not email:
+        return jsonify({"msg": "Email requerido"}), 400
 
-    token = secrets.token_urlsafe(32)
+    user = User.query.filter_by(email=email).first()
+
+    # Respuesta genérica para evitar revelar si existe o no
+    if not user:
+        return jsonify({"msg": "Si el email existe, se enviará un enlace"}), 200
+
+    # Generar token único
+    token = str(uuid.uuid4())
     user.recovery_token = token
     db.session.commit()
 
-    reset_link = f"{os.getenv('FRONTEND_URL')}/reset-password/{token}"
-
-    html = f"""
-    <h1 style='font-family: UnifrakturMaguntia, serif; color:#c9a8ff; text-shadow:0 0 12px rgba(150,80,255,0.7); text-align:center;'>
-        SHADOWMAP — Recuperación
-    </h1>
-
-    <p style='color:#ddd;'>Hemos recibido una solicitud para restaurar tu acceso.</p>
-
-    <p style='color:#c9a8ff; font-size:18px; font-weight:bold;'>
-        Haz clic en el siguiente enlace para crear una nueva contraseña:
-    </p>
-
-    <a href='{reset_link}' style='padding:12px 20px; background:#5a2de0; color:white; border-radius:8px; text-decoration:none;'>
-        Restaurar contraseña
-    </a>
-
-    <p style='color:#777; margin-top:20px;'>Si no solicitaste este cambio, ignora este mensaje.</p>
-    """
+    # Enviar email real
+    reset_url = f"{request.host_url}reset-password/{token}"
 
     mail.send({
-        "to": email,
-        "subject": "Recuperación de contraseña - ShadowMap",
-        "html": html
+        "to": user.email,
+        "subject": "Recuperación de contraseña — ShadowMap",
+        "html": f"""
+            <h2>Recuperación de contraseña</h2>
+            <p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
+            <a href="{reset_url}">{reset_url}</a>
+        """
     })
 
-    return jsonify({"success": True}), 200
+    return jsonify({"msg": "Si el email existe, se enviará un enlace"}), 200

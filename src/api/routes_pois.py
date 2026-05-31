@@ -1,10 +1,10 @@
-# src/api/routes_pois.py
-
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
 from src.api.models import db, POI
 
 pois_api = Blueprint("pois_api", __name__)
+
 
 # ============================================================
 # CREATE POI
@@ -12,76 +12,43 @@ pois_api = Blueprint("pois_api", __name__)
 @pois_api.route("/pois", methods=["POST"])
 @jwt_required()
 def create_poi():
-    data = request.get_json()
+    user_id = get_jwt_identity()
+    data = request.get_json() or {}
 
     name = data.get("name")
+    description = data.get("description")
     lat = data.get("lat")
     lng = data.get("lng")
-    description = data.get("description")
 
     if not name or lat is None or lng is None:
-        return jsonify({"message": "Nombre, lat y lng son obligatorios"}), 400
+        return jsonify({"message": "name, lat y lng son obligatorios"}), 400
 
-    new_poi = POI(
+    poi = POI(
+        user_id=user_id,
         name=name,
+        description=description,
         lat=lat,
-        lng=lng,
-        description=description
+        lng=lng
     )
 
-    db.session.add(new_poi)
+    db.session.add(poi)
     db.session.commit()
 
     return jsonify({
         "message": "POI creado correctamente",
-        "poi": new_poi.serialize()
+        "poi": poi.serialize()
     }), 201
 
 
 # ============================================================
-# GET ALL POIS
+# GET USER POIS
 # ============================================================
 @pois_api.route("/pois", methods=["GET"])
-def get_pois():
-    pois = POI.query.all()
-    return jsonify([p.serialize() for p in pois]), 200
-
-
-# ============================================================
-# GET ONE POI
-# ============================================================
-@pois_api.route("/pois/<int:poi_id>", methods=["GET"])
-def get_poi(poi_id):
-    poi = POI.query.get(poi_id)
-    if not poi:
-        return jsonify({"message": "POI no encontrado"}), 404
-
-    return jsonify(poi.serialize()), 200
-
-
-# ============================================================
-# UPDATE POI
-# ============================================================
-@pois_api.route("/pois/<int:poi_id>", methods=["PUT"])
 @jwt_required()
-def update_poi(poi_id):
-    poi = POI.query.get(poi_id)
-    if not poi:
-        return jsonify({"message": "POI no encontrado"}), 404
-
-    data = request.get_json()
-
-    poi.name = data.get("name", poi.name)
-    poi.lat = data.get("lat", poi.lat)
-    poi.lng = data.get("lng", poi.lng)
-    poi.description = data.get("description", poi.description)
-
-    db.session.commit()
-
-    return jsonify({
-        "message": "POI actualizado correctamente",
-        "poi": poi.serialize()
-    }), 200
+def get_pois():
+    user_id = get_jwt_identity()
+    pois = POI.query.filter_by(user_id=user_id).all()
+    return jsonify([p.serialize() for p in pois]), 200
 
 
 # ============================================================
@@ -90,11 +57,14 @@ def update_poi(poi_id):
 @pois_api.route("/pois/<int:poi_id>", methods=["DELETE"])
 @jwt_required()
 def delete_poi(poi_id):
-    poi = POI.query.get(poi_id)
+    user_id = get_jwt_identity()
+
+    poi = POI.query.filter_by(id=poi_id, user_id=user_id).first()
+
     if not poi:
         return jsonify({"message": "POI no encontrado"}), 404
 
     db.session.delete(poi)
     db.session.commit()
 
-    return jsonify({"message": "POI eliminado correctamente"}), 200
+    return jsonify({"message": "POI eliminado"}), 200

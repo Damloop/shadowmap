@@ -11,6 +11,7 @@ const getState = ({ getStore, getActions, setStore }) => {
       ...placesState.store,
 
       token: localStorage.getItem("token") || null,
+
       user: (() => {
         try {
           return JSON.parse(localStorage.getItem("user")) || null;
@@ -31,7 +32,7 @@ const getState = ({ getStore, getActions, setStore }) => {
       activeMission: null,
       missionPoint: null,
 
-      showPremiumPopup: false
+      showPremiumPopup: false,
     },
 
     actions: {
@@ -42,16 +43,19 @@ const getState = ({ getStore, getActions, setStore }) => {
       // ============================================================
       login: async (email, password) => {
         try {
-          const resp = await fetch(`${API_URL}/api/login`, {
+          const resp = await fetch(`${API_URL}/api/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email, password }),
           });
 
           const data = await resp.json();
 
-          if (!resp.ok) {
-            return { success: false, message: data.msg || "Credenciales incorrectas" };
+          if (!resp.ok || !data.token) {
+            return {
+              success: false,
+              message: data.msg || "Credenciales incorrectas",
+            };
           }
 
           localStorage.setItem("token", data.token);
@@ -59,9 +63,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 
           setStore({
             token: data.token,
-            user: data.user
+            user: data.user,
           });
 
+          // Reset de estado local
           localStorage.removeItem("shadowmap_completed_missions");
           localStorage.removeItem("savedRoutes_local");
 
@@ -70,12 +75,52 @@ const getState = ({ getStore, getActions, setStore }) => {
             missionPoint: null,
             selectedPoints: [],
             savedRoutes: [],
-            showPremiumPopup: false
+            showPremiumPopup: false,
           });
 
           return { success: true };
         } catch {
-          return { success: false, message: "Error de conexión con el servidor" };
+          return {
+            success: false,
+            message: "Error de conexión con el servidor",
+          };
+        }
+      },
+
+      // ============================================================
+      // SIGNUP
+      // ============================================================
+      signup: async (email, password) => {
+        try {
+          const resp = await fetch(`${API_URL}/api/auth/signup`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          const data = await resp.json();
+
+          if (!resp.ok || !data.token) {
+            return {
+              success: false,
+              message: data.msg || "No se pudo registrar",
+            };
+          }
+
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify(data.user));
+
+          setStore({
+            token: data.token,
+            user: data.user,
+          });
+
+          return { success: true };
+        } catch {
+          return {
+            success: false,
+            message: "Error de conexión con el servidor",
+          };
         }
       },
 
@@ -97,7 +142,7 @@ const getState = ({ getStore, getActions, setStore }) => {
           missionPoint: null,
           selectedPoints: [],
           savedRoutes: [],
-          showPremiumPopup: false
+          showPremiumPopup: false,
         });
       },
 
@@ -110,6 +155,7 @@ const getState = ({ getStore, getActions, setStore }) => {
           const userRaw = localStorage.getItem("user");
 
           if (token) setStore({ token });
+
           if (userRaw) {
             try {
               setStore({ user: JSON.parse(userRaw) });
@@ -128,20 +174,20 @@ const getState = ({ getStore, getActions, setStore }) => {
         if (!navigator.geolocation) return;
 
         navigator.geolocation.getCurrentPosition(
-          pos => {
+          (pos) => {
             setStore({
               userLocation: {
                 lat: pos.coords.latitude,
-                lng: pos.coords.longitude
-              }
+                lng: pos.coords.longitude,
+              },
             });
           },
-          () => {}
+          () => {},
         );
       },
 
       // ============================================================
-      // PREMIUM: ACTIVAR PREMIUM
+      // PREMIUM
       // ============================================================
       activatePremium: async () => {
         const store = getStore();
@@ -156,19 +202,22 @@ const getState = ({ getStore, getActions, setStore }) => {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "Authorization": "Bearer " + token
-            }
+              Authorization: "Bearer " + token,
+            },
           });
 
           const data = await resp.json();
 
           if (!resp.ok) {
-            return { success: false, message: data.msg || "No se pudo activar Premium" };
+            return {
+              success: false,
+              message: data.msg || "No se pudo activar Premium",
+            };
           }
 
           const updatedUser = {
             ...store.user,
-            is_premium: true
+            is_premium: true,
           };
 
           setStore({ user: updatedUser });
@@ -181,7 +230,7 @@ const getState = ({ getStore, getActions, setStore }) => {
       },
 
       // ============================================================
-      // PLACES: CREATE
+      // PLACES CRUD
       // ============================================================
       createPlace: async (placeData) => {
         const store = getStore();
@@ -192,15 +241,18 @@ const getState = ({ getStore, getActions, setStore }) => {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "Authorization": "Bearer " + token
+              Authorization: "Bearer " + token,
             },
-            body: JSON.stringify(placeData)
+            body: JSON.stringify(placeData),
           });
 
           const data = await resp.json();
 
           if (!resp.ok) {
-            return { success: false, message: data.message || "Error creando el lugar" };
+            return {
+              success: false,
+              message: data.message || "Error creando el lugar",
+            };
           }
 
           return { success: true, place: data.place };
@@ -209,9 +261,6 @@ const getState = ({ getStore, getActions, setStore }) => {
         }
       },
 
-      // ============================================================
-      // PLACES: UPDATE
-      // ============================================================
       updatePlace: async (id, placeData) => {
         const store = getStore();
         const token = store.token;
@@ -221,15 +270,18 @@ const getState = ({ getStore, getActions, setStore }) => {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
-              "Authorization": "Bearer " + token
+              Authorization: "Bearer " + token,
             },
-            body: JSON.stringify(placeData)
+            body: JSON.stringify(placeData),
           });
 
           const data = await resp.json();
 
           if (!resp.ok) {
-            return { success: false, message: data.message || "Error actualizando el lugar" };
+            return {
+              success: false,
+              message: data.message || "Error actualizando el lugar",
+            };
           }
 
           return { success: true, place: data.place };
@@ -239,24 +291,149 @@ const getState = ({ getStore, getActions, setStore }) => {
       },
 
       // ============================================================
-      // PLACES: DELETE
+      // POIS — GET ALL
       // ============================================================
-      deletePlace: async (id) => {
-        const store = getStore();
-        const token = store.token;
-
+      getPois: async () => {
         try {
-          const resp = await fetch(`${API_URL}/api/places/${id}`, {
-            method: "DELETE",
+          const store = getStore();
+          const token = store.token || localStorage.getItem("token");
+
+          const resp = await fetch(`${API_URL}/api/pois`, {
+            method: "GET",
             headers: {
-              "Authorization": "Bearer " + token
-            }
+              Authorization: "Bearer " + token,
+            },
           });
 
           const data = await resp.json();
 
           if (!resp.ok) {
-            return { success: false, message: data.message || "Error eliminando el lugar" };
+            console.error("Error cargando POIs:", data);
+            return [];
+          }
+
+          setStore({ pois: data });
+          return data;
+        } catch (err) {
+          console.error("Error en getPois:", err);
+          return [];
+        }
+      },
+
+      // ============================================================
+      // POIS — GET ONE
+      // ============================================================
+      getPoi: async (id) => {
+        try {
+          const store = getStore();
+          const token = store.token || localStorage.getItem("token");
+
+          const resp = await fetch(`${API_URL}/api/pois/${id}`, {
+            method: "GET",
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          });
+
+          const data = await resp.json();
+
+          if (!resp.ok) {
+            console.error("Error cargando POI:", data);
+            return null;
+          }
+
+          setStore({ currentPoi: data });
+          return data;
+        } catch (err) {
+          console.error("Error en getPoi:", err);
+          return null;
+        }
+      },
+
+      // ============================================================
+      // ROUTES — PREMIUM ROUTES (GET ALL)
+      // ============================================================
+      getPremiumRoutes: async () => {
+        try {
+          const store = getStore();
+          const token = store.token;
+
+          const resp = await fetch(`${API_URL}/api/premium-routes`, {
+            method: "GET",
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          });
+
+          const data = await resp.json();
+
+          if (!resp.ok) {
+            console.error("Error cargando rutas premium:", data);
+            return [];
+          }
+
+          setStore({ routes: data.routes || [] });
+          return data.routes || [];
+        } catch (err) {
+          console.error("Error en getPremiumRoutes:", err);
+          return [];
+        }
+      },
+
+      // ============================================================
+      // ROUTES — GET ONE
+      // ============================================================
+      getRoute: async (id) => {
+        try {
+          const store = getStore();
+          const token = store.token;
+
+          const resp = await fetch(`${API_URL}/api/premium-routes/${id}`, {
+            method: "GET",
+            headers: {
+              Authorization: "Bearer " + token,
+            },
+          });
+
+          const data = await resp.json();
+
+          if (!resp.ok) {
+            console.error("Error cargando ruta:", data);
+            return null;
+          }
+
+          setStore({ currentRoute: data.route });
+          return data.route;
+        } catch (err) {
+          console.error("Error en getRoute:", err);
+          return null;
+        }
+      },
+
+      // ============================================================
+      // ROUTES — SHARE ROUTE
+      // ============================================================
+      shareRoute: async (routeId, targetEmail) => {
+        try {
+          const store = getStore();
+          const token = store.token;
+
+          const resp = await fetch(`${API_URL}/api/routes/share`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token,
+            },
+            body: JSON.stringify({ route_id: routeId, email: targetEmail }),
+          });
+
+          const data = await resp.json();
+
+          if (!resp.ok) {
+            return {
+              success: false,
+              message: data.message || "Error compartiendo la ruta",
+            };
           }
 
           return { success: true };
@@ -266,97 +443,36 @@ const getState = ({ getStore, getActions, setStore }) => {
       },
 
       // ============================================================
-      // ROUTES: PUBLISH PREMIUM ROUTE
+      // GET USER PROFILE (ya corregido)
       // ============================================================
-      publishRoute: async (routeData) => {
-        const store = getStore();
-        const token = store.token;
-
+      getMe: async () => {
         try {
-          const resp = await fetch(`${API_URL}/api/premium-routes`, {
-            method: "POST",
+          const store = getStore();
+          const token = store.token || localStorage.getItem("token");
+
+          if (!token) return null;
+
+          const resp = await fetch(`${API_URL}/api/auth/me`, {
+            method: "GET",
             headers: {
-              "Content-Type": "application/json",
-              "Authorization": "Bearer " + token
+              Authorization: "Bearer " + token,
             },
-            body: JSON.stringify(routeData)
           });
 
           const data = await resp.json();
 
-          if (!resp.ok) {
-            return { success: false, message: data.message || "Error publicando la ruta" };
+          if (!resp.ok || !data.user) {
+            return null;
           }
 
-          return { success: true, route: data.route };
-        } catch {
-          return { success: false, message: "Error de conexión" };
+          setStore({ user: data.user });
+          localStorage.setItem("user", JSON.stringify(data.user));
+
+          return data.user;
+        } catch (err) {
+          console.error("Error en getMe:", err);
+          return null;
         }
-      },
-
-      // ============================================================
-      // LOCAL ROUTES
-      // ============================================================
-      saveRouteLocal: (route) => {
-        try {
-          const raw = localStorage.getItem("savedRoutes_local");
-          const arr = raw ? JSON.parse(raw) : [];
-
-          const toSave = {
-            id: Date.now().toString(),
-            name: route.name || "Ruta sin nombre",
-            description: route.description || "",
-            rating: Number(route.rating) || 1,
-            points: route.points || [],
-            createdAt: new Date().toISOString()
-          };
-
-          arr.push(toSave);
-
-          localStorage.setItem("savedRoutes_local", JSON.stringify(arr));
-          setStore({ savedRoutes: arr });
-        } catch {}
-      },
-
-      loadSavedRoutesLocal: () => {
-        try {
-          const raw = localStorage.getItem("savedRoutes_local");
-          let arr = raw ? JSON.parse(raw) : [];
-
-          arr = arr.map(r => ({
-            ...r,
-            rating: Number(r.rating) || 1,
-            createdAt: r.createdAt || new Date().toISOString()
-          }));
-
-          setStore({ savedRoutes: arr });
-        } catch {
-          setStore({ savedRoutes: [] });
-        }
-      },
-
-      deleteSavedRouteLocal: (id) => {
-        try {
-          const raw = localStorage.getItem("savedRoutes_local");
-          const arr = raw ? JSON.parse(raw) : [];
-          const filtered = arr.filter(r => r.id !== id);
-          localStorage.setItem("savedRoutes_local", JSON.stringify(filtered));
-          setStore({ savedRoutes: filtered });
-        } catch {}
-      },
-
-      // ============================================================
-      // ROUTE CREATION
-      // ============================================================
-      addPointToRoute: (lat, lng) => {
-        const store = getStore();
-        const points = Array.isArray(store.selectedPoints) ? [...store.selectedPoints] : [];
-        points.push({ lat, lng, createdAt: new Date().toISOString() });
-        setStore({ selectedPoints: points });
-      },
-
-      clearSelectedPoints: () => {
-        setStore({ selectedPoints: [], currentRouteMeta: null });
       },
 
       // ============================================================
@@ -382,7 +498,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
         const point = {
           lat: lat + (Math.random() - 0.5) * 0.002,
-          lng: lng + (Math.random() - 0.5) * 0.002
+          lng: lng + (Math.random() - 0.5) * 0.002,
         };
 
         setStore({ missionPoint: point });
@@ -411,15 +527,14 @@ const getState = ({ getStore, getActions, setStore }) => {
           if (totalMissions > 0 && completedNow >= totalMissions) {
             setStore({ showPremiumPopup: true });
           }
-
         } catch {}
 
         setStore({
           activeMission: null,
-          missionPoint: null
+          missionPoint: null,
         });
-      }
-    }
+      },
+    },
   };
 };
 

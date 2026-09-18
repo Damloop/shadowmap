@@ -13,10 +13,10 @@ from src.api.routes_places import places_api
 from src.api.routes_pois import pois_api
 from src.api.routes_premium import premium_api
 from src.api.routes_routes import routes_api
-from src.api.routes_favorites import favorites_api
+
 from src.api.routes_recover import recover_bp
 from src.api.routes_reset_password import reset_bp
-from src.api.routes_health import health_api
+
 
 
 def create_app():
@@ -34,7 +34,7 @@ def create_app():
     mail.init_app(app)
 
     # CORS GLOBAL (SOLUCIÓN FINAL)
-    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     # BLUEPRINTS
     app.register_blueprint(auth_api, url_prefix="/api")
@@ -42,10 +42,10 @@ def create_app():
     app.register_blueprint(pois_api, url_prefix="/api")
     app.register_blueprint(premium_api, url_prefix="/api")
     app.register_blueprint(routes_api, url_prefix="/api")
-    app.register_blueprint(favorites_api, url_prefix="/api")
+    
     app.register_blueprint(recover_bp, url_prefix="/api")
     app.register_blueprint(reset_bp, url_prefix="/api")
-    app.register_blueprint(health_api, url_prefix="/api")
+    
 
     # ERRORS
     @app.errorhandler(404)

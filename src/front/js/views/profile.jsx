@@ -23,10 +23,12 @@ const Profile = () => {
     const premiumLevel = sessionStorage.getItem("premiumLevel");
     const premiumNick = sessionStorage.getItem("premiumNick");
 
+    // 🔥 Cargar usuario real desde backend
     useEffect(() => {
-        actions.syncTokenFromSessionStore();
+        actions.getMe();
     }, []);
 
+    // Mantener sincronizado token/usuario si refrescas
     useEffect(() => {
         if (!store.user) {
             const saved = localStorage.getItem("user");
@@ -34,6 +36,7 @@ const Profile = () => {
         }
     }, [store.user]);
 
+    // Misiones completadas
     useEffect(() => {
         try {
             const raw = localStorage.getItem(COMPLETED_KEY);
@@ -112,6 +115,7 @@ const Profile = () => {
     return (
         <div className="profile-container">
 
+            {/* SIDEBAR */}
             <aside className="sidebar">
                 <div className="sidebar-logo-mini">SHADOWMAP</div>
 
@@ -165,8 +169,10 @@ const Profile = () => {
                 </button>
             </aside>
 
+            {/* MAIN */}
             <main className="profile-main">
 
+                {/* TARJETA DE PERFIL */}
                 <div className="profile-card">
                     <div className="profile-avatar-wrapper">
                         <img src={avatarInfo?.src} alt="avatar" className="profile-avatar" />
@@ -175,12 +181,10 @@ const Profile = () => {
                     <div className="profile-info">
                         <h2>{shortname}</h2>
 
-                        {/* ⭐ BADGE PREMIUM */}
                         {is_premium && (
                             <span className="premium-badge">⭐ Cuenta Premium</span>
                         )}
 
-                        {/* ⭐ BOTÓN ACTIVAR PREMIUM */}
                         {!is_premium && (
                             <button
                                 className="premium-btn"
@@ -209,6 +213,7 @@ const Profile = () => {
                     </div>
                 </div>
 
+                {/* CARRUSEL DE MISIONES */}
                 <div className="mission-section">
                     <MissionCarousel
                         missions={[
@@ -220,6 +225,7 @@ const Profile = () => {
                     />
                 </div>
 
+                {/* MODAL DE MISIÓN */}
                 {selectedMission && (
                     <div className="mission-modal">
                         <div className="mission-modal-content">
@@ -243,6 +249,7 @@ const Profile = () => {
                     </div>
                 )}
 
+                {/* LISTA DE TODAS LAS MISIONES */}
                 <section className="profile-missions" style={{ marginTop: 18 }}>
                     <h3>Todas las misiones</h3>
                     <div className="saved-routes-list">

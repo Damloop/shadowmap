@@ -38,20 +38,34 @@ const Register = () => {
       return;
     }
 
-    const resp = await fetch(`${API_URL}/api/register`, {
+    // 🔥 CORREGIDO: ruta correcta del backend
+    const resp = await fetch(`${API_URL}/api/auth/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form)
+
+      // 🔥 CORREGIDO: enviar solo lo que el backend espera
+      body: JSON.stringify({
+        shortname: form.shortname,
+        email: form.email,
+        password: form.password,
+        avatar: form.avatar
+      })
     });
 
     const data = await resp.json();
 
-    if (!resp.ok) {
+    // 🔥 CORREGIDO: validar token y errores
+    if (!resp.ok || !data.token) {
       setError(data.msg || "Error al crear la cuenta");
       return;
     }
 
-    navigate("/login");
+    // 🔥 CORREGIDO: guardar token y usuario igual que login
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+
+    // 🔥 CORREGIDO: redirigir al perfil directamente
+    navigate("/profile");
   };
 
   return (
